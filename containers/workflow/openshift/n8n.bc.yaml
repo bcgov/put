@@ -1,12 +1,12 @@
 ---
 kind: Template
-apiVersion: v1
+apiVersion: template.openshift.io/v1
 labels:
   app: n8n
   build: "${NAME}"
   template: "${NAME}-bc-template"
 metadata:
-  name: "${NAME}"
+  name: n8n-build
 objects:
   - kind: ImageStream
     apiVersion: v1
@@ -32,17 +32,23 @@ objects:
       postCommit: {}
       resources:
         limits:
-          cpu: 0
-          memory: 0
+          cpu: 2000m
+          memory: 2Gi
         requests:
-          cpu: 0
-          memory: 0
+          cpu: 1000m
+          memory: 1Gi
       runPolicy: SerialLatestOnly
       source:
         dockerfile: |
           FROM BuildConfig
+          ARG N8N_VERSION
           ENV HOME=/opt/app-root/src \
               TZ=America/Vancouver
+          USER root
+          RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+          RUN yum install -y GraphicsMagick
+          RUN curl https://downloads-openshift-console.apps.golddr.devops.gov.bc.ca/amd64/linux/oc.tar --output oc.tar
+          RUN tar xC /usr/bin -f oc.tar
           RUN mkdir -p $HOME
           WORKDIR $HOME
           RUN npm install -g n8n
@@ -51,13 +57,17 @@ objects:
           VOLUME [ "/data" ]
           WORKDIR /data
           EXPOSE 5678/tcp
+          USER 1001
           CMD ["n8n"]
         type: Dockerfile
       strategy:
         dockerStrategy:
+          buildArgs:
+            - name: N8N_VERSION
+              value: "${VERSION}"
           from:
             kind: DockerImage
-            name: registry.access.redhat.com/ubi8/nodejs-14:latest
+            name: "artifacts.developer.gov.bc.ca/redhat-docker-remote/ubi8/nodejs-16:${VERSION}"
         type: Docker
       triggers:
         - type: ConfigChange
@@ -67,6 +77,11 @@ parameters:
     description: The name assigned to all of the objects defined in this template.
     required: true
     value: n8n
+  - name: N8N_VERSION
+    displayName: N8N Version
+    description: Version of N8N to use
+    required: true
+    value: latest
   - name: VERSION
     displayName: Image version tag
     description: The version tag of the built image
