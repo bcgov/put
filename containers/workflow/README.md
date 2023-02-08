@@ -1,37 +1,38 @@
 # N8N
 
-This folder contains the OpenShift templates required in order to build and deploy an instance of N8N onto OpenShift. These templates were designed with the assumption that you will be building and deploying the N8N application within the same project. We will be running with the assumption that this N8N instance will be co-located in the same project as the database it is expecting to poll from.
+This folder contains the OpenShift templates required in order to build and deploy an instance of N8N onto OpenShift. These templates were designed with the assumption that you will be building and deploying the N8N application within the same project. 
 
 ## Build N8N
 
 You are supposed to build your n8n image in your <..>-tools namespace and then when you deploy you'll re-use that image.
 
-While N8N does provide a Docker image [here](https://hub.docker.com/r/n8nio/n8n), it is not compatible with OpenShift due to the image assuming it has root privileges. Instead, we build a simple NodeJS image based off Redhat's ubi8/nodejs-12 image where the N8N application can execute without needing privilege escalation. In order to build a N8N image in your project, process and create the build config template using the following command (replace anything in angle brackets with the correct value):
+While N8N does provide a Docker image [here](https://hub.docker.com/r/n8nio/n8n), it is not compatible with OpenShift due to the image assuming it has root privileges. Instead, we build a simple NodeJS image based off Redhat's ubi8/nodejs-16 image where the N8N application can execute without needing privilege escalation. In order to build a N8N image in your project, process and create the build config template using the following command  (replace anything with your correct values):
 
 ```sh
-oc process -n $NAMESPACE -f n8n.bc.yaml -p N8N_VERSION=$N8N_VERSION N8N_IMAGE_NAMESPACE=$N8N_IMAGE_NAMESPACE -o yaml | oc apply -n $NAMESPACE -f -
+export NAME=n8n
+export N8N_IMAGE_NAMESPACE=bf5ef6-tools
+export N8N_VERSION=0.195.0
 
-export NAMESPACE=a0ec71-test
-export N8N_IMAGE_NAMESPACE=a0ec71-tools
-export N8N_VERSION=0.131.0
-
-oc process -n $NAMESPACE -f n8n.bc.yaml -p N8N_VERSION=$N8N_VERSION -p N8N_IMAGE_NAMESPACE=$N8N_IMAGE_NAMESPACE -o yaml | oc apply -n $NAMESPACE -f -
+oc process -n $N8N_IMAGE_NAMESPACE -f n8n.bc.yaml -p NAME=$NAME N8N_VERSION=$N8N_VERSION N8N_IMAGE_NAMESPACE=$N8N_IMAGE_NAMESPACE -o yaml | oc apply -n $N8N_IMAGE_NAMESPACE -f -
 
 ```
 
-This will create an ImageStream called `n8n`. This image is built on top of ubi8/nodejs-12, and will have N8N installed on it.
+This will create an ImageStream called `n8n`. This image is built on top of ubi8/nodejs-16, and will have N8N installed on it.
 
 ## Deploy N8N
 
-Once your N8N image has been successfully built, you can then deploy it in your project by using the following command (replace anything in angle brackets with the correct value):
+Once your N8N image has been successfully built, you can then deploy it in your project by using the following command (replace anything with your correct values):
 
 ```sh
-export NAMESPACE=a0ec71-dev
-export N8N_IMAGE_NAMESPACE=a0ec71-tools
-oc process -n $NAMESPACE -f n8n.dc.yaml NAMESPACE=$NAMESPACE -o yaml | oc apply -n $NAMESPACE -f -
+export NAME=n8n
+export NAMESPACE=bf5ef6-dev
+export N8N_IMAGE_NAMESPACE=bf5ef6-tools
+
+oc process -n $NAMESPACE -f n8n.dc.yaml -p NAME=$NAME NAMESPACE=$NAMESPACE N8N_IMAGE_NAMESPACE=$N8N_IMAGE_NAMESPACE -o yaml | oc apply -n $NAMESPACE -f -
 ```
 
 This will create a new Secret, Service, Route, Persistent Volume Claim, and Deployment Configuration. This Deployment Config has liveliness and readiness checks built in, and handles image updates via Recreation strategy.
+It will also install, connect and configure Postgresql and Redis.
 
 ## Initial Setup
 
