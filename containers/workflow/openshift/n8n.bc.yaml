@@ -2,88 +2,132 @@
 kind: Template
 apiVersion: template.openshift.io/v1
 labels:
-  app: n8n
+  app: "${NAME}"
   build: "${NAME}"
   template: "${NAME}-bc-template"
 metadata:
-  name: n8n-build
+  name: n8n-bc
 objects:
   - kind: ImageStream
-    apiVersion: v1
+    apiVersion: image.openshift.io/v1
     metadata:
       name: "${NAME}"
+      namespace: "${N8N_IMAGE_NAMESPACE}"
     spec:
       lookupPolicy:
         local: false
   - kind: BuildConfig
-    apiVersion: v1
+    apiVersion: build.openshift.io/v1
     metadata:
       name: "${NAME}"
+      namespace: "${N8N_IMAGE_NAMESPACE}"
       labels:
+        app: "${NAME}"
+        build: "${NAME}"
         buildconfig: "${NAME}"
     spec:
-      completionDeadlineSeconds: 600
-      failedBuildsHistoryLimit: 3
-      successfulBuildsHistoryLimit: 3
+      nodeSelector: null
       output:
         to:
           kind: ImageStreamTag
-          name: "${NAME}:${VERSION}"
-      postCommit: {}
+          name: "${NAME}:latest"
       resources:
         limits:
-          cpu: 2000m
-          memory: 2Gi
-        requests:
-          cpu: 1000m
+          cpu: '1'
           memory: 1Gi
-      runPolicy: SerialLatestOnly
-      source:
-        dockerfile: |
-          FROM BuildConfig
-          ARG N8N_VERSION
-          ENV HOME=/opt/app-root/src \
-              TZ=America/Vancouver
-          USER root
-          RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-          RUN yum install -y GraphicsMagick
-          RUN curl https://downloads-openshift-console.apps.golddr.devops.gov.bc.ca/amd64/linux/oc.tar --output oc.tar
-          RUN tar xC /usr/bin -f oc.tar
-          RUN mkdir -p $HOME
-          WORKDIR $HOME
-          RUN npm install -g n8n
-          ENV PATH ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-          VOLUME ${HOME}
-          VOLUME [ "/data" ]
-          WORKDIR /data
-          EXPOSE 5678/tcp
-          USER 1001
-          CMD ["n8n"]
-        type: Dockerfile
+        requests:
+          cpu: 500m
+          memory: 512Mi
+      successfulBuildsHistoryLimit: 3
+      failedBuildsHistoryLimit: 3
+      completionDeadlineSeconds: 600
       strategy:
+        type: Docker
         dockerStrategy:
-          buildArgs:
-            - name: N8N_VERSION
-              value: "${VERSION}"
           from:
             kind: DockerImage
-            name: "artifacts.developer.gov.bc.ca/redhat-docker-remote/ubi8/nodejs-16:${VERSION}"
-        type: Docker
+            name: >-
+              artifacts.developer.gov.bc.ca/redhat-docker-remote/ubi8/nodejs-16:latest
+          env:
+            - name: N8N_VERSION
+              value: "${N8N_VERSION}"
+      postCommit: {}
+      source:
+        type: Dockerfile
+        dockerfile: >-
+          FROM BuildConfig
+
+          ARG N8N_VERSION
+
+          RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is
+          missing!" ; exit 1; fi
+
+          ENV N8N_VERSION=$N8N_VERSION
+
+          ENV HOME=/opt/app-root/src \
+              TZ=America/Vancouver
+
+          USER root
+
+          RUN rpm -ivh
+          https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
+          RUN yum update -y
+
+          RUN yum install -y GraphicsMagick gcc-c++ make
+
+          RUN yum clean all
+
+          RUN curl
+          https://downloads-openshift-console.apps.gold.devops.gov.bc.ca/amd64/linux/oc.tar
+          --output oc.tar
+
+          RUN tar -xvf oc.tar
+
+          RUN cp oc /usr/bin
+
+          RUN rm oc.tar oc
+
+          RUN mkdir -p $HOME
+
+          WORKDIR $HOME
+
+          RUN chgrp -R 0 $HOME && \
+              chmod -R g=u $HOME
+          RUN chown -R 1001:0 $HOME
+
+          RUN chmod -R 775 $HOME
+
+          USER 1001
+
+          RUN chown -R 1001:0 $HOME
+
+          ENV PATH
+          ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+
+          RUN npm_config_user=1001 npm install -g npm@8.19.2 n8n@$N8N_VERSION
+
+          WORKDIR /data
+
+          EXPOSE 5678/tcp
+
+          CMD "n8n"
       triggers:
         - type: ConfigChange
+      runPolicy: SerialLatestOnly
 parameters:
   - name: NAME
     displayName: Name
     description: The name assigned to all of the objects defined in this template.
     required: true
     value: n8n
+  - name: N8N_IMAGE_NAMESPACE
+    displayName: N8N Image Namespace
+    description: The namespace where the N8N image is stored.
+    required: true
+    value: bf5ef6-tools  
   - name: N8N_VERSION
     displayName: N8N Version
-    description: Version of N8N to use
-    required: true
-    value: latest
-  - name: VERSION
-    displayName: Image version tag
-    description: The version tag of the built image
-    required: true
-    value: latest
+    description: The version tag of the N8N NPM Module, leave blank for latest.
+    required: false
+    value: 0.195.0
