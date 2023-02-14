@@ -62,8 +62,6 @@ objects:
           RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is
           missing!" ; exit 1; fi
 
-          ENV N8N_VERSION=$N8N_VERSION
-
           ENV HOME=/opt/app-root/src \
               TZ=America/Vancouver
 
@@ -88,24 +86,30 @@ objects:
 
           RUN rm oc.tar oc
 
+
+          RUN npm install -g npm
+
+
           RUN mkdir -p $HOME
 
           WORKDIR $HOME
 
+
+          ENV PATH
+          ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+
+          RUN npm install -g n8n
+
+
           RUN chgrp -R 0 $HOME && \
               chmod -R g=u $HOME
+
           RUN chown -R 1001:0 $HOME
 
           RUN chmod -R 775 $HOME
 
           USER 1001
 
-          RUN chown -R 1001:0 $HOME
-
-          ENV PATH
-          ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-
-          RUN npm_config_user=1001 npm install -g npm@8.19.2 n8n@$N8N_VERSION
 
           WORKDIR /data
 
@@ -126,8 +130,3 @@ parameters:
     description: The namespace where the N8N image is stored.
     required: true
     value: bf5ef6-tools  
-  - name: N8N_VERSION
-    displayName: N8N Version
-    description: The version tag of the N8N NPM Module, leave blank for latest.
-    required: false
-    value: 0.195.0
