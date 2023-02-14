@@ -1,0 +1,184 @@
+{
+  "active": false,
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RocketChat": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "RocketChat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-08T06:08:46.285Z",
+  "id": "3",
+  "name": "Artifactory Basic Health Check",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "02298cbf-bd88-46a1-a865-1c8ca218241f",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://artifacts.developer.gov.bc.ca/router/api/v1/system/health",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "04274721-7408-4823-ad12-16524760ee54",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json[\"router\"][\"message\"] }}",
+              "operation": "contains",
+              "value2": "OK"
+            }
+          ]
+        }
+      },
+      "id": "cb2dbfce-8389-452d-97ff-6e239d54914d",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3cf820df-a75c-49fe-bef0-3cbbecc0627e",
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "channel": "#cypress",
+        "text": "={{$node[\"Send Email\"].parameter[\"text\"]}}",
+        "options": {},
+        "attachments": []
+      },
+      "id": "e89fb3aa-e927-436a-a711-a125ab263984",
+      "name": "RocketChat",
+      "type": "n8n-nodes-base.rocketchat",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        400
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "rocketchatApi": {
+          "id": "4",
+          "name": "Rocket account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@gov.bc.ca",
+        "toEmail": "roland.stens@gov.bc.ca",
+        "subject": "Artifactory Error Found",
+        "text": "=Router:\n{{$node[\"HTTP Request\"].json[\"router\"][\"node_id\"]}}: {{$node[\"HTTP Request\"].json[\"router\"][\"state\"]}}\n\nServices:\n{{$node[\"HTTP Request\"].json[\"services\"][0][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][0][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][1][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][1][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][2][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][2][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][3][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][3][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][4][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][4][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][5][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][5][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][6][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][6][\"state\"]}}",
+        "options": {}
+      },
+      "id": "ec7605be-bd63-45e9-80cd-fd17e4fade29",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        920,
+        400
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-02-10T18:21:13.552Z",
+  "versionId": "459f9caf-d8ed-4f83-adbe-3b5680aa585d"
+}
