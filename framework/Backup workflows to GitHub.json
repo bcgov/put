@@ -1,0 +1,468 @@
+{
+  "active": false,
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Create file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "GitHub Edit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Files": {
+      "main": [
+        [
+          {
+            "node": "Download Raw Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "transform": {
+      "main": [
+        [
+          {
+            "node": "Get workflow data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get workflows": {
+      "main": [
+        [
+          {
+            "node": "transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily at 23:59": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get workflow data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Raw Content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Get workflows",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Create file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-14T05:28:28.752Z",
+  "id": "10",
+  "name": "Backup workflows to GitHub",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": "={{ $node.Set.json.repoOwner }}",
+        "repository": "={{ $node.Set.json.repoName }}",
+        "filePath": "=framework/{{ $json.name }}.json",
+        "fileContent": "={{ JSON.stringify($(\"Merge1\").all(\"\", 0, $runIndex-1)) }}",
+        "commitMessage": "=[N8N Backup] {{ $json.name }} ({{new Date(Date.now()).toLocaleDateString()}}) "
+      },
+      "name": "GitHub Edit",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1580,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "421ac8cb-fb1a-4216-b7e5-f67d7e86c342",
+      "credentials": {
+        "githubApi": {
+          "id": "6",
+          "name": "GitHub PUT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "owner": "={{ $json.repoOwner }}",
+        "repository": "={{ $json.repoName }}",
+        "filePath": "/framework",
+        "asBinaryProperty": false,
+        "additionalParameters": {}
+      },
+      "name": "Get Files",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        600,
+        440
+      ],
+      "executeOnce": true,
+      "typeVersion": 1,
+      "alwaysOutputData": false,
+      "id": "eadd907e-4c6c-4598-9934-d03713df0c78",
+      "credentials": {
+        "githubApi": {
+          "id": "6",
+          "name": "GitHub PUT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": "={{ $node.Set.json.repoOwner }}",
+        "repository": "={{ $node.Set.json.repoName }}",
+        "filePath": "=framework/{{ $json.name }}.json",
+        "fileContent": "={{ JSON.stringify($(\"Merge\").all(\"\", 0, $runIndex-1) )}}",
+        "commitMessage": "=[N8N Backup] {{ $json.name }}.json ({{new Date(Date.now()).toLocaleDateString()}})"
+      },
+      "name": "Create file",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1640,
+        220
+      ],
+      "typeVersion": 1,
+      "id": "df1b132e-04c7-4142-8654-df5567fefb8a",
+      "credentials": {
+        "githubApi": {
+          "id": "6",
+          "name": "GitHub PUT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "removeKeyMatches",
+        "propertyName1": "data.name",
+        "propertyName2": "data.name"
+      },
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1330,
+        220
+      ],
+      "typeVersion": 1,
+      "id": "f7482d6c-985c-4679-a88d-d6dfa1996ef8"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/api/v1/workflows",
+        "allowUnauthorizedCerts": true,
+        "options": {
+          "fullResponse": false
+        },
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "name": "Get workflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        600,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "1f600b1b-35b8-40e7-a9ba-f78718e4d93c",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "10",
+          "name": "N8N API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "=https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/api/v1/workflows/{{$json[\"id\"]}}",
+        "options": {}
+      },
+      "name": "Get workflow data",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1000,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "5fb284b5-4bae-48d5-abaa-ce7347dc0def",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "10",
+          "name": "N8N API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "={{$json[\"download_url\"]}}",
+        "responseFormat": "string",
+        "options": {}
+      },
+      "name": "Download Raw Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1000,
+        440
+      ],
+      "typeVersion": 1,
+      "id": "4b4e652f-6aa9-448c-a83d-c53543865ba5",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const newItems = [];\nfor (item of items[0].json.data) {\n  newItems.push({json: item});\n}\nreturn newItems;"
+      },
+      "name": "transform",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        780,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "dc3464b8-2c20-4898-995d-35c3db488cec"
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 23,
+              "minute": 59
+            }
+          ]
+        }
+      },
+      "name": "Daily at 23:59",
+      "type": "n8n-nodes-base.cron",
+      "position": [
+        240,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "044a8561-ea50-468a-8506-e90896396709"
+    },
+    {
+      "parameters": {
+        "mode": "removeKeyMatches",
+        "propertyName1": "data.updatedAt",
+        "propertyName2": "data.updatedAt"
+      },
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1370,
+        550
+      ],
+      "typeVersion": 1,
+      "id": "249eb1d3-8c93-433a-97ea-3042125fca48"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "repoOwner",
+              "value": "bcgov"
+            },
+            {
+              "name": "repoName",
+              "value": "put"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d64157f4-8b43-45c0-b2c0-c0311e45d9c2",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        420,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "command": "rm -r -f backups\nn8n export:workflow --backup --output=/data/backups/latest/\nls -l /data/backups/latest/\ncd /data/backups/latest/\ncat 1.json\n"
+      },
+      "id": "fd91972c-0fba-4fc9-a9d1-21448fd9115a",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        480,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "/data/backups/latest/1.json"
+      },
+      "id": "4a90b4eb-7b98-44d4-a864-dc702751a63c",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        700,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "keepSource": true
+        }
+      },
+      "id": "050beb62-41b3-4a21-99ed-7486aa3f6020",
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        920,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": "=bcgov",
+        "repository": "=put",
+        "filePath": "=framework/{{ $json.name }}.json",
+        "fileContent": "={{$(\"Move Binary Data\").item.binary.data}}",
+        "commitMessage": "=[N8N Backup] {{ $json.name }}.json ({{new Date(Date.now()).toLocaleDateString()}})"
+      },
+      "name": "Create file1",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1200,
+        20
+      ],
+      "typeVersion": 1,
+      "id": "74b97149-0cd3-4e4f-9eda-19199e7bfb70",
+      "credentials": {
+        "githubApi": {
+          "id": "6",
+          "name": "GitHub PUT"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-02-14T08:31:50.067Z",
+  "versionId": "f3e469e1-408e-404e-bef9-09ed2c390958"
+}
