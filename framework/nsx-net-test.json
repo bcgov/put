@@ -1,0 +1,183 @@
+{
+  "active": false,
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OC Login": {
+      "main": [
+        [
+          {
+            "node": "Run Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Git",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Test": {
+      "main": [
+        [
+          {
+            "node": "Clean Repo Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Git": {
+      "main": [
+        [
+          {
+            "node": "OC Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-09T09:17:30.381Z",
+  "id": "8",
+  "name": "nsx-net-test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "acf525bc-0102-4963-8e2c-94c0f20f0ba1",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "nameSpace",
+              "value": "ce9012"
+            },
+            {
+              "name": "osToken"
+            },
+            {
+              "name": "serverUrl",
+              "value": "=https://api.{{$parameter[\"values\"][\"string\"][3][\"value\"]}}.devops.gov.bc.ca:6443"
+            },
+            {
+              "name": "clusterName",
+              "value": "klab2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e7f5b098-30d8-44eb-bfeb-b93764b691c7",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=oc login --token={{$node[\"Set\"].json[\"osToken\"]}}  --server={{$node[\"Set\"].json[\"serverUrl\"]}}"
+      },
+      "id": "2d25f646-de3c-4a48-b4ab-f02ae2f426ec",
+      "name": "OC Login",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=cd /data/platform-tools/nsx-net-test\n\nP={{$node[\"Set\"].parameter[\"values\"][\"string\"][0][\"value\"]}}\nfor N in tools dev test prod; do\n  oc -n \"${P}-${N}\" delete all,cm,netpol,rolebindings,secrets,sa,policy -l advsol-app=nsx-net-test\ndone\noc process -f app.yaml -p PROJECT={{$node[\"Set\"].parameter[\"values\"][\"string\"][0][\"value\"]}}| oc apply -f -\noc process -f run-test.yaml -p PROJECT={{$node[\"Set\"].parameter[\"values\"][\"string\"][0][\"value\"]}}ce9012 -p CLUSTER={{$node[\"Set\"].parameter[\"values\"][\"string\"][3][\"value\"]}} | oc create -f -"
+      },
+      "id": "add505c3-a395-4097-ab27-c17dcb753f2a",
+      "name": "Run Test",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "rm -rf platform-tools\n\n\n\n"
+      },
+      "id": "8c313f49-1929-4e43-9378-4d34a858f97d",
+      "name": "Clean Repo Files",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "gitPassword",
+        "operation": "clone",
+        "repositoryPath": "/data/platform-tools",
+        "sourceRepository": "https://github.com/bcgov-c/platform-tools.git"
+      },
+      "id": "7a0ca881-f135-4e3a-b524-29bcf5e1cc93",
+      "name": "Git",
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        300
+      ],
+      "credentials": {
+        "gitPassword": {
+          "id": "7",
+          "name": "Git BCGOV"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-02-09T09:22:16.563Z",
+      "updatedAt": "2023-02-09T09:22:16.563Z",
+      "id": "2",
+      "name": "Platform"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-02-11T01:25:53.339Z",
+  "versionId": "16ba9911-8d3a-4181-b839-b8955f079547"
+}
