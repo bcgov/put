@@ -1,0 +1,423 @@
+{
+  "active": true,
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "General Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "General Parameters": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OC Login": {
+      "main": [
+        [
+          {
+            "node": "Vault health check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OC Logout": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vault health check": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "OC Logout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "OC Logout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "General Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "OC Login",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-15T09:21:02.688Z",
+  "id": "12",
+  "name": "Vault Check",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1342ac77-21b2-4f48-be8b-928f77c6ba7f",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "token",
+              "value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImgyTm1OX2pKSXVPOUNJNzE5RlNnVHBWVEZ5MFRJc3FqbGxGSV83QUxJTmcifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJiZjVlZjYtdG9vbHMiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiZ2l0aHViLWNpY2QtdG9rZW4tOW1iYjciLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZ2l0aHViLWNpY2QiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI4MjU5ZTY0MC1hYzBmLTRiMWEtYjA5MC02MmE3NWRjMDM0Y2MiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6YmY1ZWY2LXRvb2xzOmdpdGh1Yi1jaWNkIn0.SCiJDGkxDe-86zH0TaL0NePVT83ah5Z2gg4uwEuY3bF0NP1H5zYfa8KkYzHAFD9UFrrS0OpcQNJAPjv3Ujr7fsUjnBKxzCUI_5XBqO9RMxrUPicfLGzrF1cbEv3QpY4n3j7QoJBsufk2_vnuX8bKxmRWidkm8IxH6zrGoRxf4VKGLGhOGg4zUQAjo3T-AOtDgyqWoEUFy32tbIUnCzxZSqyGvcDQGIzeXX1nAu406Y2HTdfTFvkfkbu536CPSEPLXz9hMFo5E_Y-HsokqcHaXnvhYBmcQnOD3MLH1HO-lGkowG6zYMC0wIUkpLeJkCJI1594f3dxNpr4rAV95_B29A"
+            },
+            {
+              "name": "serverUrl",
+              "value": "https://api.gold.devops.gov.bc.ca:6443"
+            },
+            {
+              "name": "nameSpace",
+              "value": "bf5ef6-dev"
+            },
+            {
+              "name": "eMail",
+              "value": "roland.stens@gmail.com"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "6ceba2f4-c168-478f-ab84-b6e91bb488dd",
+      "name": "General Parameters",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=oc login --token={{$node[\"General Parameters\"].json[\"token\"]}} --server={{$node[\"General Parameters\"].json[\"serverUrl\"]}}"
+      },
+      "id": "98bbfb10-d1ae-4e57-98a1-12fb70c2cfd3",
+      "name": "OC Login",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        160,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "command": "oc scale deployment/vault-test --replicas=0\noc logout"
+      },
+      "id": "81af0e70-55e5-4f81-b31e-ba8b799c530b",
+      "name": "OC Logout",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3cb41cec-6831-4e46-b9c9-9817f7b094d8",
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=oc project {{ $node[\"General Parameters\"].json.nameSpace }}\noc scale deployment/vault-test --replicas=0\nsleep 20\noc scale deployment/vault-test --replicas=1\nsleep 20\noc rsh $(oc get pods -o name --selector app=vault-test) cat /vault/secrets/helloworld > test.txt\n "
+      },
+      "id": "a507c191-5696-4b29-acb5-56d1f7f1440f",
+      "name": "Vault health check",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        340,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "/data/test.txt"
+      },
+      "id": "e9e73508-62ae-4560-a31a-d39c4356eda0",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        520,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.data }}",
+              "operation": "contains",
+              "value2": "world"
+            }
+          ]
+        }
+      },
+      "id": "bbdbe52e-f999-4486-8675-23bac1ac76c0",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        700,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "sourceKey": "=data",
+        "options": {}
+      },
+      "id": "ab1424f8-d09b-4c55-a486-a63cbe0a4710",
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        700,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@gov.bc.ca",
+        "toEmail": "={{ $node[\"General Parameters\"].json.eMail }}",
+        "subject": "Vault Failure",
+        "text": "=Vault is not operational in {{ $node[\"General Parameters\"].parameter[\"values\"][\"string\"][2][\"value\"] }}.",
+        "options": {}
+      },
+      "id": "dbabfa56-9d1d-46c9-8dbb-bf08d33c57d2",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        880,
+        60
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Test if Vault Pod is working",
+        "height": 390,
+        "width": 532
+      },
+      "id": "24335933-3d33-4504-a6eb-366165104794",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        312,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "ec13c708-28d5-4120-8d9a-e7d9de49e8f9",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://vault.developer.gov.bc.ca/v1/sys/health",
+        "options": {}
+      },
+      "id": "9cd5fd5b-6a6b-4849-84b8-87317f7b1280",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        340,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.initialized }}",
+              "value2": "={{ true }}"
+            }
+          ]
+        }
+      },
+      "id": "86a3ad33-f80f-419a-817f-cb53c0dd9ff7",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        500,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Check Vault Server",
+        "height": 206,
+        "width": 365
+      },
+      "id": "939788fc-8518-47ab-9d7d-d5e55075e23e",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        300,
+        -81
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-02-09T09:22:16.563Z",
+      "updatedAt": "2023-02-09T09:22:16.563Z",
+      "id": "2",
+      "name": "Platform"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-02-15T10:11:22.539Z",
+  "versionId": "6b134ccc-00e2-449f-bd06-28d067f322ee"
+}
