@@ -1,6 +1,34 @@
-      FROM n8nio/n8n:0.195.0
+      FROM registry.access.redhat.com/ubi8/nodejs-16:latest
+      ENV HOME=/opt/app-root/src \
+            TZ=America/Vancouver
 
-      RUN apk add shadow-uidmap imagemagick curl tar
+      USER root
+
+      RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
+      RUN yum update -y
+
+      RUN yum install -y GraphicsMagick gcc-c++ make
+
+      RUN yum clean all
+
       RUN curl https://downloads-openshift-console.apps.gold.devops.gov.bc.ca/amd64/linux/oc.tar --output oc.tar
-      RUN tar xC /bin -f oc.tar
-      CMD ["n8n"]
+      RUN tar -xvf oc.tar
+      RUN cp oc /usr/bin
+      RUN rm oc.tar oc
+
+      RUN npm install -g npm
+
+      RUN mkdir -p $HOME
+
+      WORKDIR $HOME
+
+      ENV PATH ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+
+      RUN npm install -g n8n
+
+      WORKDIR /data
+
+      EXPOSE 5678/tcp
+
+      CMD "n8n"
