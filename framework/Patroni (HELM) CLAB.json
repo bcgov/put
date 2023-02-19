@@ -1,0 +1,108 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "OC Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OC Login": {
+      "main": [
+        [
+          {
+            "node": "Set Port Forward",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Port Forward": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-19T08:37:17.480Z",
+  "id": "14",
+  "name": "Patroni (HELM) CLAB",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "61576b2e-b545-4738-adb1-ef7fd48eaf37",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "command": "oc login --token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjZrWi1WX0RUSTc5eGljUmlXbzlaUmVRanpNNkRLVE5YcUNQbHZPeEJOUTgifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJlMzFiNmItZGV2Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InJlbW90ZS1leGVjdXRpb24tdG9rZW4tZ210NWYiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoicmVtb3RlLWV4ZWN1dGlvbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjVhMzUzZDc2LWEzNTMtNDczMC1iZjRhLTlmNGY0ODlmOGFjMiIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDplMzFiNmItZGV2OnJlbW90ZS1leGVjdXRpb24ifQ.SnmtR8N_Du6xd6tSk0JyZuvbWK_BP_N5uCwl3cojN9-IIlqGAyXQyp9tYmd0dOwjDnXcyncMZw7Gk9uS_WGggqINjvpQ2RS0Y1wWNxco58pk0IH3tLgltHa6tmBZvV5L5hXGMnHYdiKBEU4Ht7_uhLsG1p7LsYufCkS5_7h0rBH8UltbEJJQqSbXm8hsYt7IUWCXEPEbpo8aGbqOk1ddkM-MTXhPnLK2zfMHsdqZkljY4R_tWraFUWW9U33Ts9cJv-Y3QVDLy0EgbByFAR1dqdslbLJD85TCHqrIJyifQR94sU7RyZLxM0AsmW0KuxuR00cRcvn-jJxsv-hKqdZx7w --server=https://api.clab.devops.gov.bc.ca:6443"
+      },
+      "id": "e1b672c7-bb08-4d71-b3f5-31ba967d8cb9",
+      "name": "OC Login",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        500,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "command": "export PODNAME=$(oc get pods --namespace e31b6b-dev -l \"app.kubernetes.io/name=patroni,app.kubernetes.io/instance=test-patroni-instance\" -o jsonpath=\"{.items[0].metadata.name}\") \n\nexport CONTAINERPORT=$(oc get pod --namespace e31b6b-dev $PODNAME -o jsonpath=\"{.spec.containers[0].ports[0].containerPort}\")  \n\necho $PODNAME\necho $CONTAINERPORT\n\nnohup oc --namespace e31b6b-dev port-forward $PODNAME 8432:$CONTAINER_PORT > /dev/null 2>&1 & "
+      },
+      "id": "9349cfc2-dddc-4601-9f0e-cd0365476b91",
+      "name": "Set Port Forward",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        720,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  commit;  \n\nselect count(*) from lat_longs;\n\nselect * from lat_longs;\n\ndrop table lat_longs;",
+        "additionalFields": {}
+      },
+      "id": "ffb116c2-3044-401d-be77-a8c0b599fa47",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        940,
+        360
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "14",
+          "name": "Postgres account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-02-19T10:00:41.461Z",
+  "versionId": "6b7c1aa6-efd4-4f7e-a4b6-35defcf19ca7"
+}
