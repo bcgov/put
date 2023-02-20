@@ -3099,7 +3099,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 100Mi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -3114,7 +3114,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 100Mi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -3129,7 +3129,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 100Mi
   storageClassName: netapp-block-standard
 ---
 apiVersion: apps/v1
