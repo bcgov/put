@@ -1,0 +1,42 @@
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-crunchydb-ha
+  labels:
+    postgres-operator.crunchydata.com/cluster: hippo
+spec:
+  podSelector:
+    matchLabels:
+      postgres-operator.crunchydata.com/cluster: hippo
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              postgres-operator.crunchydata.com/cluster: hippo
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 8008
+        - protocol: TCP
+          port: 2022
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-crunchydb-monitoring
+  labels:
+    postgres-operator.crunchydata.com/cluster: hippo
+spec:
+  podSelector:
+    matchLabels:
+      postgres-operator.crunchydata.com/cluster: hippo
+  ingress:
+    - from:
+        - namespaceSelector:
+            name: e31b6b
+            environment: tools
+      ports:
+        - protocol: TCP
+          port: 9187
