@@ -159,7 +159,7 @@
       "type": "n8n-nodes-base.start",
       "typeVersion": 1,
       "position": [
-        0,
+        -80,
         -20
       ]
     },
@@ -169,15 +169,15 @@
           "string": [
             {
               "name": "token",
-              "value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImgyTm1OX2pKSXVPOUNJNzE5RlNnVHBWVEZ5MFRJc3FqbGxGSV83QUxJTmcifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJiZjVlZjYtdG9vbHMiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiZ2l0aHViLWNpY2QtdG9rZW4tOW1iYjciLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZ2l0aHViLWNpY2QiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI4MjU5ZTY0MC1hYzBmLTRiMWEtYjA5MC02MmE3NWRjMDM0Y2MiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6YmY1ZWY2LXRvb2xzOmdpdGh1Yi1jaWNkIn0.SCiJDGkxDe-86zH0TaL0NePVT83ah5Z2gg4uwEuY3bF0NP1H5zYfa8KkYzHAFD9UFrrS0OpcQNJAPjv3Ujr7fsUjnBKxzCUI_5XBqO9RMxrUPicfLGzrF1cbEv3QpY4n3j7QoJBsufk2_vnuX8bKxmRWidkm8IxH6zrGoRxf4VKGLGhOGg4zUQAjo3T-AOtDgyqWoEUFy32tbIUnCzxZSqyGvcDQGIzeXX1nAu406Y2HTdfTFvkfkbu536CPSEPLXz9hMFo5E_Y-HsokqcHaXnvhYBmcQnOD3MLH1HO-lGkowG6zYMC0wIUkpLeJkCJI1594f3dxNpr4rAV95_B29A"
+              "value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjZrWi1WX0RUSTc5eGljUmlXbzlaUmVRanpNNkRLVE5YcUNQbHZPeEJOUTgifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkYmZhMGYtZGV2Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InBvc3R1cGRhdGV0ZXN0aW5nLXRva2VuLWZjdG01Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6InBvc3R1cGRhdGV0ZXN0aW5nIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiYTM4YzZiNzQtOTkyNi00NDUyLTg0YmYtOTc0ZjMyZGFhZjA3Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OmRiZmEwZi1kZXY6cG9zdHVwZGF0ZXRlc3RpbmcifQ.SRz4vpsy8nemJf-9VLteX1hkDlZWCdNp-vwFrzi0Fxt_0GQgc7XbQnaQKh5AC2ppwGEMG1i4DK-k7aZ-Se-gLEFsOGSqkB0eC11Sob1727CyLqRPHsbiYcKFcaANuxWG4ouCCQf6wqUPId-2Tx48cp14PRa8jpiCJ4VTMsrluu-QkYn9Axp8CKRubInAtNnAVX-4GKk6jG1InAQYaGqQAPOKhWlivUTv5ULHki0u5yZWtZqLLEefFZDHTWGzns6x1XykjPs4jjPGeipHm1FdnYo9bgCDlOKdx41MXuUZ5zT_TuR8LeMnnkS-lw1NI1xypDAq15vz0j4KOnF8O135Bw"
             },
             {
               "name": "serverUrl",
-              "value": "https://api.gold.devops.gov.bc.ca:6443"
+              "value": "https://api.clab.devops.gov.bc.ca:6443"
             },
             {
               "name": "nameSpace",
-              "value": "bf5ef6-dev"
+              "value": " dbfa0f-dev"
             },
             {
               "name": "eMail",
@@ -213,7 +213,7 @@
     },
     {
       "parameters": {
-        "command": "oc scale deployment/vault-test --replicas=0\noc logout"
+        "command": "#oc scale deployment/vault-test --replicas=0\noc logout"
       },
       "id": "81af0e70-55e5-4f81-b31e-ba8b799c530b",
       "name": "OC Logout",
@@ -397,8 +397,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        300,
-        -81
+        320,
+        -80
       ]
     }
   ],
@@ -418,6 +418,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-02-15T10:11:22.539Z",
-  "versionId": "6b134ccc-00e2-449f-bd06-28d067f322ee"
+  "updatedAt": "2023-02-22T08:57:33.524Z",
+  "versionId": "37272fba-0021-4b68-9fcd-7761c34e243a"
 }
