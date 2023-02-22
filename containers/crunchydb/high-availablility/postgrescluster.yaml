@@ -40,7 +40,7 @@ spec:
     pgbackrest:
       global:
         repo1-retention-full: "2"
-      image: image-registry.openshift-image-registry.svc:5000/e31b6b-dev/crunchy-pgbackrest:ubi8-2.40-1
+      image: image-registry.openshift-image-registry.svc:5000/e31b6b-dev/crunchy-pgbackrest:centos8-2.36-1
       repos:
       - name: repo1
         schedules:
