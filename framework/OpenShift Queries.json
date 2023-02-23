@@ -144,8 +144,7 @@
         "values": {
           "string": [
             {
-              "name": "token",
-              "value": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImgyTm1OX2pKSXVPOUNJNzE5RlNnVHBWVEZ5MFRJc3FqbGxGSV83QUxJTmcifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJiZjVlZjYtdG9vbHMiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiZ2l0aHViLWNpY2QtdG9rZW4tOW1iYjciLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZ2l0aHViLWNpY2QiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI4MjU5ZTY0MC1hYzBmLTRiMWEtYjA5MC02MmE3NWRjMDM0Y2MiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6YmY1ZWY2LXRvb2xzOmdpdGh1Yi1jaWNkIn0.SCiJDGkxDe-86zH0TaL0NePVT83ah5Z2gg4uwEuY3bF0NP1H5zYfa8KkYzHAFD9UFrrS0OpcQNJAPjv3Ujr7fsUjnBKxzCUI_5XBqO9RMxrUPicfLGzrF1cbEv3QpY4n3j7QoJBsufk2_vnuX8bKxmRWidkm8IxH6zrGoRxf4VKGLGhOGg4zUQAjo3T-AOtDgyqWoEUFy32tbIUnCzxZSqyGvcDQGIzeXX1nAu406Y2HTdfTFvkfkbu536CPSEPLXz9hMFo5E_Y-HsokqcHaXnvhYBmcQnOD3MLH1HO-lGkowG6zYMC0wIUkpLeJkCJI1594f3dxNpr4rAV95_B29A"
+              "name": "token"
             },
             {
               "name": "serverUrl",
@@ -212,6 +211,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2023-02-08T01:06:49.272Z",
-  "versionId": "936615de-d4f2-4f0b-97ad-2cb4bf9e6c7f"
+  "updatedAt": "2023-02-23T09:04:19.294Z",
+  "versionId": "0c9774b7-ef29-406e-8634-390074bd9796"
 }
