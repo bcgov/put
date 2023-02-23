@@ -200,7 +200,7 @@
     },
     {
       "parameters": {
-        "command": "=oc login --token={{$node[\"General Parameters\"].json[\"token\"]}} --server={{$node[\"General Parameters\"].json[\"serverUrl\"]}}"
+        "command": "=oc login --token=$CLAB_VAULT_TOKEN --server={{$node[\"General Parameters\"].json[\"serverUrl\"]}}"
       },
       "id": "98bbfb10-d1ae-4e57-98a1-12fb70c2cfd3",
       "name": "OC Login",
@@ -418,6 +418,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-02-22T08:57:33.524Z",
-  "versionId": "37272fba-0021-4b68-9fcd-7761c34e243a"
+  "updatedAt": "2023-02-23T09:01:30.971Z",
+  "versionId": "b586323d-04d6-46a8-b2a5-95214c8fccc9"
 }
