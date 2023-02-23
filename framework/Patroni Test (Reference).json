@@ -211,7 +211,7 @@
     },
     {
       "parameters": {
-        "command": "=oc login --token={{$node[\"General Parameters\"].json[\"token\"]}} --server={{$node[\"General Parameters\"].json[\"serverUrl\"]}}"
+        "command": "=oc login --token=$GOLD_TOKEN --server={{$node[\"General Parameters\"].json[\"serverUrl\"]}}"
       },
       "id": "ec5b4c64-4878-4ea5-9157-4c361fbcb8fc",
       "name": "OC Login",
@@ -339,6 +339,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2023-02-18T10:04:57.705Z",
-  "versionId": "7d9a466d-8dbb-4490-99d9-ad91eae8d1f4"
+  "updatedAt": "2023-02-23T08:56:38.017Z",
+  "versionId": "dae95dce-c5a6-480e-8e82-727c9504148e"
 }
