@@ -1,0 +1,340 @@
+{
+  "active": false,
+  "connections": {
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Postgres Delete Table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Delete Table": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Postgres Delete Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OC Login": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "General Parameters": {
+      "main": [
+        [
+          {
+            "node": "OC Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Patroni (Reference)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "General Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Send Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patroni (Reference)": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-18T08:39:09.817Z",
+  "id": "13",
+  "name": "Patroni Test (Reference)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "41a19749-c56e-46ef-b89a-8e586f714547",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -540,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.count }}",
+              "operation": "larger"
+            }
+          ]
+        }
+      },
+      "id": "a43af1e6-e97e-4f14-8b25-d63724c8c709",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "truncate TABLE lat_longs;\ndrop TABLE lat_longs;\ncommit;",
+        "additionalFields": {}
+      },
+      "id": "04058651-bbee-4c7e-8cb4-296b6499a5c5",
+      "name": "Postgres Delete Table",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        980,
+        40
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "13",
+          "name": "Patroni (Reference)"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "02df4a0d-9877-4e58-8523-e6901867da43",
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "roland.stens@gov.bc.ca",
+        "toEmail": "roland.stens@gmail.com",
+        "subject": "=Database Problem - XXXX in Server Gold NameSpace YYYY",
+        "text": "No valid DB entries found in Canary database.\nCanary could not talk to the Patroni cluster.",
+        "options": {}
+      },
+      "id": "e902b456-c241-4323-8403-c4bcf79c6574",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        860,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=oc login --token=$GOLD_TOKEN --server={{$node[\"General Parameters\"].json[\"serverUrl\"]}}"
+      },
+      "id": "ec5b4c64-4878-4ea5-9157-4c361fbcb8fc",
+      "name": "OC Login",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "command": "oc rsh $(oc get pods --namespace bf5ef6-dev -l \"app.kubernetes.io/name=patroni,app.kubernetes.io/instance=test-patroni\" -o jsonpath=\"{.items[0].metadata.name}\" ) patronictl -c patroni.yml list > output.txt\noc logout\ncat output.txt\n\n\n"
+      },
+      "id": "2e06e6af-4219-4b9e-b21b-45914a6bb617",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "serverUrl",
+              "value": "https://api.gold.devops.gov.bc.ca:6443"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "f6af97bb-221a-431c-9243-c7af0fd50f55",
+      "name": "General Parameters",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "/data/output.txt"
+      },
+      "id": "01361074-61ad-441a-964d-94520128acee",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        180,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "id": "3f783b56-4570-4fd5-ae31-8e9d78464686",
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        340,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@gov.bc.ca",
+        "toEmail": "=roland.stens@gmail.com",
+        "subject": "=Patroni Reference Test {{ $now.toISODate() }}",
+        "text": "={{ $json.data }}",
+        "options": {}
+      },
+      "id": "13d1c810-51f3-4f7d-8ea5-2d5536c46ed1",
+      "name": "Send Email1",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        520,
+        -260
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "create table IF NOT EXISTS lat_longs \n(\n  c1 bigint generated always as identity,\n  c2 float\n);\n\ninsert into lat_longs(c2)\nselect random() * 100\nfrom generate_series(1,10e6) as g(id);\n\ncommit;\n\nselect count(*) from lat_longs;",
+        "additionalFields": {}
+      },
+      "id": "2570adf2-97c0-4481-bd3f-70b84531c448",
+      "name": "Patroni (Reference)",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        80
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "13",
+          "name": "Patroni (Reference)"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-02-24T03:03:21.066Z",
+  "versionId": "2623be42-97ed-49f7-a962-657e60119677"
+}
