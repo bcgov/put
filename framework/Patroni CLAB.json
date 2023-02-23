@@ -70,7 +70,7 @@
       "main": [
         [
           {
-            "node": "Merge",
+            "node": "IF1",
             "type": "main",
             "index": 0
           }
@@ -81,9 +81,9 @@
       "main": [
         [
           {
-            "node": "Merge",
+            "node": "IF",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
@@ -92,29 +92,105 @@
       "main": [
         [
           {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "Merge": {
-      "main": [
-        [
-          {
-            "node": "OC Login CLAB1",
+            "node": "IF2",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "OC Login CLAB1": {
+    "OC Logout": {
       "main": [
         [
           {
             "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Error": {
+      "main": [
+        [
+          {
+            "node": "OC Logout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Message Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF2": {
+      "main": [
+        [
+          {
+            "node": "OC Logout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Message Params2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Message Params1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params2": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params1": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
             "type": "main",
             "index": 0
           }
@@ -140,7 +216,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  commit;  \n\nselect count(*) from lat_longs;\n\nselect * from lat_longs;\n\ndrop table lat_longs;",
+        "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  commit;  \n\nselect count(*) from lat_longs;\n\ndrop table lat_longs;",
         "additionalFields": {}
       },
       "id": "ffb116c2-3044-401d-be77-a8c0b599fa47",
@@ -161,7 +237,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e4) as g(id);  \n\ncommit;  \n\nselect count(*) from lat_longs;\n\nselect * from lat_longs;\n\ndrop table lat_longs;",
+        "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  \n\ncommit;  \n\nselect count(*) from lat_longs;\n\ndrop table lat_longs;",
         "additionalFields": {}
       },
       "id": "8f16dbe8-cd5d-45d9-8f60-270cfcfecccf",
@@ -207,7 +283,7 @@
     },
     {
       "parameters": {
-        "command": "oc login --token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjZrWi1WX0RUSTc5eGljUmlXbzlaUmVRanpNNkRLVE5YcUNQbHZPeEJOUTgifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJlMzFiNmItZGV2Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6InJlbW90ZS1leGVjdXRpb24tdG9rZW4tZ210NWYiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoicmVtb3RlLWV4ZWN1dGlvbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjVhMzUzZDc2LWEzNTMtNDczMC1iZjRhLTlmNGY0ODlmOGFjMiIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDplMzFiNmItZGV2OnJlbW90ZS1leGVjdXRpb24ifQ.SnmtR8N_Du6xd6tSk0JyZuvbWK_BP_N5uCwl3cojN9-IIlqGAyXQyp9tYmd0dOwjDnXcyncMZw7Gk9uS_WGggqINjvpQ2RS0Y1wWNxco58pk0IH3tLgltHa6tmBZvV5L5hXGMnHYdiKBEU4Ht7_uhLsG1p7LsYufCkS5_7h0rBH8UltbEJJQqSbXm8hsYt7IUWCXEPEbpo8aGbqOk1ddkM-MTXhPnLK2zfMHsdqZkljY4R_tWraFUWW9U33Ts9cJv-Y3QVDLy0EgbByFAR1dqdslbLJD85TCHqrIJyifQR94sU7RyZLxM0AsmW0KuxuR00cRcvn-jJxsv-hKqdZx7w --server=https://api.clab.devops.gov.bc.ca:6443"
+        "command": "oc login --token=$CLAB_TOKEN --server=https://api.clab.devops.gov.bc.ca:6443"
       },
       "id": "e1b672c7-bb08-4d71-b3f5-31ba967d8cb9",
       "name": "OC Login CLAB",
@@ -234,7 +310,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  commit;  \n\nselect count(*) from lat_longs;\n\nselect * from lat_longs;\n\ndrop table lat_longs;",
+        "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  commit;  \n\nselect count(*) from lat_longs;\n\ndrop table lat_longs;",
         "additionalFields": {}
       },
       "id": "a1920eff-62d0-4713-a245-d73ab6c7d6e7",
@@ -253,38 +329,250 @@
       }
     },
     {
-      "parameters": {
-        "command": "oc logout"
-      },
-      "id": "e097f0f5-3adb-4897-8764-d06c0e4b9a77",
-      "name": "OC Login CLAB1",
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
-      "position": [
-        760,
-        220
-      ]
-    },
-    {
-      "parameters": {},
-      "id": "af1035db-6156-4ad0-8347-a44936e0908f",
-      "name": "Merge",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 2,
-      "position": [
-        580,
-        220
-      ]
-    },
-    {
       "parameters": {},
       "id": "130c3cd7-0fa6-40d1-affd-c7a7461125de",
       "name": "No Operation, do nothing",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        940,
+        1240,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "command": "oc logout"
+      },
+      "id": "e097f0f5-3adb-4897-8764-d06c0e4b9a77",
+      "name": "OC Logout",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.count }}",
+              "value2": "10000"
+            }
+          ]
+        }
+      },
+      "id": "78c58cb7-6ea5-4f0e-8911-c0ed0faa0697",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        600,
         220
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "#cypress"
+            },
+            {
+              "name": "rcMessage",
+              "value": "Patroni (HELM) Failed Post Update Test"
+            },
+            {
+              "name": "fromAddress",
+              "value": "no-reply@gov.bc.ca"
+            },
+            {
+              "name": "toAddress",
+              "value": "roland.stens@gmail.com"
+            },
+            {
+              "name": "textMessage",
+              "value": "Test 2"
+            },
+            {
+              "name": "htmlMessage"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "=Patroni (HELM) Failed Post Update Test"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1141d9d6-25b8-4a4c-bf13-f28e5cf7437a",
+      "name": "Set Message Params",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        840,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "17"
+      },
+      "id": "a7e74356-eecd-467c-9420-ecb426a5e3c7",
+      "name": "Report Error",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.count }}",
+              "value2": "10000"
+            }
+          ]
+        }
+      },
+      "id": "399918a8-c810-4a63-828e-afa15acdf272",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        600,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.count }}",
+              "value2": "10000"
+            }
+          ]
+        }
+      },
+      "id": "6662a51f-02a9-4e04-b54d-212dcb79eed8",
+      "name": "IF2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        600,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "#cypress"
+            },
+            {
+              "name": "rcMessage",
+              "value": "Patroni (Reference) Failed Post Update Test"
+            },
+            {
+              "name": "fromAddress",
+              "value": "no-reply@gov.bc.ca"
+            },
+            {
+              "name": "toAddress",
+              "value": "roland.stens@gmail.com"
+            },
+            {
+              "name": "textMessage",
+              "value": "Test 2"
+            },
+            {
+              "name": "htmlMessage"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "=Patroni (Reference) Failed Post Update Test"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7808345b-0dfc-4b5e-bb7b-8a2468291595",
+      "name": "Set Message Params1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        840,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "#cypress"
+            },
+            {
+              "name": "rcMessage",
+              "value": "Crunchy Failed Post Update Test"
+            },
+            {
+              "name": "fromAddress",
+              "value": "no-reply@gov.bc.ca"
+            },
+            {
+              "name": "toAddress",
+              "value": "roland.stens@gmail.com"
+            },
+            {
+              "name": "textMessage",
+              "value": "Test 2"
+            },
+            {
+              "name": "htmlMessage"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "=Crunchy Failed Post Update Test"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "193f62d0-58f8-498c-a69d-0a8e5bf4392c",
+      "name": "Set Message Params2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        840,
+        380
       ]
     }
   ],
@@ -293,6 +581,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2023-02-20T09:48:35.609Z",
-  "versionId": "6c35f3f4-bf12-48f5-b8f8-bc0afa661407"
+  "updatedAt": "2023-02-23T08:54:08.209Z",
+  "versionId": "4d00926b-f5cd-4dda-a910-d4784819392c"
 }
