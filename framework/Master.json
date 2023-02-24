@@ -1,7 +1,51 @@
 {
   "active": false,
   "connections": {
-    "Start": {
+    "Artifactory": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N8N": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patroni CLAB": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vault Check": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
       "main": [
         [
           {
@@ -15,89 +59,12 @@
             "index": 0
           },
           {
-            "node": "Postgres",
+            "node": "Patroni CLAB",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Cypress",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Cypress": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "Postgres": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Artifactory": {
-      "main": [
-        [
-          {
-            "node": "Merge1",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "N8N": {
-      "main": [
-        [
-          {
-            "node": "Merge1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge1": {
-      "main": [
-        [
-          {
-            "node": "Merge2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge": {
-      "main": [
-        [
-          {
-            "node": "Merge2",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "Merge2": {
-      "main": [
-        [
-          {
-            "node": "NoOp",
+            "node": "Vault Check",
             "type": "main",
             "index": 0
           }
@@ -110,17 +77,6 @@
   "name": "Master",
   "nodes": [
     {
-      "parameters": {},
-      "id": "38f97112-9f2f-4239-bd73-6bea1d9594a6",
-      "name": "Start",
-      "type": "n8n-nodes-base.start",
-      "typeVersion": 1,
-      "position": [
-        -360,
-        500
-      ]
-    },
-    {
       "parameters": {
         "workflowId": "1"
       },
@@ -130,7 +86,7 @@
       "typeVersion": 1,
       "position": [
         -20,
-        320
+        300
       ]
     },
     {
@@ -147,73 +103,51 @@
       ]
     },
     {
-      "parameters": {
-        "workflowId": "5"
-      },
-      "id": "c5d13474-8dd4-4f6a-99fc-62de30455a7d",
-      "name": "Postgres",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        -20,
-        600
-      ]
-    },
-    {
-      "parameters": {
-        "workflowId": "6"
-      },
-      "id": "3c0e9bbc-07ab-4aeb-8730-dd78435d2624",
-      "name": "Cypress",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        -20,
-        740
-      ]
-    },
-    {
-      "parameters": {},
-      "id": "24987ff7-b496-43fa-8d62-ef69bd914f27",
-      "name": "Merge",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 2,
-      "position": [
-        200,
-        660
-      ]
-    },
-    {
-      "parameters": {},
-      "id": "92abb885-b7a9-4367-aeb6-55707081afdd",
-      "name": "Merge1",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 2,
-      "position": [
-        200,
-        420
-      ]
-    },
-    {
-      "parameters": {},
-      "id": "0a431abf-4b1c-40f6-8275-4be13f833b22",
-      "name": "Merge2",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 2,
-      "position": [
-        380,
-        520
-      ]
-    },
-    {
       "parameters": {},
       "id": "9841c131-1ee6-4587-bc17-fd4797465ba2",
       "name": "NoOp",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        600,
-        520
+        360,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "14"
+      },
+      "id": "c5d13474-8dd4-4f6a-99fc-62de30455a7d",
+      "name": "Patroni CLAB",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "12"
+      },
+      "id": "cfa1dc1b-76a4-47df-b69c-eef657663991",
+      "name": "Vault Check",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        780
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b3e59f23-bf34-45fe-affe-44da20cafd9e",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        500
       ]
     }
   ],
@@ -222,6 +156,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2023-02-09T18:40:13.978Z",
-  "versionId": "eeeebde9-9c45-4a0f-a187-c10cf722c030"
+  "updatedAt": "2023-02-24T10:16:36.374Z",
+  "versionId": "a21b132d-dc71-4c97-b6a8-e800e214bd22"
 }
