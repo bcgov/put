@@ -78,7 +78,7 @@
         ],
         [
           {
-            "node": "Send Email",
+            "node": "Set Message Params",
             "type": "main",
             "index": 0
           }
@@ -90,17 +90,6 @@
         [
           {
             "node": "IF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send Email": {
-      "main": [
-        [
-          {
-            "node": "OC Logout",
             "type": "main",
             "index": 0
           }
@@ -140,7 +129,40 @@
         ],
         [
           {
-            "node": "Send Email",
+            "node": "Set Message Params1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params1": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Error": {
+      "main": [
+        [
+          {
+            "node": "OC Logout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
             "type": "main",
             "index": 0
           }
@@ -216,8 +238,8 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1040,
-        200
+        1200,
+        140
       ]
     },
     {
@@ -227,8 +249,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1240,
-        200
+        1340,
+        140
       ]
     },
     {
@@ -295,30 +317,7 @@
     },
     {
       "parameters": {
-        "fromEmail": "n8n@gov.bc.ca",
-        "toEmail": "={{ $node[\"General Parameters\"].json.eMail }}",
-        "subject": "Vault Failure",
-        "text": "=Vault is not operational in {{ $node[\"General Parameters\"].parameter[\"values\"][\"string\"][2][\"value\"] }}.",
-        "options": {}
-      },
-      "id": "dbabfa56-9d1d-46c9-8dbb-bf08d33c57d2",
-      "name": "Send Email",
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 2,
-      "position": [
-        880,
-        60
-      ],
-      "credentials": {
-        "smtp": {
-          "id": "1",
-          "name": "SMTP account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "content": "## Test if Vault Pod is working",
+        "content": "## Test if Vault Client Pod is working CLAB",
         "height": 390,
         "width": 532
       },
@@ -350,7 +349,7 @@
     },
     {
       "parameters": {
-        "url": "https://vault.developer.gov.bc.ca/v1/sys/health",
+        "url": "https://vault-lab.developer.gov.bc.ca/v1/sys/health",
         "options": {}
       },
       "id": "9cd5fd5b-6a6b-4849-84b8-87317f7b1280",
@@ -384,7 +383,7 @@
     },
     {
       "parameters": {
-        "content": "## Check Vault Server",
+        "content": "## Check Vault Server KLAB",
         "height": 206,
         "width": 365
       },
@@ -395,6 +394,121 @@
       "position": [
         320,
         -80
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "#cypress"
+            },
+            {
+              "name": "rcMessage",
+              "value": "=# Vault Failure https://vault-lab.developer.gov.bc.ca/ \n* **initialized**: {{ $json.initialized.toString() }} \n* **sealed**: {{ $json.sealed.toString() }}  \n* **standby**: {{ $json.standby.toString() }} \n* **performance_standby**: {{ $json.performance_standby.toString() }}  \n* **replication_performance_mode**: {{ $json.replication_performance_mode }} \n* **replication_dr_mode**: {{ $json.replication_dr_mode }} \n* **server_time_utc**: {{ $json.server_time_utc }} \n* **version**: {{ $json.version }} \n* **cluster_name**: {{ $json.cluster_name }} \n* **cluster_id**: {{ $json.cluster_id }}"
+            },
+            {
+              "name": "toAddress",
+              "value": "roland.stens@gmail.com"
+            },
+            {
+              "name": "=textMessage",
+              "value": "="
+            },
+            {
+              "name": "htmlMessage",
+              "value": "=<h1 id=\"vault-failure-klab-https-vault-lab-developer-gov-bc-ca-\">Vault Failure <a href=\"https://vault-lab.developer.gov.bc.ca/\">KLAB</a></h1> <ul> <li><strong>initialized</strong>: {{ $json.initialized.toString() }} </li> <li><strong>sealed</strong>: {{ $json.sealed.toString() }}  </li> <li><strong>standby</strong>: {{ $json.standby.toString() }} </li> <li><strong>performance_standby</strong>: {{ $json.performance_standby.toString() }}  </li> <li><strong>replication_performance_mode</strong>: {{ $json.replication_performance_mode }} </li> <li><strong>replication_dr_mode</strong>: {{ $json.replication_dr_mode }} </li> <li><strong>server_time_utc</strong>: {{ $json.server_time_utc }} </li> <li><strong>version</strong>: {{ $json.version }} </li> <li><strong>cluster_name</strong>: {{ $json.cluster_name }} </li> <li><strong>cluster_id</strong>: {{ $json.cluster_id }}</li> </ul>"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "=Vault Failure KLAB"
+            },
+            {
+              "name": "from Address",
+              "value": "no-reply@gov.bc.ca"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "11934ffb-0384-4242-a813-47a01a6456a5",
+      "name": "Set Message Params1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "17"
+      },
+      "id": "0f58a9cd-2b72-4559-ad4c-a65392f104d1",
+      "name": "Report Error",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "#cypress"
+            },
+            {
+              "name": "rcMessage",
+              "value": "=# Vault Client Failure CLAB dbfa0f-dev\n* **stderr**:  {{ $json.stderr }}"
+            },
+            {
+              "name": "toAddress",
+              "value": "roland.stens@gmail.com"
+            },
+            {
+              "name": "=textMessage",
+              "value": "="
+            },
+            {
+              "name": "htmlMessage",
+              "value": "=<h1 id=\"vault-client-failure-clab-dbfa0f-dev\">Vault Client Failure CLAB dbfa0f-dev</h1>\n<ul>\n<li><strong>stderr</strong>:  {{ $json.stderr }}</li>\n</ul>"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "=Vault Failure KLAB"
+            },
+            {
+              "name": "from Address",
+              "value": "no-reply@gov.bc.ca"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "142b6b3e-3570-48a0-9084-814f7bd7cf6c",
+      "name": "Set Message Params",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        900,
+        420
       ]
     }
   ],
@@ -414,6 +528,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-02-24T03:01:26.016Z",
-  "versionId": "9ab59046-0e80-49b4-a4dc-83d1bfaa59ee"
+  "updatedAt": "2023-02-24T06:59:33.100Z",
+  "versionId": "218ce13e-a155-4227-b6e9-45c1a595a3c0"
 }
