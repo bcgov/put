@@ -288,7 +288,7 @@
     },
     {
       "parameters": {
-        "command": "oc login --token=$CLAB_TOKEN --server=https://api.clab.devops.gov.bc.ca:6443"
+        "command": "oc login --token=$CLAB_TOKEN --server=https://api.clab.devops.gov.bc.ca:6443\n\n"
       },
       "id": "e1b672c7-bb08-4d71-b3f5-31ba967d8cb9",
       "name": "OC Login CLAB",
@@ -584,8 +584,15 @@
   "pinData": {},
   "settings": {},
   "staticData": null,
-  "tags": [],
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:07:35.632Z",
+      "updatedAt": "2023-02-25T02:07:35.632Z",
+      "id": "3",
+      "name": "Test"
+    }
+  ],
   "triggerCount": 0,
-  "updatedAt": "2023-02-24T06:02:45.139Z",
-  "versionId": "644af0cb-3c56-4826-acd8-968e8ab81098"
+  "updatedAt": "2023-02-25T02:09:03.352Z",
+  "versionId": "0a442961-e6d5-4b9f-99b1-ea190b6dda84"
 }
