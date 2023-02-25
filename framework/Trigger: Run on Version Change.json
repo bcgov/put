@@ -1,0 +1,477 @@
+{
+  "active": true,
+  "connections": {
+    "OC Login CLAB": {
+      "main": [
+        [
+          {
+            "node": "Get Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Version": {
+      "main": [
+        [
+          {
+            "node": "Read Binary Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OC Logout": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary Files": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis1": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "OC Logout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "OC Login CLAB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Run Main",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Run": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params": {
+      "main": [
+        [
+          {
+            "node": "Report Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Main": {
+      "main": [
+        [
+          {
+            "node": "Set Message Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-24T09:46:43.996Z",
+  "id": "18",
+  "name": "Trigger: Run on Version Change",
+  "nodes": [
+    {
+      "parameters": {
+        "command": "oc login --token=$CLAB_TOKEN --server=https://api.clab.devops.gov.bc.ca:6443\noc project "
+      },
+      "id": "bca44f33-6518-43f1-beda-163d0426a4be",
+      "name": "OC Login CLAB",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -940,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "command": "rm -f version.json\noc version -o json > version.json"
+      },
+      "id": "b801bd2b-5449-496d-a4dd-66b8570869e8",
+      "name": "Get Version",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -140
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ba622911-d1c7-4a36-8372-cfc6a01ab6a9",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        340,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "command": "oc logout"
+      },
+      "id": "1012efed-24d2-439a-b2b5-860ca7a737c7",
+      "name": "OC Logout",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "fileSelector": "version.json"
+      },
+      "id": "fd20be5e-9afd-4d19-b88d-1d3e289a555f",
+      "name": "Read Binary Files",
+      "type": "n8n-nodes-base.readBinaryFiles",
+      "typeVersion": 1,
+      "position": [
+        -660,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "1c588906-2063-4db6-a8dd-78b28df787a4",
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=serverVersion",
+        "value": "={{ $json.serverVersion }}"
+      },
+      "id": "ec72c96c-7759-48ab-927c-141b59ad419b",
+      "name": "Redis",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        80
+      ],
+      "credentials": {
+        "redis": {
+          "id": "5",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "data",
+        "key": "serverVersion",
+        "options": {}
+      },
+      "id": "297608d5-694a-44b0-bc17-d0b0f438c5b9",
+      "name": "Redis1",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        -140
+      ],
+      "credentials": {
+        "redis": {
+          "id": "5",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.data }}",
+              "operation": "contains",
+              "value2": "={{ $node[\"Move Binary Data\"].json.serverVersion }}"
+            }
+          ]
+        }
+      },
+      "id": "54775eec-3351-4043-ac92-9099f43904fb",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "13584fe4-7235-4e56-b6b6-389f06b80107",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Get Current Kubernetes Version",
+        "height": 218,
+        "width": 567
+      },
+      "id": "fc14a34c-b3f5-4d0c-976c-21c7249937e8",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        -198
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Same as before?",
+        "height": 218,
+        "width": 349
+      },
+      "id": "aefab6b5-fe1b-4775-b74d-c140b823f45f",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Trigger Runs",
+        "height": 218,
+        "width": 349
+      },
+      "id": "b4c8cbc5-432a-4ca0-8047-055f4656fc4f",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## All Good, just exit",
+        "height": 218,
+        "width": 530
+      },
+      "id": "f574fb98-aa8e-4707-b237-597dd7ec6515",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "#PUT"
+            },
+            {
+              "name": "rcMessage",
+              "value": "=PUT Run on {{ $now }}"
+            },
+            {
+              "name": "fromAddress",
+              "value": "no-reply@gov.bc.ca"
+            },
+            {
+              "name": "toAddress",
+              "value": "roland.stens@gmail.com"
+            },
+            {
+              "name": "=PUT Run on {{ $now }}",
+              "value": "Test 2"
+            },
+            {
+              "name": "htmlMessage"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "=Post Update Test Run Notification"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "adfa7e36-4502-49e3-8afe-4371d2836f33",
+      "name": "Set Message Params",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        20,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "17"
+      },
+      "id": "a4647a6c-406f-4248-912e-953695b9d420",
+      "name": "Report Run",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        180,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Trigger to kick off the tests when the Kubernetes version in CLAB changes\n\nThis trigger will check the CLAB Kubernetes version once every hour 24 hours a days.\nIf a change is detected, it will kick off all the tests as defined in the [**Master**](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/workflow/7) workflow.",
+        "height": 136.70454545454535,
+        "width": 894.4913419913415
+      },
+      "id": "082cc892-a76a-4401-90a9-05c1db56d019",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "7"
+      },
+      "id": "6dcaa813-dac4-4809-95b2-a93838b78676",
+      "name": "Run Main",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        80
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:08:35.040Z",
+      "updatedAt": "2023-02-25T02:08:35.040Z",
+      "id": "5",
+      "name": "Trigger"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-02-25T07:41:30.287Z",
+  "versionId": "e6c24cdf-da37-410e-878a-d0605f62aa62"
+}
