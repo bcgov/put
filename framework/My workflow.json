@@ -1,0 +1,108 @@
+{
+  "active": false,
+  "connections": {
+    "Set Port Forward Patroni": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "OC Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OC Login": {
+      "main": [
+        [
+          {
+            "node": "Set Port Forward Patroni",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-25T08:09:55.577Z",
+  "id": "21",
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "cfbe9a57-8006-46a4-be08-6d64b198eb64",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "command": "oc project bf5ef6-dev\n\nnohup oc port-forward $(oc -n  bf5ef6-dev get pods -o name --selector role=master,cluster-name=patroni-reference) 15433:5432 > /dev/null 2>&1 & "
+      },
+      "id": "bb5e08f4-2189-4d92-8cc7-fd35979d85f8",
+      "name": "Set Port Forward Patroni",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        620,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DROP TABLE scale_data;\nDROP FUNCTION test_scalability;\n\n\nCREATE TABLE IF NOT EXISTS scale_data (\n   section NUMERIC NOT NULL,\n   id1     NUMERIC NOT NULL,\n   id2     NUMERIC NOT NULL\n);\n\nINSERT INTO scale_data\nSELECT sections.*, gen.*\n     , CEIL(RANDOM()*100) \n  FROM GENERATE_SERIES(1, 300)     sections,\n       GENERATE_SERIES(1, 90000) gen\n WHERE gen <= sections * 3000;\n\nCREATE INDEX scale_slow ON scale_data (section, id1, id2);\n\nALTER TABLE scale_data CLUSTER ON scale_slow;\nCLUSTER scale_data;\n\nCREATE OR REPLACE FUNCTION test_scalability\n   (sql_txt VARCHAR(2000), n INT)\n   RETURNS SETOF RECORD AS\n$$\nDECLARE\n   tim   INTERVAL[300];\n   rec   INT[300];\n   strt  TIMESTAMP;\n   v_rec RECORD;\n   iter  INT;\n   sec   INT;\n   cnt   INT;\n   rnd   INT;\nBEGIN\n   FOR iter  IN 0..n LOOP\n      FOR sec IN 0..300 LOOP\n         IF iter = 0 THEN\n           tim[sec] := 0;\n           rec[sec] := 0;\n         END IF;\n         rnd  := CEIL(RANDOM() * 100);\n         strt := CLOCK_TIMESTAMP();\n\n         EXECUTE 'select count(*) from (' || sql_txt || ') tbl'\n            INTO cnt\n           USING sec, rnd;\n\n         tim[sec] := tim[sec] + CLOCK_TIMESTAMP() - strt;\n         rec[sec] := rec[sec] + cnt;\n\n         IF iter = n THEN\n            SELECT INTO v_rec sec, tim[sec], rec[sec];\n            RETURN NEXT v_rec;\n         END IF;\n      END LOOP;\n   END LOOP;\n\n   RETURN;\nEND;\n$$ LANGUAGE plpgsql;\n\nSELECT *\n  FROM test_scalability('SELECT * '\n                      ||  'FROM scale_data '\n                      || 'WHERE section=$1 '\n                      ||   'AND id2=$2', 10)\n       AS (sec INT, seconds INTERVAL, cnt_rows INT);",
+        "additionalFields": {}
+      },
+      "id": "f71c6705-1fe6-42cb-9574-d3fa84ea15b6",
+      "name": "Postgres2",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        820,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "16",
+          "name": "Postgres Reference Gold"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "oc login --token=$GOLD_TOKEN --server=https://api.gold.devops.gov.bc.ca:6443\n\n"
+      },
+      "id": "6ee44b90-579d-408b-88d8-ba8f4acde4ac",
+      "name": "OC Login",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        440,
+        400
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-02-25T08:48:39.433Z",
+  "versionId": "04280846-6b76-4050-b11c-5498a9b481b8"
+}
