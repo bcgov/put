@@ -483,8 +483,15 @@
   "pinData": {},
   "settings": {},
   "staticData": null,
-  "tags": [],
+  "tags": [
+    {
+      "createdAt": "2023-02-09T09:22:16.563Z",
+      "updatedAt": "2023-02-09T09:22:16.563Z",
+      "id": "2",
+      "name": "Platform"
+    }
+  ],
   "triggerCount": 1,
-  "updatedAt": "2023-02-15T02:57:38.786Z",
-  "versionId": "ebeeba5f-9401-4f63-bdba-9697ef7311dd"
+  "updatedAt": "2023-02-25T02:10:17.254Z",
+  "versionId": "78e0d9e8-0583-4c95-a20f-2ce815d6e5c1"
 }
