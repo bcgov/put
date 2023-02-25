@@ -402,7 +402,7 @@
           "string": [
             {
               "name": "rcChannel",
-              "value": "#cypress"
+              "value": "#PUT"
             },
             {
               "name": "rcMessage",
@@ -466,7 +466,7 @@
           "string": [
             {
               "name": "rcChannel",
-              "value": "#cypress"
+              "value": "#PUT"
             },
             {
               "name": "rcMessage",
@@ -521,13 +521,13 @@
   },
   "tags": [
     {
-      "createdAt": "2023-02-09T09:22:16.563Z",
-      "updatedAt": "2023-02-09T09:22:16.563Z",
-      "id": "2",
-      "name": "Platform"
+      "createdAt": "2023-02-25T02:07:35.632Z",
+      "updatedAt": "2023-02-25T02:07:35.632Z",
+      "id": "3",
+      "name": "Test"
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-02-24T06:59:33.100Z",
-  "versionId": "218ce13e-a155-4227-b6e9-45c1a595a3c0"
+  "updatedAt": "2023-02-25T02:09:40.472Z",
+  "versionId": "e22793a5-c417-4a36-985c-3159c0789730"
 }
