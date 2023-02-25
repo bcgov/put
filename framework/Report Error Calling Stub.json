@@ -143,8 +143,15 @@
   "pinData": {},
   "settings": {},
   "staticData": null,
-  "tags": [],
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:07:50.772Z",
+      "updatedAt": "2023-02-25T02:07:50.772Z",
+      "id": "4",
+      "name": "Common Component"
+    }
+  ],
   "triggerCount": 0,
-  "updatedAt": "2023-02-23T07:43:13.151Z",
-  "versionId": "472d67f1-98c9-432c-9fc4-fa7980953f31"
+  "updatedAt": "2023-02-25T02:21:57.979Z",
+  "versionId": "bda273d2-58a5-4c51-98f9-a82387f0ebb4"
 }
