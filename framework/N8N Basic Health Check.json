@@ -1,17 +1,6 @@
 {
   "active": false,
   "connections": {
-    "Start": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "HTTP Request": {
       "main": [
         [
@@ -67,23 +56,23 @@
           }
         ]
       ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "createdAt": "2023-02-08T04:04:37.152Z",
   "id": "1",
   "name": "N8N Basic Health Check",
   "nodes": [
-    {
-      "parameters": {},
-      "id": "6695587a-1b37-477d-a14b-c7eda5581525",
-      "name": "Start",
-      "type": "n8n-nodes-base.start",
-      "typeVersion": 1,
-      "position": [
-        240,
-        300
-      ]
-    },
     {
       "parameters": {
         "url": "https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/healthz",
@@ -157,7 +146,7 @@
     },
     {
       "parameters": {
-        "channel": "#cypress",
+        "channel": "#PUT",
         "text": "= {{$node[\"Send Email\"].parameter[\"subject\"]}}\n\n{{$node[\"Send Email\"].parameter[\"text\"]}}",
         "options": {},
         "attachments": []
@@ -177,6 +166,31 @@
           "name": "Rocket account"
         }
       }
+    },
+    {
+      "parameters": {
+        "content": "## N8N Health Check\n\nQuick check on N8N running well.",
+        "width": 841
+      },
+      "id": "8d8db4bd-1d5f-4c60-813f-f049401c9862",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b97a7f3e-59c5-46b8-ac75-47975e909eca",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        300
+      ]
     }
   ],
   "pinData": {},
@@ -187,13 +201,13 @@
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-02-08T06:06:16.935Z",
-      "updatedAt": "2023-02-08T06:06:16.935Z",
-      "id": "1",
-      "name": "PUT"
+      "createdAt": "2023-02-25T02:07:35.632Z",
+      "updatedAt": "2023-02-25T02:07:35.632Z",
+      "id": "3",
+      "name": "Test"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-02-07T22:07:27.817Z",
-  "versionId": "21092e46-f7dd-456e-a025-6e9801f2552d"
+  "updatedAt": "2023-02-25T02:46:42.435Z",
+  "versionId": "942cc229-5224-49b8-be88-b66be42e2133"
 }
