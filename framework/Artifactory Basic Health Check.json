@@ -177,8 +177,15 @@
   "pinData": {},
   "settings": {},
   "staticData": null,
-  "tags": [],
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:07:35.632Z",
+      "updatedAt": "2023-02-25T02:07:35.632Z",
+      "id": "3",
+      "name": "Test"
+    }
+  ],
   "triggerCount": 0,
-  "updatedAt": "2023-02-10T18:21:13.552Z",
-  "versionId": "459f9caf-d8ed-4f83-adbe-3b5680aa585d"
+  "updatedAt": "2023-02-25T02:10:29.404Z",
+  "versionId": "3fadc40e-5a0a-458b-911d-ae56ce0fc111"
 }
