@@ -409,7 +409,8 @@
     {
       "parameters": {
         "fileName": "/data/log.txt",
-        "dataPropertyName": "=file_1"
+        "dataPropertyName": "=file_1",
+        "options": {}
       },
       "id": "ac9ac2ee-79e1-44b6-8116-fc8ac30f16ca",
       "name": "Store Log",
@@ -525,8 +526,21 @@
   "pinData": {},
   "settings": {},
   "staticData": null,
-  "tags": [],
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:07:35.632Z",
+      "updatedAt": "2023-02-25T02:07:35.632Z",
+      "id": "3",
+      "name": "Test"
+    },
+    {
+      "createdAt": "2023-02-25T02:10:52.949Z",
+      "updatedAt": "2023-02-25T02:10:52.949Z",
+      "id": "6",
+      "name": "Example"
+    }
+  ],
   "triggerCount": 0,
-  "updatedAt": "2023-02-08T23:10:59.496Z",
-  "versionId": "ac1cca6d-8b96-491a-9b0b-a6e363ccc009"
+  "updatedAt": "2023-02-25T02:10:53.735Z",
+  "versionId": "860ab8e5-7057-4ecf-a190-16ad0e47c9aa"
 }
