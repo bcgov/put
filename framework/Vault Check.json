@@ -209,7 +209,7 @@
     },
     {
       "parameters": {
-        "command": "#oc scale deployment/vault-test --replicas=0\noc logout"
+        "command": "oc logout"
       },
       "id": "81af0e70-55e5-4f81-b31e-ba8b799c530b",
       "name": "OC Logout",
@@ -508,6 +508,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-01T08:41:12.137Z",
-  "versionId": "9308b326-f962-4fe5-8854-107dab08417b"
+  "updatedAt": "2023-03-02T04:00:17.089Z",
+  "versionId": "91c8c73e-ffe8-4306-a3c7-feb56c51e50f"
 }
