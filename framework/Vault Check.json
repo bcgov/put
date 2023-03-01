@@ -1,17 +1,6 @@
 {
   "active": true,
   "connections": {
-    "Start": {
-      "main": [
-        [
-          {
-            "node": "General Parameters",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "General Parameters": {
       "main": [
         [
@@ -175,17 +164,6 @@
   "name": "Vault Check",
   "nodes": [
     {
-      "parameters": {},
-      "id": "1342ac77-21b2-4f48-be8b-928f77c6ba7f",
-      "name": "Start",
-      "type": "n8n-nodes-base.start",
-      "typeVersion": 1,
-      "position": [
-        -80,
-        -20
-      ]
-    },
-    {
       "parameters": {
         "values": {
           "string": [
@@ -334,7 +312,9 @@
       "parameters": {
         "rule": {
           "interval": [
-            {}
+            {
+              "triggerAtHour": 3
+            }
           ]
         }
       },
@@ -528,6 +508,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-02-25T02:09:40.472Z",
-  "versionId": "e22793a5-c417-4a36-985c-3159c0789730"
+  "updatedAt": "2023-03-01T08:41:12.137Z",
+  "versionId": "9308b326-f962-4fe5-8854-107dab08417b"
 }
