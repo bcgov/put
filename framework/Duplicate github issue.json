@@ -1,0 +1,421 @@
+{
+  "active": true,
+  "connections": {
+    "GitHub": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "GitHub 3 Labels3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GitHub 3 Labels1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GitHub 3 Labels2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GitHub 3 Labels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub 3 Labels": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub 3 Labels2": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub 3 Labels1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub 3 Labels3": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-02T07:56:18.172Z",
+  "id": "23",
+  "name": "Duplicate github issue",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "BCDevOps",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "developer-experience",
+          "mode": "name"
+        },
+        "issueNumber": "={{ $json.query.id }}"
+      },
+      "id": "6868d180-558b-4d9a-bcde-f79fc3b871d9",
+      "name": "GitHub",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        500,
+        440
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "6",
+          "name": "GitHub PUT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "47f12fef-d385-413f-bd13-6a06725b0207",
+        "options": {}
+      },
+      "id": "45796d2d-7923-488d-8a1a-cfa4584a259c",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        280,
+        440
+      ],
+      "webhookId": "47f12fef-d385-413f-bd13-6a06725b0207"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "labels",
+        "options": {}
+      },
+      "id": "95fca5af-bfd2-463f-983b-3774714682a8",
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        640,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "if (Object.keys(items[0].json).length === 0) {\n  return [\n     {\n       json: {\n         results: 0,\n       }\n      }\n  ]\n}\nreturn [\n  {\n    json: {\n      results: items.length,\n    }\n  }\n];"
+      },
+      "id": "7c2c12f7-0f0b-4889-87ce-02b758684361",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        800,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "value1": "={{ $json.results }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal"
+            },
+            {
+              "operation": "equal",
+              "value2": 1,
+              "output": 1
+            },
+            {
+              "operation": "equal",
+              "value2": 2,
+              "output": 2
+            },
+            {
+              "operation": "equal",
+              "value2": 3,
+              "output": 3
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "id": "d49b8d0d-0451-4665-85d0-7ef8b9d8c485",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "BCDevOps",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "developer-experience",
+          "mode": "name"
+        },
+        "title": "=CLONE: {{ $node.GitHub.json.title }}",
+        "body": "={{ $node.GitHub.json.body }}",
+        "labels": [
+          {
+            "label": "={{ $node.GitHub.json.labels[0].name }}"
+          },
+          {
+            "label": "={{ $node.GitHub.json.labels[1].name }}"
+          },
+          {
+            "label": "={{ $node.GitHub.json.labels[2].name }}"
+          }
+        ],
+        "assignees": [
+          {
+            "assignee": "={{ $node.GitHub.json.assignee.login }}"
+          }
+        ]
+      },
+      "id": "c26f0875-f396-46b1-bc48-cc17c0011887",
+      "name": "GitHub 3 Labels",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        720
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "6",
+          "name": "GitHub PUT"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "b0eacb1a-b61e-4449-b3a6-9fc2b43c22b7",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "BCDevOps",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "developer-experience",
+          "mode": "name"
+        },
+        "title": "=CLONE: {{ $node.GitHub.json.title }}",
+        "body": "={{ $node.GitHub.json.body }}",
+        "labels": [
+          {
+            "label": "={{ $node.GitHub.json.labels[0].name }}"
+          }
+        ],
+        "assignees": [
+          {
+            "assignee": "={{ $node.GitHub.json.assignee.login }}"
+          }
+        ]
+      },
+      "id": "5e349e48-61ba-4e71-a468-3b52c1d89039",
+      "name": "GitHub 3 Labels1",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        340
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "6",
+          "name": "GitHub PUT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "BCDevOps",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "developer-experience",
+          "mode": "name"
+        },
+        "title": "=CLONE: {{ $node.GitHub.json.title }}",
+        "body": "={{ $node.GitHub.json.body }}",
+        "labels": [
+          {
+            "label": "={{ $node.GitHub.json.labels[0].name }}"
+          },
+          {
+            "label": "={{ $node.GitHub.json.labels[1].name }}"
+          }
+        ],
+        "assignees": [
+          {
+            "assignee": "={{ $node.GitHub.json.assignee.login }}"
+          }
+        ]
+      },
+      "id": "a9257f05-8618-4aa1-a241-3b046763b981",
+      "name": "GitHub 3 Labels2",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        540
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "6",
+          "name": "GitHub PUT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "BCDevOps",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "developer-experience",
+          "mode": "name"
+        },
+        "title": "=CLONE: {{ $node.GitHub.json.title }}",
+        "body": "={{ $node.GitHub.json.body }}",
+        "labels": [],
+        "assignees": [
+          {
+            "assignee": "={{ $node.GitHub.json.assignee.login }}"
+          }
+        ]
+      },
+      "id": "830e9f73-4fe8-4f4d-994e-1dc0fd8bc577",
+      "name": "GitHub 3 Labels3",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        180
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "6",
+          "name": "GitHub PUT"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2023-03-02T09:31:51.262Z",
+  "versionId": "87884c72-0953-4df7-a9ce-82d44f8aed4a"
+}
