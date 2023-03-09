@@ -1,0 +1,122 @@
+{
+  "active": false,
+  "connections": {
+    "Get Token": {
+      "main": [
+        [
+          {
+            "node": "Build Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Login": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-08T05:17:18.589Z",
+  "id": "28",
+  "name": "OC Login Common Component",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Build OC Login Command\n\nThis workflow gets called while providing the **tokenName** in the calling workflow. \n\nThe workflow will find the token from the credential and will build the `oc login` statement that you can use.\n\n### Do not change this workflow as it is a common component used by other workflows.",
+        "height": 217,
+        "width": 717
+      },
+      "id": "7a878f99-a65b-4205-b354-e24217655eb7",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=n8n export:credentials --all --decrypted | jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.value' | tr -d '\\n'"
+      },
+      "id": "a6df4f34-8c05-4d68-a0c6-3be3cb58e1ad",
+      "name": "Get Token",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        420,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=n8n export:credentials --all --decrypted | jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.name' | sed \"s/<token>/{{ $json.stdout }}/g\" "
+      },
+      "id": "93d8354c-56c6-4a93-9b05-39c73004e390",
+      "name": "Build Login",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        560,
+        200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "1e437650-2955-47d7-b6e6-5001b3f4f96e",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        220,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ \"ocLogin\": $('Build Login').item.json.stdout }];"
+      },
+      "id": "0ef6b639-b0d6-497b-bb41-c9e868c0eee7",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        720,
+        200
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:07:50.772Z",
+      "updatedAt": "2023-02-25T02:07:50.772Z",
+      "id": "4",
+      "name": "Common Component"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-03-08T08:40:11.681Z",
+  "versionId": "edca3d80-4229-4e9f-a542-3d80f2bb3a78"
+}
