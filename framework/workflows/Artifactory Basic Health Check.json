@@ -1,0 +1,279 @@
+{
+  "active": true,
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Message Params for Error Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params for Error Report": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Error": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-08T06:08:46.285Z",
+  "id": "3",
+  "name": "Artifactory Basic Health Check",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://artifacts.developer.gov.bc.ca/router/api/v1/system/health",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "04274721-7408-4823-ad12-16524760ee54",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        540,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json[\"router\"][\"message\"] }}",
+              "operation": "contains",
+              "value2": "OK"
+            }
+          ]
+        }
+      },
+      "id": "cb2dbfce-8389-452d-97ff-6e239d54914d",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3cf820df-a75c-49fe-bef0-3cbbecc0627e",
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "id": "fb7e096c-1b1a-4033-aa5b-d3cbdef28efe",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "17"
+      },
+      "id": "b5832f26-e972-4c29-a776-c57662e5ba22",
+      "name": "Report Error",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1028,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Report the Error",
+        "height": 217.8125,
+        "width": 361.0555345436212
+      },
+      "id": "3660c539-9e1b-46cb-b9ae-5403d7885b9d",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        820,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "#devops-artifactory"
+            },
+            {
+              "name": "rcMessage",
+              "value": "=## Artifactory Error Found on https://artifacts.developer.gov.bc.ca\nAt: {{ $now }}\n\nRouter:\n{{$node[\"HTTP Request\"].json[\"router\"][\"node_id\"]}}: {{$node[\"HTTP Request\"].json[\"router\"][\"state\"]}}\n\nServices:\n{{$node[\"HTTP Request\"].json[\"services\"][0][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][0][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][1][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][1][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][2][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][2][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][3][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][3][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][4][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][4][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][5][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][5][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][6][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][6][\"state\"]}}\n\n @cailey.jones and @shelly.han\n"
+            },
+            {
+              "name": "fromAddress",
+              "value": "no-reply@gov.bc.ca"
+            },
+            {
+              "name": "toAddress",
+              "value": "cailey.jones@gov.bc.ca,shelly.han@gov.bc.ca,hsmcs@dxcas.com"
+            },
+            {
+              "name": "textMessage",
+              "value": "=At: {{ $now }}  \n\nRouter: {{$node[\"HTTP Request\"].json[\"router\"][\"node_id\"]}}: {{$node[\"HTTP Request\"].json[\"router\"][\"state\"]}}  \n\nServices: {{$node[\"HTTP Request\"].json[\"services\"][0][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][0][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][1][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][1][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][2][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][2][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][3][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][3][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][4][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][4][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][5][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][5][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][6][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][6][\"state\"]}}"
+            },
+            {
+              "name": "htmlMessage"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "=Artifactory Error Found on https://artifacts.developer.gov.bc.ca"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2edf4b5d-dd25-4541-8609-e941d54194b7",
+      "name": "Set Message Params for Error Report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        880,
+        520
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "53eceb43-33d0-4fbd-abac-f9c65c367ca7",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        380,
+        160
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ee30fd19-9da2-48f4-8b9b-eb863497f362",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        380,
+        460
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:07:35.632Z",
+      "updatedAt": "2023-02-25T02:07:35.632Z",
+      "id": "3",
+      "name": "Test"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-03-10T04:35:46.803Z",
+  "versionId": "f8308cd5-5637-4ab9-b613-91152b3df7e3"
+}
