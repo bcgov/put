@@ -1,0 +1,426 @@
+{
+  "active": false,
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OC Login": {
+      "main": [
+        [
+          {
+            "node": "Run Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Git",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Test": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Git": {
+      "main": [
+        [
+          {
+            "node": "OC Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Report": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Remove Files and Logout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Run Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Files and Logout": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-09T09:17:30.381Z",
+  "id": "8",
+  "name": "nsx-net-test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "acf525bc-0102-4963-8e2c-94c0f20f0ba1",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -500,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "nameSpace",
+              "value": "ce9012"
+            },
+            {
+              "name": "osToken"
+            },
+            {
+              "name": "serverUrl",
+              "value": "=https://api.{{$parameter[\"values\"][\"string\"][3][\"value\"]}}.devops.gov.bc.ca:6443"
+            },
+            {
+              "name": "clusterName",
+              "value": "klab2"
+            },
+            {
+              "name": "eMail",
+              "value": "roland.stens@gmail.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e7f5b098-30d8-44eb-bfeb-b93764b691c7",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        80
+      ],
+      "notesInFlow": true,
+      "notes": "Set Parameters"
+    },
+    {
+      "parameters": {
+        "command": "=oc login --token={{$node[\"Set\"].json[\"osToken\"]}}  --server={{$node[\"Set\"].json[\"serverUrl\"]}}"
+      },
+      "id": "2d25f646-de3c-4a48-b4ab-f02ae2f426ec",
+      "name": "OC Login",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=cd /data/platform-tools/nsx-net-test\n\nP={{$node[\"Set\"].parameter[\"values\"][\"string\"][0][\"value\"]}}\nfor N in tools dev test prod; do\n  oc -n \"${P}-${N}\" delete all,cm,netpol,rolebindings,secrets,sa,policy -l advsol-app=nsx-net-test\ndone\noc process -f app.yaml -p PROJECT={{$node[\"Set\"].parameter[\"values\"][\"string\"][0][\"value\"]}}| oc apply -f -\noc process -f run-test.yaml -p PROJECT={{$node[\"Set\"].parameter[\"values\"][\"string\"][0][\"value\"]}} -p CLUSTER={{$node[\"Set\"].parameter[\"values\"][\"string\"][3][\"value\"]}} | oc create -f -\n"
+      },
+      "id": "add505c3-a395-4097-ab27-c17dcb753f2a",
+      "name": "Run Test",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        20,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "gitPassword",
+        "operation": "clone",
+        "repositoryPath": "/data/platform-tools",
+        "sourceRepository": "https://github.com/bcgov-c/platform-tools.git"
+      },
+      "id": "7a0ca881-f135-4e3a-b524-29bcf5e1cc93",
+      "name": "Git",
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        80
+      ],
+      "notesInFlow": true,
+      "credentials": {
+        "gitPassword": {
+          "id": "7",
+          "name": "Git BCGOV"
+        }
+      },
+      "notes": "Get the test files from the repo."
+    },
+    {
+      "parameters": {
+        "content": "## NSX Networking Test\nThis is a suite of tests that will help validate all networking is working properly in a NSX cluster.\n\nThe tests will run in a product set of namespaces.\n\nKLAB2 ce9012\nEMERALD a66e79\n\n## Set Up\nYou need to `Set`:\n* **nameSpace** - ce9012 (KLAB2) or a66e79 (EMERALD)\n* **osToken** - A Openshift Token for a service account in the targeted namespace that can run the scripts.\n* **clusterName**: klab2 or emerald\n* **eMail**: Email address for the report\n\n## Git\nYou need a Git Credential (id and Personal Access Token) that has access to the [repo](https://github.com/bcgov-c/platform-tools).",
+        "height": 488.7992046271345,
+        "width": 434.78906250000017
+      },
+      "id": "2d7e95e0-41d6-4321-90b5-362dc6902503",
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -940,
+        -40
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "command": "=cd /data/platform-tools/nsx-net-test\ncurl https://www.pixelbeat.org/scripts/ansi2html.sh --output ansi2html.sh\nchmod +x ansi2html.sh\n./report.sh | ./ansi2html.sh > report.html\n\n"
+      },
+      "id": "5c16bb4e-8957-45d6-9297-b0d165f730c3",
+      "name": "Run Report",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        300,
+        340
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "0f6599fa-ea1e-4600-9932-1ad1b4457f69",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        660,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Set Up",
+        "height": 217,
+        "width": 383
+      },
+      "id": "912a5df0-4c76-4dd4-8a05-378829dabbb5",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -379,
+        28
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Run Test Code",
+        "height": 194,
+        "width": 577.1543116490166
+      },
+      "id": "6cfb71c5-28bd-4cac-8c48-c371a4bdeb98",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Clean Up and Close",
+        "height": 209.7077660110943,
+        "width": 370
+      },
+      "id": "e79d5dc8-4f9a-43a8-8aa4-eb39a1f2c44e",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "/data/ls.html"
+      },
+      "id": "055eddcf-a404-42e2-85c7-d9008bb4a3b6",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@gov.bc.ca",
+        "toEmail": "={{ $node.Set.json.eMail }}",
+        "subject": "=NSX Network Test {{ $now.toISODate() }}",
+        "emailFormat": "html",
+        "html": "={{ $json.data }}",
+        "options": {}
+      },
+      "id": "fd3c5c21-dffc-4a1b-8582-5700537445a7",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        180,
+        600
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "id": "d19a9057-0e2b-49b5-9290-7a61ca860120",
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        20,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Email Report",
+        "height": 209.7077660110943,
+        "width": 457.8719112455876
+      },
+      "id": "bfae09f7-5bbf-426b-b254-8f01aa96521d",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "id": "eca03057-8897-4840-bc98-d9f13d1e04d7",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        160,
+        340
+      ],
+      "webhookId": "af1ddd53-0a92-4f2b-89dc-d2f643628bba"
+    },
+    {
+      "parameters": {
+        "command": "rm -rf platform-tools\noc logout\n\n \n\n\n\n"
+      },
+      "id": "8c313f49-1929-4e43-9378-4d34a858f97d",
+      "name": "Remove Files and Logout",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        500,
+        600
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "timezone": "America/Los_Angeles",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-02-09T09:22:16.563Z",
+      "updatedAt": "2023-02-09T09:22:16.563Z",
+      "id": "2",
+      "name": "Platform"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-02-15T02:50:17.374Z",
+  "versionId": "68ddb359-260a-4c78-8e77-eef1965fbb44"
+}
