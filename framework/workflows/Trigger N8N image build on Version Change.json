@@ -1,0 +1,272 @@
+{
+  "active": true,
+  "connections": {
+    "Get Version": {
+      "main": [
+        [
+          {
+            "node": "IF Versions are identical",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Latest N8N Version": {
+      "main": [
+        [
+          {
+            "node": "Get Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Latest N8N Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Login Command": {
+      "main": [
+        [
+          {
+            "node": "Build New Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Token Name1": {
+      "main": [
+        [
+          {
+            "node": "Build Login Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build New Version": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Versions are identical": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Token Name1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-08T02:21:02.700Z",
+  "id": "27",
+  "name": "Trigger N8N image build on Version Change",
+  "nodes": [
+    {
+      "parameters": {
+        "command": "n8n version | grep -o \"[0-9][\\.][0-9][0-9][0-9][\\.][0-9]\"\n"
+      },
+      "id": "cd42b331-ce17-4456-8201-55eae4158bd7",
+      "name": "Get Version",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -820,
+        -140
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "f5d3df30-e18e-493c-b3f0-c1eb0269de74",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 22
+            }
+          ]
+        }
+      },
+      "id": "b5d0ed7a-d023-4dff-911e-cb0ca01a06ce",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Get Current and Latest Version",
+        "height": 474.3585476550668,
+        "width": 1389.622793746848
+      },
+      "id": "80418f4c-3946-485e-8f6b-16cdf093614d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://registry.npmjs.org/n8n/latest",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9f9c2a62-9bb4-4040-9ecf-66b232aa26a1",
+      "name": "Get Latest N8N Version",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        -980,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "28"
+      },
+      "id": "5ac20052-3d3f-4e34-835a-136e936cf31d",
+      "name": "Build Login Command",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        20
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "tokenName",
+              "value": "GOLD_Token"
+            },
+            {
+              "name": "nameSpace",
+              "value": "bf5ef6-tools"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9a241e78-c19f-4a1d-b60d-69f7e77220df",
+      "name": "Set Token Name1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name1\"].json.nameSpace }}\noc start-build bc/n8n\noc logout\n"
+      },
+      "id": "968bd756-1af4-4786-b440-069a8a83f336",
+      "name": "Build New Version",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.stdout }}",
+              "operation": "contains",
+              "value2": "={{ $json.version }}"
+            }
+          ]
+        }
+      },
+      "id": "ee5622b1-1076-42b4-b871-76b2ffdd9fbe",
+      "name": "IF Versions are identical",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -660,
+        -140
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:08:35.040Z",
+      "updatedAt": "2023-02-25T02:08:35.040Z",
+      "id": "5",
+      "name": "Trigger"
+    },
+    {
+      "createdAt": "2023-02-09T09:22:16.563Z",
+      "updatedAt": "2023-02-09T09:22:16.563Z",
+      "id": "2",
+      "name": "Platform"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-03-09T01:50:08.324Z",
+  "versionId": "4ad49312-4d91-456c-97a5-cf4489b3b565"
+}
