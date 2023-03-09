@@ -1,0 +1,147 @@
+{
+  "active": false,
+  "connections": {
+    "Set Token Name": {
+      "main": [
+        [
+          {
+            "node": "Build Login Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Login Command": {
+      "main": [
+        [
+          {
+            "node": "OC Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Set Token Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-10T02:22:08.438Z",
+  "id": "36",
+  "name": "Common OC Login",
+  "nodes": [
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "tokenName",
+              "value": "GOLD_Token"
+            },
+            {
+              "name": "nameSpace",
+              "value": "bf5ef6-dev"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d033b9f1-7cf2-45d8-8a1c-9e08ad1c4976",
+      "name": "Set Token Name",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "28"
+      },
+      "id": "14b25078-e9c8-45fe-bda1-236856d63e02",
+      "name": "Build Login Command",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        340
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name\"].json.nameSpace }}"
+      },
+      "id": "feda7f71-01d4-4ed9-812a-743a7bfb2373",
+      "name": "OC Login",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Example of using the common OC login\n\nBy copying and using the 3 nodes below you can quickly do an `oc login` on your target environment.\n* In the `Set Token Name` you fill in the name of the credential where you stored the token. For instance check out: [GOLD_Token](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/credentials) and take note on how this credential has been set up.\n* Also in the `Set Token Name` fill in the targeted namespace, that will be set after your login.\n* You can verify if it works by running the 3 nodes. the stdout should show ```Logged into \"https://api.gold.devops.gov.bc.ca:6443\" as \"system:serviceaccount:bf5ef6-tools:github-cicd\" using the token provided.\\n\\nYou have access to the following projects and can switch between them with 'oc project <projectname>':\\n\\n  * bf5ef6-dev\\n    bf5ef6-prod\\n    bf5ef6-test\\n    bf5ef6-tools\\n\\nUsing project \"bf5ef6-dev\".``` or something similar.\n* Now you can use these 3 nodes in your workflow whenever you need to be logging in into OpenShift.",
+        "height": 322,
+        "width": 1058
+      },
+      "id": "34429efa-d383-46db-9df5-6299d312699e",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        -20
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a150ed99-4df0-41e7-8bf1-1154a13f0d8b",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        340
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-03-10T02:25:44.914Z",
+      "updatedAt": "2023-03-10T02:25:44.914Z",
+      "id": "8",
+      "name": "Template"
+    },
+    {
+      "createdAt": "2023-02-25T02:10:52.949Z",
+      "updatedAt": "2023-02-25T02:10:52.949Z",
+      "id": "6",
+      "name": "Example"
+    },
+    {
+      "createdAt": "2023-03-10T02:26:00.290Z",
+      "updatedAt": "2023-03-10T02:26:00.290Z",
+      "id": "9",
+      "name": "OpenShift"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-03-10T03:34:48.304Z",
+  "versionId": "ab32ec4b-0d37-4b71-864f-72bc14078595"
+}
