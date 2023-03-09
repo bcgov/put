@@ -1,0 +1,127 @@
+{
+  "active": true,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-08T08:49:30.663Z",
+  "id": "30",
+  "name": "Run N8N Audit",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e046b83b-51b4-4582-aeb2-a2f8e933be33",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "command": "n8n audit"
+      },
+      "id": "9ff09da2-2ea9-412b-a3ba-d39e4825bf59",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        440,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@gov.bc.ca",
+        "toEmail": "roland.stens@gmail.com",
+        "subject": "N8N Audit Report",
+        "text": "={{ $node[\"Execute Command\"].json.stdout }}",
+        "options": {}
+      },
+      "id": "7ec5e984-ac9f-4077-b05d-a65f77c51d33",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        620,
+        440
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 4
+            }
+          ]
+        }
+      },
+      "id": "d2d2b090-f9d1-4d83-9b6f-52f8d504ac95",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        280
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-02-09T09:22:16.563Z",
+      "updatedAt": "2023-02-09T09:22:16.563Z",
+      "id": "2",
+      "name": "Platform"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-03-08T09:15:08.799Z",
+  "versionId": "cfb9cbdc-56c4-4058-b96c-9ebbd6051489"
+}
