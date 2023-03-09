@@ -1,0 +1,213 @@
+{
+  "active": false,
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RocketChat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RocketChat": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-08T04:04:37.152Z",
+  "id": "1",
+  "name": "N8N Basic Health Check",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/healthz",
+        "options": {
+          "fullResponse": true
+        }
+      },
+      "id": "b3b08f64-5443-4139-a90c-7dd62a76127b",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$node[\"HTTP Request\"].json[\"statusCode\"]}}",
+              "operation": "equal",
+              "value2": 200
+            }
+          ]
+        }
+      },
+      "id": "b1aa7509-4166-4647-bd2c-121b92de3d02",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "92be5063-8963-4f04-b22e-8739e1dc0005",
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@gov.bc.ca",
+        "toEmail": "roland.stens@gov.bc.ca",
+        "subject": "Error Found",
+        "text": "=Server: {{$node[\"HTTP Request\"].parameter[\"url\"]}}\nHealth Status: {{$node[\"HTTP Request\"].json[\"body\"][\"status\"]}} \nHTTP Status: {{$node[\"HTTP Request\"].json[\"statusCode\"]}}\n\nDatabase Users: {{$node[\"Postgres\"].json[\"user\"]}}",
+        "options": {}
+      },
+      "id": "afa49cbf-8b3c-44ba-93e6-d8535931b68b",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        960,
+        500
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channel": "#PUT",
+        "text": "= {{$node[\"Send Email\"].parameter[\"subject\"]}}\n\n{{$node[\"Send Email\"].parameter[\"text\"]}}",
+        "options": {},
+        "attachments": []
+      },
+      "id": "2908ab0a-7d2e-497a-8101-5f11b8217bf7",
+      "name": "RocketChat",
+      "type": "n8n-nodes-base.rocketchat",
+      "typeVersion": 1,
+      "position": [
+        960,
+        320
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "rocketchatApi": {
+          "id": "4",
+          "name": "Rocket account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## N8N Health Check\n\nQuick check on N8N running well.",
+        "width": 841
+      },
+      "id": "8d8db4bd-1d5f-4c60-813f-f049401c9862",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b97a7f3e-59c5-46b8-ac75-47975e909eca",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "timezone": "America/Los_Angeles",
+    "saveExecutionProgress": "DEFAULT"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:07:35.632Z",
+      "updatedAt": "2023-02-25T02:07:35.632Z",
+      "id": "3",
+      "name": "Test"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-02-25T02:46:42.435Z",
+  "versionId": "942cc229-5224-49b8-be88-b66be42e2133"
+}
