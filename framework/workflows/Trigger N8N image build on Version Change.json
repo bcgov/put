@@ -230,7 +230,7 @@
             {
               "value1": "={{ $json.stdout }}",
               "operation": "contains",
-              "value2": "={{ $json.version }}"
+              "value2": "={{ $node[\"Get Latest N8N Version\"].json.version }}"
             }
           ]
         }
@@ -246,7 +246,12 @@
     }
   ],
   "pinData": {},
-  "settings": {},
+  "settings": {
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
+  },
   "staticData": {
     "node:Schedule Trigger": {
       "recurrencyRules": []
@@ -267,6 +272,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-09T01:50:08.324Z",
-  "versionId": "4ad49312-4d91-456c-97a5-cf4489b3b565"
+  "updatedAt": "2023-03-14T04:11:00.059Z",
+  "versionId": "cd312ceb-5caa-4afa-b12d-95d940b6a90b"
 }
