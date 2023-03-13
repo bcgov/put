@@ -259,7 +259,12 @@
     }
   ],
   "pinData": {},
-  "settings": {},
+  "settings": {
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
+  },
   "staticData": {
     "node:Schedule Trigger": {
       "recurrencyRules": []
@@ -274,6 +279,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-10T04:35:46.803Z",
-  "versionId": "f8308cd5-5637-4ab9-b613-91152b3df7e3"
+  "updatedAt": "2023-03-14T04:11:31.623Z",
+  "versionId": "6a0f406e-f991-4506-ac88-30b9d9fcae41"
 }
