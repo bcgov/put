@@ -91,6 +91,7 @@
         "rule": {
           "interval": [
             {
+              "field": "weeks",
               "triggerAtHour": 4
             }
           ]
@@ -107,7 +108,12 @@
     }
   ],
   "pinData": {},
-  "settings": {},
+  "settings": {
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
+  },
   "staticData": {
     "node:Schedule Trigger": {
       "recurrencyRules": []
@@ -122,6 +128,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-08T09:15:08.799Z",
-  "versionId": "cfb9cbdc-56c4-4058-b96c-9ebbd6051489"
+  "updatedAt": "2023-03-14T06:14:11.994Z",
+  "versionId": "352b2be6-5a4f-4621-865f-c3ae309db457"
 }
