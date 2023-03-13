@@ -441,7 +441,12 @@
     }
   ],
   "pinData": {},
-  "settings": {},
+  "settings": {
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
+  },
   "staticData": null,
   "tags": [
     {
@@ -452,6 +457,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-03-09T09:31:21.568Z",
-  "versionId": "45c152d0-7202-4e76-bdc5-48160bb7f225"
+  "updatedAt": "2023-03-14T04:13:49.736Z",
+  "versionId": "e9bc0429-a160-4d27-b17d-a2d60bc6a95c"
 }
