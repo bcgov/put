@@ -1,5 +1,5 @@
 {
-  "active": false,
+  "active": true,
   "connections": {
     "When clicking \"Execute Workflow\"": {
       "main": [
@@ -250,8 +250,17 @@
     }
   ],
   "pinData": {},
-  "settings": {},
-  "staticData": null,
+  "settings": {
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
   "tags": [
     {
       "createdAt": "2023-02-25T02:07:35.632Z",
@@ -260,7 +269,7 @@
       "name": "Test"
     }
   ],
-  "triggerCount": 0,
-  "updatedAt": "2023-03-10T02:38:03.039Z",
-  "versionId": "dc62f68b-95c8-48b4-9603-a8c675212c7c"
+  "triggerCount": 1,
+  "updatedAt": "2023-03-14T04:48:27.028Z",
+  "versionId": "b879ecd1-18fd-46ef-ba67-6bf62583ffca"
 }
