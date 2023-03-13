@@ -490,7 +490,8 @@
       "position": [
         -280,
         -80
-      ]
+      ],
+      "continueOnFail": true
     },
     {
       "parameters": {
@@ -542,7 +543,12 @@
     }
   ],
   "pinData": {},
-  "settings": {},
+  "settings": {
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
+  },
   "staticData": null,
   "tags": [
     {
@@ -553,6 +559,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-03-10T02:02:38.769Z",
-  "versionId": "562f178a-2158-4bab-ab37-e220b78fd25c"
+  "updatedAt": "2023-03-14T04:11:49.281Z",
+  "versionId": "b09687a8-0c7a-4f1e-9370-79582482002f"
 }
