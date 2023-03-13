@@ -1,0 +1,62 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-14T06:12:05.843Z",
+  "id": "42",
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1dde7363-f16e-4b6b-ae2e-e6851dbee902",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        960,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select distinct status from execution_entity;",
+        "additionalFields": {
+          "mode": "independently"
+        }
+      },
+      "id": "84c4d0e0-ef57-4c86-a7da-ac5921c87312",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        480
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "21",
+          "name": "N8N database access"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-03-14T06:13:23.276Z",
+  "versionId": "b5253966-6e64-46e5-814b-1108cdeca93a"
+}
