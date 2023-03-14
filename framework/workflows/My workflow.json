@@ -31,7 +31,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "select distinct status from execution_entity;",
+        "query": "select id,name from credentials_entity order by id;",
         "additionalFields": {
           "mode": "independently"
         }
@@ -57,6 +57,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2023-03-14T06:13:23.276Z",
-  "versionId": "b5253966-6e64-46e5-814b-1108cdeca93a"
+  "updatedAt": "2023-03-14T06:34:03.261Z",
+  "versionId": "b8af9d7a-4561-4b9f-aca4-de672b73f6bf"
 }
