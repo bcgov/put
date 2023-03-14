@@ -528,16 +528,16 @@
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-02-25T02:10:52.949Z",
-      "updatedAt": "2023-02-25T02:10:52.949Z",
-      "id": "6",
-      "name": "Example"
-    },
-    {
       "createdAt": "2023-02-25T02:07:35.632Z",
       "updatedAt": "2023-02-25T02:07:35.632Z",
       "id": "3",
       "name": "Test"
+    },
+    {
+      "createdAt": "2023-02-25T02:10:52.949Z",
+      "updatedAt": "2023-02-25T02:10:52.949Z",
+      "id": "6",
+      "name": "Example"
     }
   ],
   "triggerCount": 0,
