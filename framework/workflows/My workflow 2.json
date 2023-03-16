@@ -1,0 +1,52 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-17T01:21:21.275Z",
+  "id": "44",
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "39fcc7ef-1f06-476f-9564-651ed99c9444",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        880,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "command": "rm -f test.py\npython3 -V\n"
+      },
+      "id": "183aae3a-9dff-4d75-adef-d463687ccfdc",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        480
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-03-17T01:50:49.668Z",
+  "versionId": "9eec024e-a376-43e3-bc42-d785b041f315"
+}
