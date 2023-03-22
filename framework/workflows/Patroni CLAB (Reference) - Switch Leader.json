@@ -433,7 +433,7 @@
     },
     {
       "parameters": {
-        "command": "=oc rsh $(oc get pods -o name --selector role=master,cluster-name=patroni-reference) curl -s http://localhost:8008/switchover -XPOST -d '{\"leader\":\"{{ $json.stdout }}\"}' \nsleep 20"
+        "command": "=oc exec $(oc get pods -o name --selector role=master,cluster-name=patroni-reference) -- curl -s http://localhost:8008/switchover -XPOST -d '{\"leader\":\"{{ $json.stdout }}\"}' \nsleep 20"
       },
       "id": "25e0396b-815d-470c-a5da-ae565f776077",
       "name": "Change Leader",
@@ -462,7 +462,7 @@
     },
     {
       "parameters": {
-        "command": "=oc rsh $(oc get pods -o name --selector role=master,cluster-name=patroni-reference) curl -s localhost:8008/cluster | jq -r '.members[] | select(.role==\"leader\") | .name'\n"
+        "command": "=oc exec $(oc get pods -o name --selector role=master,cluster-name=patroni-reference) -- curl -s localhost:8008/cluster | jq -r '.members[] | select(.role==\"leader\") | .name'\n"
       },
       "id": "22ee15e7-ae7f-464e-9940-f6ce4c7b3acd",
       "name": "Find Leader",
@@ -492,6 +492,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-03-14T04:14:07.971Z",
-  "versionId": "e2f3daf6-91a0-49e6-a31f-13196dc01c74"
+  "updatedAt": "2023-03-22T23:53:24.730Z",
+  "versionId": "0440c37e-3987-4eb9-8b66-87e256b77052"
 }
