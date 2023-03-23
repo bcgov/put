@@ -259,11 +259,7 @@
             "label": "={{ $node.GitHub.json.labels[2].name }}"
           }
         ],
-        "assignees": [
-          {
-            "assignee": "={{ $node.GitHub.json.assignee.login }}"
-          }
-        ]
+        "assignees": []
       },
       "id": "c26f0875-f396-46b1-bc48-cc17c0011887",
       "name": "GitHub 3 Labels",
@@ -310,11 +306,7 @@
             "label": "={{ $node.GitHub.json.labels[0].name }}"
           }
         ],
-        "assignees": [
-          {
-            "assignee": "={{ $node.GitHub.json.assignee.login }}"
-          }
-        ]
+        "assignees": []
       },
       "id": "5e349e48-61ba-4e71-a468-3b52c1d89039",
       "name": "GitHub 3 Labels1",
@@ -353,11 +345,7 @@
             "label": "={{ $node.GitHub.json.labels[1].name }}"
           }
         ],
-        "assignees": [
-          {
-            "assignee": "={{ $node.GitHub.json.assignee.login }}"
-          }
-        ]
+        "assignees": []
       },
       "id": "a9257f05-8618-4aa1-a241-3b046763b981",
       "name": "GitHub 3 Labels2",
@@ -389,11 +377,7 @@
         "title": "=CLONE: {{ $node.GitHub.json.title }}",
         "body": "={{ $node.GitHub.json.body }}",
         "labels": [],
-        "assignees": [
-          {
-            "assignee": "={{ $node.GitHub.json.assignee.login }}"
-          }
-        ]
+        "assignees": []
       },
       "id": "830e9f73-4fe8-4f4d-994e-1dc0fd8bc577",
       "name": "GitHub 3 Labels3",
@@ -450,6 +434,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-23T00:47:19.878Z",
-  "versionId": "82c3ee0e-a401-4884-a894-e9cce1de45c3"
+  "updatedAt": "2023-03-23T23:47:36.366Z",
+  "versionId": "8421a928-1977-4f52-95fc-a7dc20201286"
 }
