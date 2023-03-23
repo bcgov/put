@@ -33,8 +33,8 @@ objects:
           name: "${NAME}:latest"
       resources:
         limits:
-          cpu: '1'
-          memory: 1Gi
+          cpu: 1400m
+          memory: 3Gi
         requests:
           cpu: 500m
           memory: 512Mi
@@ -48,9 +48,6 @@ objects:
             kind: DockerImage
             name: >-
               artifacts.developer.gov.bc.ca/redhat-docker-remote/ubi8/nodejs-16:latest
-          env:
-            - name: N8N_VERSION
-              value: "${N8N_VERSION}"
       postCommit: {}
       source:
         type: Dockerfile
@@ -67,7 +64,7 @@ objects:
 
           RUN yum update -y
 
-          RUN yum install -y GraphicsMagick gcc-c++ make
+          RUN yum install -y GraphicsMagick gcc-c++ make jq python3
 
           RUN yum clean all
 

@@ -11,9 +11,8 @@ While N8N does provide a Docker image [here](https://hub.docker.com/r/n8nio/n8n)
 ```sh
 export NAME=n8n
 export N8N_IMAGE_NAMESPACE=bf5ef6-tools
-export N8N_VERSION=0.195.0
 
-oc process -n $N8N_IMAGE_NAMESPACE -f n8n.bc.yaml -p NAME=$NAME N8N_VERSION=$N8N_VERSION N8N_IMAGE_NAMESPACE=$N8N_IMAGE_NAMESPACE -o yaml | oc apply -n $N8N_IMAGE_NAMESPACE -f -
+oc process -n $N8N_IMAGE_NAMESPACE -f n8n.bc.yaml -p NAME=$NAME N8N_IMAGE_NAMESPACE=$N8N_IMAGE_NAMESPACE -o yaml | oc apply -n $N8N_IMAGE_NAMESPACE -f -
 
 ```
 

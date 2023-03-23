@@ -28,9 +28,9 @@ objects:
     apiVersion: v1
     metadata:
       annotations:
-        template.openshift.io/expose-database_name: '{.data[''database-name'']}'
-        template.openshift.io/expose-password: '{.data[''database-password'']}'
-        template.openshift.io/expose-username: '{.data[''database-user'']}'
+        template.openshift.io/expose-database_name: "{.data['database-name']}"
+        template.openshift.io/expose-password: "{.data['database-password']}"
+        template.openshift.io/expose-username: "{.data['database-user']}"
       labels:
         template: "${NAME}-template"
         app.kubernetes.io/part-of: "${NAME}-app"
@@ -46,7 +46,7 @@ objects:
     apiVersion: v1
     metadata:
       annotations:
-        template.openshift.io/expose-password: '{.data[''database-password'']}'
+        template.openshift.io/expose-password: "{.data['database-password']}"
       labels:
         template: "${NAME}-template"
         app.kubernetes.io/part-of: "${NAME}-app"
@@ -67,10 +67,10 @@ objects:
       namespace: "${NAMESPACE}"
     spec:
       ports:
-      - name: 5678-tcp
-        port: 5678
-        protocol: TCP
-        targetPort: 5678
+        - name: 5678-tcp
+          port: 5678
+          protocol: TCP
+          targetPort: 5678
       selector:
         name: "${NAME}"
       sessionAffinity: None
@@ -103,10 +103,10 @@ objects:
       namespace: "${NAMESPACE}"
     spec:
       ports:
-      - name: "redis-${NAME}"
-        port: 6379
-        protocol: TCP
-        targetPort: 6379
+        - name: "redis-${NAME}"
+          port: 6379
+          protocol: TCP
+          targetPort: 6379
       selector:
         name: "redis-${NAME}"
       sessionAffinity: None
@@ -118,7 +118,7 @@ objects:
       labels:
         app.kubernetes.io/part-of: "${NAME}-app"
     spec:
-      host: "${NAME}-${NAMESPACE}.apps.gold.devops.gov.bc.ca"
+      host: "${NAME}-${NAMESPACE}.apps.${CLUSTER_NAME}.devops.gov.bc.ca"
       tls:
         insecureEdgeTerminationPolicy: Redirect
         termination: edge
@@ -141,7 +141,7 @@ objects:
       namespace: "${NAMESPACE}"
     spec:
       accessModes:
-      - ReadWriteMany
+        - ReadWriteMany
       resources:
         requests:
           storage: "${PVC_SIZE}"
@@ -159,7 +159,7 @@ objects:
       namespace: "${NAMESPACE}"
     spec:
       accessModes:
-      - ReadWriteOnce
+        - ReadWriteOnce
       resources:
         requests:
           storage: "${REDIS_PVC_SIZE}"
@@ -177,7 +177,7 @@ objects:
       namespace: "${NAMESPACE}"
     spec:
       accessModes:
-      - ReadWriteMany
+        - ReadWriteMany
       resources:
         requests:
           storage: "${PSQL_PVC_SIZE}"
@@ -212,70 +212,70 @@ objects:
             name: "redis-${NAME}"
         spec:
           containers:
-          - env:
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: database-password
-                  name: "redis-${NAME}"
-            imagePullPolicy: IfNotPresent
-            image: image-registry.openshift-image-registry.svc:5000/openshift/redis:latest
-            livenessProbe:
-              failureThreshold: 3
-              initialDelaySeconds: 30
-              periodSeconds: 10
-              successThreshold: 1
-              tcpSocket:
-                port: 6379
-              timeoutSeconds: 1
-            name: "redis-${NAME}"
-            ports:
-            - containerPort: 6379
-              protocol: TCP
-            readinessProbe:
-              exec:
-                command:
-                - /bin/sh
-                - -i
-                - -c
-                - test "$(redis-cli -h 127.0.0.1 -a $REDIS_PASSWORD ping)" == "PONG"
-              failureThreshold: 3
-              initialDelaySeconds: 5
-              periodSeconds: 10
-              successThreshold: 1
-              timeoutSeconds: 1
-            resources:
-              limits:
-                memory: 512Mi
-            securityContext:
-              capabilities: {}
-              privileged: false
-            terminationMessagePath: /dev/termination-log
-            terminationMessagePolicy: File
-            volumeMounts:
-            - mountPath: /var/lib/redis/data
-              name: "redis-${NAME}-data"
+            - env:
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-password
+                      name: "redis-${NAME}"
+              imagePullPolicy: IfNotPresent
+              image: image-registry.openshift-image-registry.svc:5000/openshift/redis:latest
+              livenessProbe:
+                failureThreshold: 3
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                successThreshold: 1
+                tcpSocket:
+                  port: 6379
+                timeoutSeconds: 1
+              name: "redis-${NAME}"
+              ports:
+                - containerPort: 6379
+                  protocol: TCP
+              readinessProbe:
+                exec:
+                  command:
+                    - /bin/sh
+                    - -i
+                    - -c
+                    - test "$(redis-cli -h 127.0.0.1 -a $REDIS_PASSWORD ping)" == "PONG"
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  memory: 512Mi
+              securityContext:
+                capabilities: {}
+                privileged: false
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /var/lib/redis/data
+                  name: "redis-${NAME}-data"
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           schedulerName: default-scheduler
           securityContext: {}
           terminationGracePeriodSeconds: 30
           volumes:
-          - name: "redis-${NAME}-data"
-            persistentVolumeClaim:
-              claimName: "redis-${NAME}"
+            - name: "redis-${NAME}-data"
+              persistentVolumeClaim:
+                claimName: "redis-${NAME}"
       test: false
       triggers:
-      - type: ImageChange
-        imageChangeParams:
-          automatic: true
-          containerNames:
-          - "redis-${NAME}"
-          from:
-            kind: ImageStreamTag
-            name: redis:latest
-            namespace: openshift
-      - type: ConfigChange
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - "redis-${NAME}"
+            from:
+              kind: ImageStreamTag
+              name: redis:latest
+              namespace: openshift
+        - type: ConfigChange
   - kind: DeploymentConfig
     apiVersion: apps.openshift.io/v1
     metadata:
@@ -305,79 +305,79 @@ objects:
             name: "postgresql-${NAME}"
         spec:
           containers:
-          - env:
-            - name: POSTGRESQL_USER
-              valueFrom:
-                secretKeyRef:
-                  key: database-user
-                  name: "postgresql-${NAME}"
-            - name: POSTGRESQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: database-password
-                  name: "postgresql-${NAME}"
-            - name: POSTGRESQL_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  key: database-name
-                  name: "postgresql-${NAME}"
-            imagePullPolicy: IfNotPresent
-            image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql:latest
-            livenessProbe:
-              exec:
-                command:
-                - /usr/libexec/check-container
-                - --live
-              failureThreshold: 3
-              initialDelaySeconds: 120
-              periodSeconds: 10
-              successThreshold: 1
-              timeoutSeconds: 10
-            name: "postgresql-${NAME}"
-            ports:
-            - containerPort: 5432
-              protocol: TCP
-            readinessProbe:
-              exec:
-                command:
-                - /usr/libexec/check-container
-              failureThreshold: 3
-              initialDelaySeconds: 5
-              periodSeconds: 10
-              successThreshold: 1
-              timeoutSeconds: 1
-            resources:
-              limits:
-                memory: 512Mi
-            securityContext:
-              capabilities: {}
-              privileged: false
-            terminationMessagePath: /dev/termination-log
-            terminationMessagePolicy: File
-            volumeMounts:
-            - mountPath: /var/lib/pgsql/data
-              name: "postgresql-${NAME}-data"
+            - env:
+                - name: POSTGRESQL_USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-user
+                      name: "postgresql-${NAME}"
+                - name: POSTGRESQL_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-password
+                      name: "postgresql-${NAME}"
+                - name: POSTGRESQL_DATABASE
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-name
+                      name: "postgresql-${NAME}"
+              imagePullPolicy: IfNotPresent
+              image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql:latest
+              livenessProbe:
+                exec:
+                  command:
+                    - /usr/libexec/check-container
+                    - --live
+                failureThreshold: 3
+                initialDelaySeconds: 120
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 10
+              name: "postgresql-${NAME}"
+              ports:
+                - containerPort: 5432
+                  protocol: TCP
+              readinessProbe:
+                exec:
+                  command:
+                    - /usr/libexec/check-container
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  memory: 512Mi
+              securityContext:
+                capabilities: {}
+                privileged: false
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /var/lib/pgsql/data
+                  name: "postgresql-${NAME}-data"
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           schedulerName: default-scheduler
           securityContext: {}
           terminationGracePeriodSeconds: 30
           volumes:
-          - name: "postgresql-${NAME}-data"
-            persistentVolumeClaim:
-              claimName: "postgresql-${NAME}"
+            - name: "postgresql-${NAME}-data"
+              persistentVolumeClaim:
+                claimName: "postgresql-${NAME}"
       test: false
       triggers:
-      - imageChangeParams:
-          automatic: true
-          containerNames:
-          - "postgresql-${NAME}"
-          from:
-            kind: ImageStreamTag
-            name: postgresql:latest
-            namespace: openshift
-        type: ImageChange
-      - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - "postgresql-${NAME}"
+            from:
+              kind: ImageStreamTag
+              name: postgresql:latest
+              namespace: openshift
+          type: ImageChange
+        - type: ConfigChange
   - kind: DeploymentConfig
     apiVersion: apps.openshift.io/v1
     metadata:
@@ -390,7 +390,7 @@ objects:
       name: "${NAME}"
       namespace: "${NAMESPACE}"
     spec:
-      replicas: 1
+      replicas: 2
       revisionHistoryLimit: 10
       selector:
         name: "${NAME}"
@@ -411,119 +411,193 @@ objects:
             name: "${NAME}"
         spec:
           containers:
-          - env:
-            - name: DB_TYPE
-              value: postgresdb
-            - name: DB_POSTGRESDB_HOST
-              value: "postgresql-${NAME}"
-            - name: DB_POSTGRESDB_USER
-              valueFrom:
-                secretKeyRef:
-                  key: database-user
-                  name: "postgresql-${NAME}"
-            - name: DB_POSTGRESDB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: database-password
-                  name: "postgresql-${NAME}"
-            - name: DB_POSTGRESDB_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  key: database-name
-                  name: "postgresql-${NAME}"
-            - name: DB_POSTGRESDB_PORT
-              value: "5432"
-            - name: DB_POSTGRESDB_SCHEMA
-              value: public
-            - name: N8N_BASIC_AUTH_ACTIVE
-              value: "true"
-            - name: N8N_BASIC_AUTH_USER
-              valueFrom:
-                secretKeyRef:
-                  key: username
-                  name: "${NAME}"
-            - name: N8N_BASIC_AUTH_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: password
-                  name: "${NAME}"
-            - name: NODE_ENV
-              value: production
-            - name: N8N_PORT
-              value: "5678"
-            - name: N8N_EMAIL_MODE
-              value: smtp
-            - name: N8N_SMTP_HOST
-              value: apps.smtp.gov.bc.ca
-            - name: N8N_SMTP_PORT
-              value: "25"
-            - name: N8N_SMTP_USER
-              value: dummy@test.com
-            - name: N8N_SMTP_PASS
-              value: dummy
-            - name: N8N_SMTP_SENDER
-              value: roland.stens@gov.bc.ca
-            - name: N8N_SMTP_SSL
-              value: "false"
-            - name: QUEUE_BULL_REDIS_HOST
-              value: "redis-${NAME}"
-            - name: QUEUE_BULL_REDIS_PORT
-              value: "6379"
-            - name: QUEUE_BULL_REDIS_TIMEOUT_THRESHOLD
-              value: "20"
-            - name: QUEUE_RECOVERY_INTERVAL
-              value: "10"
-            - name: QUEUE_BULL_REDIS_DB
-              value: "0"
-            - name: QUEUE_BULL_REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: database-password
-                  name: "redis-${NAME}"
-            - name: N8N_ENCRYPTION_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: encryption-key
-                  name: "${NAME}"
-            - name: WEBHOOK_TUNNEL_URL
-              value: "https://${NAME}-${NAMESPACE}.apps.gold.devops.gov.bc.ca/"
-            image: "image-registry.openshift-image-registry.svc:5000/${N8N_IMAGE_NAMESPACE}/${NAME}:latest"
-            imagePullPolicy: IfNotPresent
-            name: n8n
-            resources:
-              limits:
-                cpu: "${CPU_LIMIT}"
-                memory: "${MEMORY_LIMIT}"
-              requests:
-                cpu: "${CPU_REQUEST}"
-                memory: "${MEMORY_REQUEST}"
-            terminationMessagePath: /dev/termination-log
-            terminationMessagePolicy: File
-            volumeMounts:
-            - mountPath: /data
-              name: "${NAME}-data"
+            - env:
+                - name: DB_TYPE
+                  value: postgresdb
+                - name: DB_POSTGRESDB_HOST
+                  value: "postgresql-${NAME}"
+                - name: DB_POSTGRESDB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-user
+                      name: "postgresql-${NAME}"
+                - name: DB_POSTGRESDB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-password
+                      name: "postgresql-${NAME}"
+                - name: DB_POSTGRESDB_DATABASE
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-name
+                      name: "postgresql-${NAME}"
+                - name: DB_POSTGRESDB_PORT
+                  value: "5432"
+                - name: DB_POSTGRESDB_SCHEMA
+                  value: public
+                - name: N8N_BASIC_AUTH_ACTIVE
+                  value: "true"
+                - name: N8N_BASIC_AUTH_USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: username
+                      name: "${NAME}"
+                - name: N8N_BASIC_AUTH_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: "${NAME}"
+                - name: N8N_PORT
+                  value: "5678"
+                - name: N8N_EMAIL_MODE
+                  value: smtp
+                - name: N8N_SMTP_HOST
+                  value: apps.smtp.gov.bc.ca
+                - name: N8N_SMTP_PORT
+                  value: "25"
+                - name: N8N_SMTP_USER
+                  value: no-reply@gov.bc.ca
+                - name: N8N_SMTP_PASS
+                  value:
+                - name: N8N_SMTP_SENDER
+                  value: no-reply@gov.bc.ca
+                - name: N8N_SMTP_SSL
+                  value: "false"
+                - name: N8N_ENCRYPTION_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: encryption-key
+                      name: "${NAME}"
+                - name: N8N_DEFAULT_BINARY_DATA_MODE
+                  value: filesystem
+                - name: N8N_METRICS
+                  value: "true"
+                - name: QUEUE_BULL_REDIS_HOST
+                  value: "redis-${NAME}"
+                - name: QUEUE_BULL_REDIS_PORT
+                  value: "6379"
+                - name: QUEUE_BULL_REDIS_TIMEOUT_THRESHOLD
+                  value: "20"
+                - name: QUEUE_RECOVERY_INTERVAL
+                  value: "10"
+                - name: QUEUE_BULL_REDIS_DB
+                  value: "0"
+                - name: QUEUE_BULL_REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-password
+                      name: "redis-${NAME}"
+                - name: GENERIC_TIMEZONE
+                  value: America/Vancouver
+                - name: EXECUTIONS_PROCESS
+                  value: own
+                - name: WEBHOOK_TUNNEL_URL
+                  value: "https://${NAME}-${NAMESPACE}.apps.${CLUSTER_NAME}.devops.gov.bc.ca/"
+                - name: NODE_ENV
+                  value: production
+                - name: NODE_OPTIONS
+                  value: --max_old_space_size=7168
+              image: "image-registry.openshift-image-registry.svc:5000/${N8N_IMAGE_NAMESPACE}/${NAME}:latest"
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: 5678
+                  scheme: HTTP
+                initialDelaySeconds: 10
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: 5678
+                  scheme: HTTP
+                initialDelaySeconds: 20
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              startupProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: 5678
+                  scheme: HTTP
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1              
+              name: n8n
+              resources:
+                limits:
+                  cpu: "${CPU_LIMIT}"
+                  memory: "${MEMORY_LIMIT}"
+                requests:
+                  cpu: "${CPU_REQUEST}"
+                  memory: "${MEMORY_REQUEST}"
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /data
+                  name: "${NAME}-data"
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           schedulerName: default-scheduler
           securityContext: {}
           terminationGracePeriodSeconds: 30
           volumes:
-          - name: "${NAME}-data"
-            persistentVolumeClaim:
-              claimName: "${NAME}-data"
+            - name: "${NAME}-data"
+              persistentVolumeClaim:
+                claimName: "${NAME}-data"
       test: false
       triggers:
-      - imageChangeParams:
-          automatic: true
-          containerNames:
-          - "${NAME}"
-          from:
-            kind: ImageStreamTag
-            name: "${NAME}:latest"
-            namespace: "${N8N_IMAGE_NAMESPACE}"
-        type: ImageChange
-      - type: ConfigChange
-
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - "${NAME}"
+            from:
+              kind: ImageStreamTag
+              name: "${NAME}:latest"
+              namespace: "${N8N_IMAGE_NAMESPACE}"
+          type: ImageChange
+        - type: ConfigChange
+  - kind: HorizontalPodAutoscaler
+    apiVersion: autoscaling/v2beta2
+    metadata:
+      name: "${NAME}"
+      namespace: "${NAMESPACE}"
+    spec:
+      scaleTargetRef:
+        apiVersion: apps.openshift.io/v1
+        kind: DeploymentConfig
+        name: "${NAME}"
+      minReplicas: 1
+      maxReplicas: 3
+      metrics:
+        - type: Resource
+          resource:
+            name: memory
+            target:
+              type: Utilization
+              averageUtilization: 75
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 75
+  - kind: PodDisruptionBudget
+    apiVersion: policy/v1
+    metadata:
+      name: "${NAME}"
+      namespace: "${NAMESPACE}"
+    spec:
+      selector:
+        matchLabels:
+          name: "${NAME}"
+      maxUnavailable: 1
 parameters:
   - name: NAME
     displayName: Name
@@ -540,6 +614,11 @@ parameters:
     displayName: Namespace
     required: true
     value: bf5ef6-tools
+  - name: CLUSTER_NAME
+    description: Target cluster reference (i.e. 'silver', 'gold' etc.) for the N8N image
+    displayName: Cluster Name
+    required: true
+    value: gold    
   - name: CPU_REQUEST
     description: Minimal CPU needed to run
     displayName: CPU Request
@@ -547,7 +626,7 @@ parameters:
   - name: CPU_LIMIT
     description: Maximum CPU allowed to use
     displayName: CPU Limit
-    value: '1'
+    value: "1"
   - name: MEMORY_REQUEST
     description: Minimal amount of memory needed to run
     displayName: Memory Request
@@ -555,22 +634,22 @@ parameters:
   - name: MEMORY_LIMIT
     description: Maximum amount of memory allowed to use
     displayName: Memory Limit
-    value: 1Gi
+    value: 8Gi
   - name: PVC_SIZE
     description: Amount of disk space needed for persistence
     displayName: PVC Size
     required: true
-    value: 400Mi
+    value: 5Gi
   - name: REDIS_PVC_SIZE
     description: Amount of disk space needed for Redis
     displayName: PVC Size
     required: true
-    value: 200Mi
+    value: 1Gi
   - name: PSQL_PVC_SIZE
     description: Amount of disk space needed for postgresql
     displayName: PVC Size
     required: true
-    value: 300Mi
+    value: 10Gi
   - name: N8N_USER
     displayName: N8N User name
     description: The name associated with the n8n basic user
@@ -578,16 +657,14 @@ parameters:
     value: n8n
   - name: N8N_PASSWORD
     displayName: N8N Password
-    description:
-      The password for the n8n basic user. Requires 2 upper, 2 lower,
+    description: The password for the n8n basic user. Requires 2 upper, 2 lower,
       1 special, 1 numeric chars and minimum 8 char length
     generate: expression
     from: "[a-zA-Z0-9]{16}"
     required: true
   - name: N8N_ENCRYPTION_KEY
     displayName: N8N Encryption Key
-    description:
-      The encryption key for n8n.
+    description: The encryption key for n8n.
     generate: expression
     from: "[a-zA-Z0-9]{8}!@#$%^&_[a-zA-Z0-9]{8}"
     required: true
