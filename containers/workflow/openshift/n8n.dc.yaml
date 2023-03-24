@@ -115,8 +115,12 @@ objects:
     apiVersion: v1
     metadata:
       name: "${NAME}"
+      namespace: "${NAMESPACE}"
       labels:
         app.kubernetes.io/part-of: "${NAME}-app"
+      annotations:
+        haproxy.router.openshift.io/cookie_name: "${NAME}"
+        haproxy.router.openshift.io/timeout: 1d
     spec:
       host: "${NAME}-${NAMESPACE}.apps.${CLUSTER_NAME}.devops.gov.bc.ca"
       tls:
@@ -528,7 +532,7 @@ objects:
                 initialDelaySeconds: 120
                 periodSeconds: 10
                 successThreshold: 1
-                timeoutSeconds: 1              
+                timeoutSeconds: 1
               name: n8n
               resources:
                 limits:
@@ -568,6 +572,8 @@ objects:
     metadata:
       name: "${NAME}"
       namespace: "${NAMESPACE}"
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
     spec:
       scaleTargetRef:
         apiVersion: apps.openshift.io/v1
@@ -593,11 +599,27 @@ objects:
     metadata:
       name: "${NAME}"
       namespace: "${NAMESPACE}"
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
     spec:
       selector:
         matchLabels:
           name: "${NAME}"
       maxUnavailable: 1
+  - kind: NetworkPolicy
+    apiVersion: networking.k8s.io/v1
+    metadata:
+      name: allow-all-ingress
+      namespace: "${NAMESPACE}"
+      labels:
+        app: "${NAME}"
+        app.kubernetes.io/part-of: "${NAME}-app"
+    spec:
+      podSelector: {}
+      ingress:
+        - {}
+      policyTypes:
+        - Ingress
 parameters:
   - name: NAME
     displayName: Name
@@ -618,7 +640,7 @@ parameters:
     description: Target cluster reference (i.e. 'silver', 'gold' etc.) for the N8N image
     displayName: Cluster Name
     required: true
-    value: gold    
+    value: gold
   - name: CPU_REQUEST
     description: Minimal CPU needed to run
     displayName: CPU Request
