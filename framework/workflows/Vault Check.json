@@ -114,20 +114,14 @@
         ]
       ]
     },
-    "Set Message Params1": {
-      "main": [
-        [
-          {
-            "node": "Report Error",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Report Error": {
       "main": [
         [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          },
           {
             "node": "OC Logout",
             "type": "main",
@@ -185,6 +179,17 @@
         [
           {
             "node": "Vault health check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params1": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
             "type": "main",
             "index": 0
           }
@@ -588,12 +593,25 @@
         -200,
         153.58547655068077
       ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "=Error in {{ $workflow.name }}"
+      },
+      "id": "b3f53262-a103-458c-8fe1-a989bf57e661",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        420
+      ]
     }
   ],
   "pinData": {},
   "settings": {
-    "saveExecutionProgress": "DEFAULT",
-    "saveManualExecutions": false,
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
@@ -611,6 +629,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-14T04:11:17.867Z",
-  "versionId": "ea0116a0-d15f-4d5b-b587-fdbedf8f280b"
+  "updatedAt": "2023-03-30T01:37:34.792Z",
+  "versionId": "fbb6f2ed-7173-487b-a912-d1478266b5b1"
 }
