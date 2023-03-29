@@ -26,11 +26,6 @@
             "node": "Send Email",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "RocketChat",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -39,7 +34,7 @@
       "main": [
         [
           {
-            "node": "NoOp",
+            "node": "RocketChat",
             "type": "main",
             "index": 0
           }
@@ -50,7 +45,7 @@
       "main": [
         [
           {
-            "node": "NoOp",
+            "node": "Stop and Error",
             "type": "main",
             "index": 0
           }
@@ -58,6 +53,17 @@
       ]
     },
     "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
       "main": [
         [
           {
@@ -123,9 +129,9 @@
     },
     {
       "parameters": {
-        "fromEmail": "n8n@gov.bc.ca",
+        "fromEmail": "no-reply@gov.bc.ca",
         "toEmail": "roland.stens@gov.bc.ca",
-        "subject": "Error Found",
+        "subject": "N8N Server Error Found",
         "text": "=Server: {{$node[\"HTTP Request\"].parameter[\"url\"]}}\nHealth Status: {{$node[\"HTTP Request\"].json[\"body\"][\"status\"]}} \nHTTP Status: {{$node[\"HTTP Request\"].json[\"statusCode\"]}}\n\nDatabase Users: {{$node[\"Postgres\"].json[\"user\"]}}",
         "options": {}
       },
@@ -134,8 +140,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 1,
       "position": [
-        960,
-        500
+        940,
+        320
       ],
       "credentials": {
         "smtp": {
@@ -146,7 +152,7 @@
     },
     {
       "parameters": {
-        "channel": "#PUT",
+        "channel": "#devops-post-update-testing ",
         "text": "= {{$node[\"Send Email\"].parameter[\"subject\"]}}\n\n{{$node[\"Send Email\"].parameter[\"text\"]}}",
         "options": {},
         "attachments": []
@@ -156,7 +162,7 @@
       "type": "n8n-nodes-base.rocketchat",
       "typeVersion": 1,
       "position": [
-        960,
+        1120,
         320
       ],
       "alwaysOutputData": true,
@@ -191,12 +197,39 @@
         260,
         300
       ]
+    },
+    {
+      "parameters": {},
+      "id": "ded942c6-39d7-483f-91b4-f15ce7240272",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "=Error in {{ $workflow.name }}"
+      },
+      "id": "01eb3ef7-641c-4766-acce-8aa61c58d29a",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        320
+      ]
     }
   ],
   "pinData": {},
   "settings": {
     "timezone": "America/Los_Angeles",
-    "saveExecutionProgress": "DEFAULT"
+    "saveExecutionProgress": true,
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
   },
   "staticData": null,
   "tags": [
@@ -208,6 +241,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-02-25T02:46:42.435Z",
-  "versionId": "942cc229-5224-49b8-be88-b66be42e2133"
+  "updatedAt": "2023-03-30T01:25:04.467Z",
+  "versionId": "b498b0f2-fa43-4b01-91d5-69f1eae1ff56"
 }
