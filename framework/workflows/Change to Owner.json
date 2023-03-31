@@ -1,0 +1,60 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-31T23:48:45.097Z",
+  "id": "49",
+  "name": "Change to Owner",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4cb73b4f-3cbc-45b9-972a-ba893df17d7f",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        880,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "update \"user\" set \"globalRoleId\"=1;",
+        "additionalFields": {}
+      },
+      "id": "ff310bd4-f3b8-4423-857e-1964e8a40335",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        500
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "2",
+          "name": "Postgres account N8N"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-03-31T23:49:58.271Z",
+  "versionId": "6c6422bb-ea5c-4f78-a0df-91464c66a7d4"
+}
