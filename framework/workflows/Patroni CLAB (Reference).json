@@ -41,6 +41,11 @@
             "node": "OC Logout",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -382,15 +387,15 @@
     {
       "parameters": {
         "content": "## Close the Workflow",
-        "height": 214.8088439233485,
-        "width": 418.125
+        "height": 571.1994768028239,
+        "width": 377.6614346949063
       },
       "id": "7d898d90-fb73-4135-a7ae-d8c89a0713fb",
       "name": "Sticky Note4",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1308,
+        1301.7748361069087,
         -180
       ]
     },
@@ -540,12 +545,37 @@
         -300,
         -184.50548411497726
       ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error in {{ $workflow.name }}"
+      },
+      "id": "d1ef826a-6bce-4fa0-b1a0-a473db9dd233",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Test Patroni Reference Install\n\nFrom: https://github.com/bcgov/patroni-postgres-container",
+        "width": 1397.880484114978
+      },
+      "id": "1fd91291-82a6-4ca2-b85c-f2a8e94ed9a5",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -500
+      ]
     }
   ],
   "pinData": {},
   "settings": {
-    "saveExecutionProgress": "DEFAULT",
-    "saveManualExecutions": false,
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
@@ -559,6 +589,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-03-14T04:11:49.281Z",
-  "versionId": "b09687a8-0c7a-4f1e-9370-79582482002f"
+  "updatedAt": "2023-03-31T04:36:53.037Z",
+  "versionId": "92342819-544a-4230-bf15-1e63fa7968b0"
 }
