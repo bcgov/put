@@ -38,6 +38,11 @@
       "main": [
         [
           {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          },
+          {
             "node": "OC Logout",
             "type": "main",
             "index": 0
@@ -165,7 +170,7 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1140,
+        1220,
         -360
       ]
     },
@@ -178,7 +183,7 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        960,
+        1040,
         -360
       ]
     },
@@ -342,7 +347,7 @@
     {
       "parameters": {
         "content": "## Close the Workflow",
-        "height": 217.8125,
+        "height": 527.5937657589516,
         "width": 418.125
       },
       "id": "7c2a8bee-4087-4516-8f74-7dc41ecafd94",
@@ -350,7 +355,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        940,
+        1020,
         -420
       ]
     },
@@ -438,11 +443,23 @@
         560,
         -60
       ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error in {{ $workflow.name }}"
+      },
+      "id": "506d371f-4d5a-4e97-bbd4-73f5bf4563eb",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        -60
+      ]
     }
   ],
   "pinData": {},
   "settings": {
-    "saveExecutionProgress": "DEFAULT",
     "saveManualExecutions": false,
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
@@ -457,6 +474,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-03-14T04:13:32.880Z",
-  "versionId": "710981b8-2c70-401c-93f7-d51830844205"
+  "updatedAt": "2023-03-31T04:33:56.779Z",
+  "versionId": "964b4eb6-a70d-4583-bb46-9029b4b98e8c"
 }
