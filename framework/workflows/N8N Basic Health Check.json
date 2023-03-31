@@ -176,6 +176,7 @@
     {
       "parameters": {
         "content": "## N8N Health Check\n\nQuick check on N8N running well.",
+        "height": 111,
         "width": 841
       },
       "id": "8d8db4bd-1d5f-4c60-813f-f049401c9862",
@@ -226,8 +227,8 @@
   "pinData": {},
   "settings": {
     "timezone": "America/Los_Angeles",
-    "saveExecutionProgress": true,
-    "saveManualExecutions": false,
+    "saveExecutionProgress": "DEFAULT",
+    "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
@@ -241,6 +242,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-03-30T01:25:04.467Z",
-  "versionId": "b498b0f2-fa43-4b01-91d5-69f1eae1ff56"
+  "updatedAt": "2023-03-31T03:40:48.422Z",
+  "versionId": "4afaa9ad-46f7-4cb4-89f0-4646848d09b7"
 }
