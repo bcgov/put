@@ -1,5 +1,5 @@
 {
-  "active": true,
+  "active": false,
   "connections": {
     "When clicking \"Execute Workflow\"": {
       "main": [
@@ -91,32 +91,6 @@
         [
           {
             "node": "Execute Patroni (Reference) Test",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Schedule Trigger": {
-      "main": [
-        [
-          {
-            "node": "Execute Patroni (Reference) Test",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Patroni (Reference) Switch Main",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Execute Patroni (HELM) Test",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Execute Crunchy Test",
             "type": "main",
             "index": 0
           }
@@ -227,32 +201,11 @@
         -420,
         -400
       ]
-    },
-    {
-      "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "triggerAtHour": 3,
-              "triggerAtMinute": 30
-            }
-          ]
-        }
-      },
-      "id": "bfe9f721-b7f7-4408-9bea-dd4b840e023d",
-      "name": "Schedule Trigger",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1,
-      "position": [
-        -820,
-        -380
-      ]
     }
   ],
   "pinData": {},
   "settings": {
-    "saveExecutionProgress": "DEFAULT",
-    "saveManualExecutions": false,
+    "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
@@ -270,6 +223,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-31T04:27:48.723Z",
-  "versionId": "7b132db3-9e21-4a4c-a50c-36458babeae1"
+  "updatedAt": "2023-03-31T23:55:57.870Z",
+  "versionId": "a998a543-3199-4e34-9459-73aee1c0cfb0"
 }
