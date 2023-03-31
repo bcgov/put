@@ -1,5 +1,5 @@
 {
-  "active": true,
+  "active": false,
   "connections": {
     "Artifactory": {
       "main": [
@@ -46,32 +46,6 @@
       ]
     },
     "Execute Workflow Trigger": {
-      "main": [
-        [
-          {
-            "node": "N8N",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Artifactory",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Patroni CLAB",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Vault Check",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Webhook": {
       "main": [
         [
           {
@@ -190,26 +164,10 @@
         -840,
         180
       ]
-    },
-    {
-      "parameters": {
-        "path": "dde9ac8e-5ddc-4224-9a82-8714155bf55d",
-        "options": {}
-      },
-      "id": "4ecc1301-48fc-4713-af78-2cf2ffaf7706",
-      "name": "Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1,
-      "position": [
-        -360,
-        680
-      ],
-      "webhookId": "dde9ac8e-5ddc-4224-9a82-8714155bf55d"
     }
   ],
   "pinData": {},
   "settings": {
-    "saveExecutionProgress": "DEFAULT",
     "saveManualExecutions": false,
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
@@ -230,6 +188,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-22T06:38:16.054Z",
+  "updatedAt": "2023-03-31T07:36:14.124Z",
   "versionId": "4335c717-928e-4608-9cd8-710860cb271e"
 }
