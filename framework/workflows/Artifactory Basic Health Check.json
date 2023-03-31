@@ -56,7 +56,7 @@
       "main": [
         [
           {
-            "node": "NoOp",
+            "node": "Stop and Error",
             "type": "main",
             "index": 0
           }
@@ -242,8 +242,8 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        380,
-        160
+        200,
+        140
       ]
     },
     {
@@ -253,8 +253,36 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        380,
+        200,
         460
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Artifactory Test\n\nCurrently a simple health check against production, will be built out to test against the CLAB Antifactory install.",
+        "height": 117,
+        "width": 859
+      },
+      "id": "2f3c1e8f-6c90-498a-8668-9a52462f5bc8",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        440,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error in {{ $workflow.name }}"
+      },
+      "id": "684720e8-b221-4521-b681-a73ba46309ea",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        520
       ]
     }
   ],
@@ -279,6 +307,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-14T04:11:31.623Z",
-  "versionId": "6a0f406e-f991-4506-ac88-30b9d9fcae41"
+  "updatedAt": "2023-03-31T04:23:54.195Z",
+  "versionId": "3a749d1a-3856-46ab-8520-924315385ad6"
 }
