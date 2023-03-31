@@ -195,17 +195,6 @@
           }
         ]
       ]
-    },
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "General Parameters",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "createdAt": "2023-02-15T09:21:02.688Z",
@@ -617,21 +606,6 @@
         1300,
         420
       ]
-    },
-    {
-      "parameters": {
-        "path": "b39a695b-6434-477d-9823-ae91a36b2581",
-        "options": {}
-      },
-      "id": "f5374549-7df6-4368-967d-ad89ff002637",
-      "name": "Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1,
-      "position": [
-        -280,
-        -360
-      ],
-      "webhookId": "b39a695b-6434-477d-9823-ae91a36b2581"
     }
   ],
   "pinData": {},
@@ -654,7 +628,7 @@
       "name": "Test"
     }
   ],
-  "triggerCount": 2,
-  "updatedAt": "2023-03-30T03:55:59.291Z",
-  "versionId": "87b94191-ea3b-4db1-a6e7-fd4c143d5485"
+  "triggerCount": 1,
+  "updatedAt": "2023-03-31T04:39:52.014Z",
+  "versionId": "ee14579c-84ef-45a4-a2db-31a3f03fb542"
 }
