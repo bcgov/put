@@ -84,6 +84,17 @@
           }
         ]
       ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Latest N8N Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "createdAt": "2023-03-08T02:21:02.700Z",
@@ -243,6 +254,17 @@
         -660,
         -140
       ]
+    },
+    {
+      "parameters": {},
+      "id": "60b32b00-591e-4ac7-938d-687b0becb0ac",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        60
+      ]
     }
   ],
   "pinData": {},
@@ -272,6 +294,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-14T04:11:00.059Z",
-  "versionId": "cd312ceb-5caa-4afa-b12d-95d940b6a90b"
+  "updatedAt": "2023-03-31T04:17:35.550Z",
+  "versionId": "9e7cd666-38e2-478d-a5a5-76de20bf3aac"
 }
