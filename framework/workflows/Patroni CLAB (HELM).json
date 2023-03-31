@@ -38,6 +38,11 @@
       "main": [
         [
           {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          },
+          {
             "node": "OC Logout",
             "type": "main",
             "index": 0
@@ -165,7 +170,7 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1140,
+        1180,
         -360
       ]
     },
@@ -178,7 +183,7 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        960,
+        1000,
         -360
       ]
     },
@@ -342,15 +347,15 @@
     {
       "parameters": {
         "content": "## Close the Workflow",
-        "height": 217.8125,
-        "width": 418.125
+        "height": 513.4527191558439,
+        "width": 376.94128787878833
       },
       "id": "a25e2d82-e3c5-458a-94ab-d75913183dfe",
       "name": "Sticky Note4",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        940,
+        980,
         -420
       ]
     },
@@ -438,12 +443,39 @@
         560,
         -60
       ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error in {{ $workflow.name }}"
+      },
+      "id": "08584b9c-834c-47ec-a040-d87d19c247a3",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        -60
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## This is the test for the HELM Patroni installed in CLAB\n\nFrom https://github.com/bcgov/nr-patroni-chart\n",
+        "height": 146.76237824675292,
+        "width": 863.6390692640689
+      },
+      "id": "cb3a9723-dcef-4801-836d-5208513d8ee1",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -440
+      ]
     }
   ],
   "pinData": {},
   "settings": {
-    "saveExecutionProgress": "DEFAULT",
-    "saveManualExecutions": false,
+    "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
@@ -457,6 +489,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-03-14T04:13:49.736Z",
-  "versionId": "e9bc0429-a160-4d27-b17d-a2d60bc6a95c"
+  "updatedAt": "2023-03-31T04:32:19.451Z",
+  "versionId": "7d0c4645-d938-4af3-ab03-90647ff4003c"
 }
