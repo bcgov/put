@@ -1,0 +1,96 @@
+{
+  "active": true,
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-31T03:37:03.120Z",
+  "id": "47",
+  "name": "Remotely Trigger Workflows",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "start_workflow",
+        "options": {
+          "ignoreBots": true
+        }
+      },
+      "id": "67465315-899e-451a-90fd-fa21870348c7",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        880,
+        480
+      ],
+      "webhookId": "64895dcd-e86d-4c14-85fe-33ce4655c155"
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $json.query.id }}"
+      },
+      "id": "f43ed6b4-e389-40d3-862f-e80e7f69127f",
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## This Workflow is used to trigger any other workflow \n\nBy simply providing the workflow ID as a query parameter to the webhook. This is used by the uptime tool to trigger a workflow.\n\nhttps://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/webhook/start_workflow?id=1\n\nid \t                   Name                    \n1\t N8N Basic Health Check\n3\t Artifactory Basic Health Check\n7\t Main\n12\t Vault Check\n14\t Patroni CLAB Main\n27\t Trigger N8N image build on Version Change\n31\t Patroni CLAB (Reference)\n32\t Patroni CLAB (HELM)\n33\t Patroni CLAB (Crunchy)\n34\t Patroni CLAB (Reference) - Switch Leader\n",
+        "height": 424,
+        "width": 1054
+      },
+      "id": "0cacf005-9dbd-47dc-b390-74f0b10938f1",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        280
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:07:50.772Z",
+      "updatedAt": "2023-02-25T02:07:50.772Z",
+      "id": "4",
+      "name": "Common Component"
+    },
+    {
+      "createdAt": "2023-02-08T06:06:16.935Z",
+      "updatedAt": "2023-02-08T06:06:16.935Z",
+      "id": "1",
+      "name": "PUT"
+    },
+    {
+      "createdAt": "2023-02-25T02:08:35.040Z",
+      "updatedAt": "2023-02-25T02:08:35.040Z",
+      "id": "5",
+      "name": "Trigger"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-03-31T04:40:11.440Z",
+  "versionId": "08158815-95b7-467c-9f45-2bdf37f7f783"
+}
