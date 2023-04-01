@@ -281,16 +281,16 @@
   },
   "tags": [
     {
-      "createdAt": "2023-02-09T09:22:16.563Z",
-      "updatedAt": "2023-02-09T09:22:16.563Z",
-      "id": "2",
-      "name": "Platform"
-    },
-    {
       "createdAt": "2023-02-25T02:08:35.040Z",
       "updatedAt": "2023-02-25T02:08:35.040Z",
       "id": "5",
       "name": "Trigger"
+    },
+    {
+      "createdAt": "2023-02-09T09:22:16.563Z",
+      "updatedAt": "2023-02-09T09:22:16.563Z",
+      "id": "2",
+      "name": "Platform"
     }
   ],
   "triggerCount": 1,
