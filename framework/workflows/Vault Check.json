@@ -1,5 +1,5 @@
 {
-  "active": true,
+  "active": false,
   "connections": {
     "General Parameters": {
       "main": [
@@ -68,17 +68,6 @@
         [
           {
             "node": "IF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Schedule Trigger": {
-      "main": [
-        [
-          {
-            "node": "General Parameters",
             "type": "main",
             "index": 0
           }
@@ -335,25 +324,6 @@
     },
     {
       "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "triggerAtHour": 3
-            }
-          ]
-        }
-      },
-      "id": "ec13c708-28d5-4120-8d9a-e7d9de49e8f9",
-      "name": "Schedule Trigger",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1,
-      "position": [
-        -280,
-        -60
-      ]
-    },
-    {
-      "parameters": {
         "url": "https://vault-lab.developer.gov.bc.ca/v1/sys/health",
         "options": {}
       },
@@ -523,8 +493,8 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -280,
-        -220
+        -180,
+        -20
       ]
     },
     {
@@ -629,6 +599,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-03-31T04:39:52.014Z",
-  "versionId": "ee14579c-84ef-45a4-a2db-31a3f03fb542"
+  "updatedAt": "2023-04-01T05:54:37.912Z",
+  "versionId": "17b0bd61-5323-4c97-8b1c-83bb3d125242"
 }
