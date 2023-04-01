@@ -1,0 +1,343 @@
+{
+  "active": true,
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Message Params for Error Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params for Error Report": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Error": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-08T06:08:46.285Z",
+  "id": "3",
+  "name": "Artifactory Basic Health Check CLAB",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://artifacts.apps.clab.devops.gov.bc.ca/router/api/v1/system/health",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "04274721-7408-4823-ad12-16524760ee54",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        280,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json[\"router\"][\"message\"] }}",
+              "operation": "contains",
+              "value2": "OK"
+            },
+            {
+              "value1": "={{ $node[\"HTTP Request1\"].json.data }}",
+              "value2": "OK"
+            }
+          ]
+        }
+      },
+      "id": "cb2dbfce-8389-452d-97ff-6e239d54914d",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        460,
+        320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3cf820df-a75c-49fe-bef0-3cbbecc0627e",
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "id": "fb7e096c-1b1a-4033-aa5b-d3cbdef28efe",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "17"
+      },
+      "id": "b5832f26-e972-4c29-a776-c57662e5ba22",
+      "name": "Report Error",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        988,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Report the Error",
+        "height": 217.8125,
+        "width": 361.0555345436212
+      },
+      "id": "3660c539-9e1b-46cb-b9ae-5403d7885b9d",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        780,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "#devops-artifactory"
+            },
+            {
+              "name": "rcMessage",
+              "value": "=## Artifactory Error Found on https://artifacts.developer.gov.bc.ca\nAt: {{ $now }}\n\nRouter:\n{{$node[\"HTTP Request\"].json[\"router\"][\"node_id\"]}}: {{$node[\"HTTP Request\"].json[\"router\"][\"state\"]}}\n\nServices:\n{{$node[\"HTTP Request\"].json[\"services\"][0][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][0][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][1][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][1][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][2][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][2][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][3][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][3][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][4][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][4][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][5][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][5][\"state\"]}}\n{{$node[\"HTTP Request\"].json[\"services\"][6][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][6][\"state\"]}}\n\n @cailey.jones and @shelly.han\n"
+            },
+            {
+              "name": "fromAddress",
+              "value": "no-reply@gov.bc.ca"
+            },
+            {
+              "name": "toAddress",
+              "value": "cailey.jones@gov.bc.ca,shelly.han@gov.bc.ca,hsmcs@dxcas.com"
+            },
+            {
+              "name": "textMessage",
+              "value": "=At: {{ $now }}  \n\nRouter: {{$node[\"HTTP Request\"].json[\"router\"][\"node_id\"]}}: {{$node[\"HTTP Request\"].json[\"router\"][\"state\"]}}  \n\nServices: {{$node[\"HTTP Request\"].json[\"services\"][0][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][0][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][1][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][1][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][2][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][2][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][3][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][3][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][4][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][4][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][5][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][5][\"state\"]}} {{$node[\"HTTP Request\"].json[\"services\"][6][\"service_id\"]}}: {{$node[\"HTTP Request\"].json[\"services\"][6][\"state\"]}}"
+            },
+            {
+              "name": "htmlMessage"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "=Artifactory Error Found on https://artifacts.developer.gov.bc.ca"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2edf4b5d-dd25-4541-8609-e941d54194b7",
+      "name": "Set Message Params for Error Report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        840,
+        680
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "53eceb43-33d0-4fbd-abac-f9c65c367ca7",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        160
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ee30fd19-9da2-48f4-8b9b-eb863497f362",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Artifactory Test CLAB\n\n",
+        "height": 117,
+        "width": 1076
+      },
+      "id": "2f3c1e8f-6c90-498a-8668-9a52462f5bc8",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        223,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error in {{ $workflow.name }}"
+      },
+      "id": "684720e8-b221-4521-b681-a73ba46309ea",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://artifacts.apps.clab.devops.gov.bc.ca/router/api/v1/system/ping",
+        "responseFormat": "string",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "ee5e961e-c5b6-4bd7-ba1a-461f4db93e33",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        100,
+        320
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-02-25T02:07:35.632Z",
+      "updatedAt": "2023-02-25T02:07:35.632Z",
+      "id": "3",
+      "name": "Test"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-04-01T06:34:05.835Z",
+  "versionId": "17a7b67d-81b5-4077-9c0e-8b30e23d6122"
+}
