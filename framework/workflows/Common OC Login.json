@@ -123,16 +123,16 @@
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-02-25T02:10:52.949Z",
-      "updatedAt": "2023-02-25T02:10:52.949Z",
-      "id": "6",
-      "name": "Example"
-    },
-    {
       "createdAt": "2023-03-10T02:25:44.914Z",
       "updatedAt": "2023-03-10T02:25:44.914Z",
       "id": "8",
       "name": "Template"
+    },
+    {
+      "createdAt": "2023-02-25T02:10:52.949Z",
+      "updatedAt": "2023-02-25T02:10:52.949Z",
+      "id": "6",
+      "name": "Example"
     },
     {
       "createdAt": "2023-03-10T02:26:00.290Z",
