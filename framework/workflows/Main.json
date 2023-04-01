@@ -175,16 +175,16 @@
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-02-25T02:07:35.632Z",
-      "updatedAt": "2023-02-25T02:07:35.632Z",
-      "id": "3",
-      "name": "Test"
-    },
-    {
       "createdAt": "2023-02-25T02:07:50.772Z",
       "updatedAt": "2023-02-25T02:07:50.772Z",
       "id": "4",
       "name": "Common Component"
+    },
+    {
+      "createdAt": "2023-02-25T02:07:35.632Z",
+      "updatedAt": "2023-02-25T02:07:35.632Z",
+      "id": "3",
+      "name": "Test"
     }
   ],
   "triggerCount": 1,
