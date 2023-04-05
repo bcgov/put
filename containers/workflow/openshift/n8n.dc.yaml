@@ -119,8 +119,10 @@ objects:
       labels:
         app.kubernetes.io/part-of: "${NAME}-app"
       annotations:
-        haproxy.router.openshift.io/cookie_name: "${NAME}"
+        haproxy.router.openshift.io/balance: leastconn
         haproxy.router.openshift.io/timeout: 1d
+        openshift.io/host.generated: 'true'
+        router.openshift.io/cookie_name: "${NAME}"
     spec:
       host: "${NAME}-${NAMESPACE}.apps.${CLUSTER_NAME}.devops.gov.bc.ca"
       tls:

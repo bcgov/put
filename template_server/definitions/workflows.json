@@ -1,0 +1,114 @@
+"definitions": {
+	"workflows": {
+		"type": "array",
+		"items": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "number",
+					"example": "1747"
+				},
+				"name": {
+					"type": "string",
+					"example": "Joining different datasets"
+				},
+				"totalViews": {
+					"type": "number",
+					"example": "2219"
+				},
+				"recentViews": {
+					"type": "number",
+					"example": "9999"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time",
+					"example": "2022-07-06T13:58:22.488Z"
+				},
+				"user": {
+					"type": "object",
+					"properties": {
+						"username": {
+							"type": "string",
+							"example": "jon-n8n"
+						}
+					}
+				},
+				"nodes": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "number",
+								"example": "14"
+							},
+							"icon": {
+								"type": "string",
+								"example": "fa:code"
+							},
+							"name": {
+								"type": "string",
+								"example": "n8n-nodes-base.function"
+							},
+							"defaults": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string",
+										"example": "Function"
+									},
+									"color": {
+										"type": "string",
+										"example": "#FF9922"
+									}
+								}
+							},
+							"iconData": {
+								"type": "object",
+								"properties": {
+									"icon": {
+										"type": "string",
+										"example": "code"
+									},
+									"type": {
+										"type": "string",
+										"example": "icon"
+									}
+								}
+							},
+							"categories": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "number",
+											"example": "5"
+										},
+										"name": {
+											"type": "string",
+											"example": "Development"
+										}
+									}
+								}
+							},
+							"displayName": {
+								"type": "string",
+								"example": "Function"
+							},
+							"typeVersion": {
+								"type": "number",
+								"example": "1"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"totalWorkflows": {
+		"type": "number",
+		"example": "613"
+	}
+}
