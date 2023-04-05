@@ -8,7 +8,7 @@
 
       RUN yum update -y
 
-      RUN yum install -y GraphicsMagick gcc-c++ make
+      RUN yum install -y GraphicsMagick gcc-c++ make jq python3
 
       RUN yum clean all
 

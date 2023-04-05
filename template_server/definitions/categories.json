@@ -1,0 +1,18 @@
+"definitions": {
+	"categories": {
+		"type": "array",
+		"items": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "number",
+					"example": "20"
+				},
+				"name": {
+					"type": "string",
+					"example": "Building Blocks"
+				}
+			}
+		}
+	}
+}
