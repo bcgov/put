@@ -759,36 +759,6 @@ objects:
               imagePullPolicy: IfNotPresent
               command: ["n8n"]
               args: ["worker"]
-              livenessProbe:
-                failureThreshold: 3
-                httpGet:
-                  path: /healthz
-                  port: 5678
-                  scheme: HTTP
-                initialDelaySeconds: 10
-                periodSeconds: 10
-                successThreshold: 1
-                timeoutSeconds: 1
-              readinessProbe:
-                failureThreshold: 3
-                httpGet:
-                  path: /healthz
-                  port: 5678
-                  scheme: HTTP
-                initialDelaySeconds: 20
-                periodSeconds: 10
-                successThreshold: 1
-                timeoutSeconds: 1
-              startupProbe:
-                failureThreshold: 5
-                httpGet:
-                  path: /healthz
-                  port: 5678
-                  scheme: HTTP
-                initialDelaySeconds: 120
-                periodSeconds: 10
-                successThreshold: 1
-                timeoutSeconds: 1
               name: n8n-worker
               resources:
                 limits:
@@ -971,36 +941,6 @@ objects:
               imagePullPolicy: IfNotPresent
               command: ["n8n"]
               args: ["webhook"]
-              livenessProbe:
-                failureThreshold: 3
-                httpGet:
-                  path: /healthz
-                  port: 5678
-                  scheme: HTTP
-                initialDelaySeconds: 10
-                periodSeconds: 10
-                successThreshold: 1
-                timeoutSeconds: 1
-              readinessProbe:
-                failureThreshold: 3
-                httpGet:
-                  path: /healthz
-                  port: 5678
-                  scheme: HTTP
-                initialDelaySeconds: 20
-                periodSeconds: 10
-                successThreshold: 1
-                timeoutSeconds: 1
-              startupProbe:
-                failureThreshold: 5
-                httpGet:
-                  path: /healthz
-                  port: 5678
-                  scheme: HTTP
-                initialDelaySeconds: 120
-                periodSeconds: 10
-                successThreshold: 1
-                timeoutSeconds: 1
               name: n8n-webhook
               resources:
                 limits:
