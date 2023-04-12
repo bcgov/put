@@ -106,8 +106,6 @@ objects:
           WORKDIR /data
 
           EXPOSE 5678/tcp
-
-          CMD "n8n"
       triggers:
         - type: ConfigChange
       runPolicy: SerialLatestOnly
