@@ -88,7 +88,7 @@ The Deployment Configs for N8N have liveliness and readiness checks built in, an
 
 ## Initial Setup
 
-Once N8N is up and functional (this will take between 3 to 5 minutes), you will have to do initial setup manually. We suggest you populate the email account and password as whatever the `n8n-secret` secret contains in the `admin-user` and `admin-password` fields respectively.
+Once N8N is up and functional (this will take between 3 to 5 minutes), you will have to do initial setup manually. We suggest you populate the email account and password as whatever the `n8n-secret` secret contains in the `owner-user` and `owner-password` fields respectively.
 
 ## Notes
 
