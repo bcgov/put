@@ -88,8 +88,13 @@ The Deployment Configs for N8N have liveliness and readiness checks built in, an
 
 ## Initial Setup
 
-Once N8N is up and functional (this will take between 3 to 5 minutes), you will have to do initial setup manually. We suggest you populate the email account and password as whatever the `n8n-secret` secret contains in the `admin-user` and `admin-password` fields respectively.
+Once N8N is up and functional (this will take between 3 to 5 minutes), you will have to do initial setup manually. We suggest you populate the email account and password as whatever the `n8n-secret` secret contains in the `owner-user` and `owner-password` fields respectively.
 
 ## Notes
 
 In general, N8N should generally take up very little CPU (<0.01 cores) and float between 700 to 800mb of memory usage during operation. The template has some reasonable requests and limits set for both CPU and Memory, but you may change it should your needs be different. For inspecting the official N8N documentation [here](https://docs.n8n.io/).
+
+## Overall Resource Requirements
+
+N8N requires 1 Main Pod, up to 3 worker pods and up to 3 Webhook pods.
+
