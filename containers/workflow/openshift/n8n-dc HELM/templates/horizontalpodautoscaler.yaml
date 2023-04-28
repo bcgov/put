@@ -1,0 +1,59 @@
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: {{ .Values.name }}
+    app.kubernetes.io/part-of: {{ .Values.name }}-app
+    template: {{ .Values.name }}-dc-template
+  name: {{ .Values.name }}-worker
+  namespace: {{ .Values.namespace }}
+spec:
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: memory
+      target:
+        averageUtilization: 75
+        type: Utilization
+    type: Resource
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 75
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps.openshift.io/v1
+    kind: DeploymentConfig
+    name: {{ .Values.name }}-worker
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: {{ .Values.name }}
+    app.kubernetes.io/part-of: {{ .Values.name }}-app
+    template: {{ .Values.name }}-dc-template
+  name: {{ .Values.name }}-webhook
+  namespace: {{ .Values.namespace }}
+spec:
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: memory
+      target:
+        averageUtilization: 75
+        type: Utilization
+    type: Resource
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 75
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps.openshift.io/v1
+    kind: DeploymentConfig
+    name: {{ .Values.name }}-webhook

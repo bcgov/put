@@ -1,0 +1,44 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app: {{ .Values.name }}
+    app.kubernetes.io/part-of: {{ .Values.name }}-app
+    template: {{ .Values.name }}-dc-template
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      name: {{ .Values.name }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app: {{ .Values.name }}
+    app.kubernetes.io/part-of: {{ .Values.name }}-app
+    template: {{ .Values.name }}-dc-template
+  name: {{ .Values.name }}-worker
+  namespace: {{ .Values.namespace }}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      name: {{ .Values.name }}-worker
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app: {{ .Values.name }}
+    app.kubernetes.io/part-of: {{ .Values.name }}-app
+    template: {{ .Values.name }}-dc-template
+  name: {{ .Values.name }}-webhook
+  namespace: {{ .Values.namespace }}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      name: {{ .Values.name }}-webhook
