@@ -1,0 +1,12 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: {{ .Values.name }}
+    build: {{ .Values.name }}
+    template: {{ .Values.name }}-bc-template
+  name: {{ .Values.name }}
+  namespace: {{ .Values.n8n_image_namespace }}
+spec:
+  lookupPolicy:
+    local: false

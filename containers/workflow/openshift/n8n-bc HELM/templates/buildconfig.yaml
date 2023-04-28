@@ -1,0 +1,70 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: {{ .Values.name }}
+    build: {{ .Values.name }}
+    buildconfig: {{ .Values.name }}
+    template: {{ .Values.name }}-bc-template
+  name: {{ .Values.name }}
+  namespace: {{ .Values.n8n_image_namespace }}
+spec:
+  completionDeadlineSeconds: 600
+  failedBuildsHistoryLimit: 3
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ .Values.name }}:latest
+  postCommit: {}
+  resources:
+    limits:
+      cpu: 1400m
+      memory: 3Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  runPolicy: SerialLatestOnly
+  source:
+    dockerfile: |-
+      FROM BuildConfig
+      ENV HOME=/opt/app-root/src \
+          TZ=America/Vancouver
+
+      USER root
+      RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+      RUN yum update -y
+      RUN yum install -y GraphicsMagick gcc-c++ make jq python3
+      RUN yum clean all
+      RUN curl https://downloads-openshift-console.apps.gold.devops.gov.bc.ca/amd64/linux/oc.tar --output oc.tar
+      RUN tar -xvf oc.tar
+      RUN cp oc /usr/bin
+      RUN rm oc.tar oc
+
+      RUN npm install -g npm
+
+      RUN mkdir -p $HOME
+      WORKDIR $HOME
+
+      ENV PATH ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+      RUN npm install -g n8n
+
+      RUN chgrp -R 0 $HOME && \
+          chmod -R g=u $HOME
+
+      RUN chown -R 1001:0 $HOME
+      RUN chmod -R 775 $HOME
+      USER 1001
+
+      WORKDIR /data
+      EXPOSE 5678/tcp
+    type: Dockerfile
+  strategy:
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        name: artifacts.developer.gov.bc.ca/redhat-docker-remote/ubi8/nodejs-16:latest
+    type: Docker
+  successfulBuildsHistoryLimit: 3
+  triggers:
+  - type: ConfigChange
