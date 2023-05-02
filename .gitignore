@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Cypress env file
+**/cypress.env.json
+
+# MacOS indexing files
+**/.DS_Store
