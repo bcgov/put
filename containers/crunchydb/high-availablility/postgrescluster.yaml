@@ -6,8 +6,8 @@ spec:
   monitoring:
     pgmonitor:
       exporter:
-        image: image-registry.openshift-image-registry.svc:5000/e31b6b-dev/crunchy-postgres-exporter:ubi8-5.0.4-0
-  image: image-registry.openshift-image-registry.svc:5000/e31b6b-dev/crunchy-postgres:centos8-14.2-0
+        image: artifacts.developer.gov.bc.ca/redhat-docker-remote/crunchydata/crunchy-postgres-exporter:ubi8-5.0.4-0
+  image: artifacts.developer.gov.bc.ca/redhat-docker-remote/crunchydata/crunchy-postgres:ubi8-14.5-1
   postgresVersion: 14
   instances:
     - name: ha1
@@ -40,7 +40,7 @@ spec:
     pgbackrest:
       global:
         repo1-retention-full: "2"
-      image: image-registry.openshift-image-registry.svc:5000/e31b6b-dev/crunchy-pgbackrest:centos8-2.36-1
+      image: artifacts.developer.gov.bc.ca/redhat-docker-remote/crunchydata/crunchy-pgbackrest:ubi8-2.40-1
       repos:
       - name: repo1
         schedules:
@@ -61,7 +61,7 @@ spec:
       config:
         global:
           client_tls_sslmode: disable
-      image: image-registry.openshift-image-registry.svc:5000/e31b6b-dev/crunchy-pgbouncer:centos8-1.16-1
+      image: artifacts.developer.gov.bc.ca/redhat-docker-remote/crunchydata/crunchy-pgbouncer:ubi8-1.16-1
       replicas: 2
       affinity:
         podAntiAffinity:
