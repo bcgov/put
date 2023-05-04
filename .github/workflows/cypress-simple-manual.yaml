@@ -1,10 +1,14 @@
 # Manual started workflow
 # This is the simplest for of running the Cypress tests in Github actions
 name: artifactory-smoke
-on: [workflow_dispatch,repository_dispatch]
+on: [workflow_dispatch, repository_dispatch]
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+    env:
+      CYPRESS_username: ${{ secrets.CYPRESS_USER_NAME }}
+      CYPRESS_password: ${{ secrets.CYPRESS_ARTIFACTORY_PW }}
+      CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASEURL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -15,8 +19,8 @@ jobs:
         # commit status in the next step, both in case of success and failure
         continue-on-error: true
         with:
-        # No recording of results in the cloud
+          # No recording of results in the cloud
           record: false
-        # We need to force the install due to version checking  
+          # We need to force the install due to version checking
           install-command: npm ci
           working-directory: testing
