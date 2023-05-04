@@ -6,7 +6,7 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
     env:
-      CYPRESS_username: ${{ secrets.CYPRESS_USER_NAME }}
+      CYPRESS_username: ${{ secrets.CYPRESS_USERNAME }}
       CYPRESS_password: ${{ secrets.CYPRESS_ARTIFACTORY_PW }}
       CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASEURL }}
     steps:
