@@ -21,8 +21,8 @@ import './commands'
 
 function loginToArtifactory(username, password) {
 
-    cy.visit(Cypress.env('base_url'))
-    cy.get('input[name="username"]').type(username);
+    cy.visit("/");
+    cy.get('input[name="username"]').should('be.visible').type(username);
     cy.get('input[name="password"]').type(password);
     cy.get('input[type="checkbox"]').click({ force: true });
     cy.get('button[type="submit"]').click();
@@ -31,7 +31,7 @@ function loginToArtifactory(username, password) {
 
 Cypress.Commands.add('loginToArtifactory', (username, password) => {
     const log = Cypress.log({
-        displayName: 'Logint to Artifactory',
+        displayName: 'Login to Artifactory',
         message: [`🔐 Authenticating | ${username}`],
         autoEnd: false,
     })
