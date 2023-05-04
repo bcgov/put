@@ -1,0 +1,122 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+labels:
+  app: "${NAME}"
+  build: "${NAME}"
+  template: "${NAME}-bc-template"
+metadata:
+  name: n8n-bc
+objects:
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      name: "${NAME}"
+      namespace: "${N8N_IMAGE_NAMESPACE}"
+    spec:
+      lookupPolicy:
+        local: false
+  - kind: BuildConfig
+    apiVersion: build.openshift.io/v1
+    metadata:
+      name: "${NAME}"
+      namespace: "${N8N_IMAGE_NAMESPACE}"
+      labels:
+        app: "${NAME}"
+        build: "${NAME}"
+        buildconfig: "${NAME}"
+    spec:
+      nodeSelector: null
+      output:
+        to:
+          kind: ImageStreamTag
+          name: "${NAME}:latest"
+      resources:
+        limits:
+          cpu: 1400m
+          memory: 3Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+      successfulBuildsHistoryLimit: 3
+      failedBuildsHistoryLimit: 3
+      completionDeadlineSeconds: 600
+      strategy:
+        type: Docker
+        dockerStrategy:
+          from:
+            kind: DockerImage
+            name: >-
+              artifacts.developer.gov.bc.ca/redhat-docker-remote/ubi8/nodejs-16:latest
+      postCommit: {}
+      source:
+        type: Dockerfile
+        dockerfile: >-
+          FROM BuildConfig
+
+          ENV HOME=/opt/app-root/src \
+              TZ=America/Vancouver
+
+          USER root
+
+          RUN rpm -ivh
+          https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
+          RUN yum update -y
+
+          RUN yum install -y GraphicsMagick gcc-c++ make jq python3
+
+          RUN yum clean all
+
+          RUN curl
+          https://downloads-openshift-console.apps.gold.devops.gov.bc.ca/amd64/linux/oc.tar
+          --output oc.tar
+
+          RUN tar -xvf oc.tar
+
+          RUN cp oc /usr/bin
+
+          RUN rm oc.tar oc
+
+
+          RUN npm install -g npm
+
+
+          RUN mkdir -p $HOME
+
+          WORKDIR $HOME
+
+
+          ENV PATH
+          ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+
+          RUN npm install -g n8n
+
+
+          RUN chgrp -R 0 $HOME && \
+              chmod -R g=u $HOME
+
+          RUN chown -R 1001:0 $HOME
+
+          RUN chmod -R 775 $HOME
+
+          USER 1001
+
+
+          WORKDIR /data
+
+          EXPOSE 5678/tcp
+      triggers:
+        - type: ConfigChange
+      runPolicy: SerialLatestOnly
+parameters:
+  - name: NAME
+    displayName: Name
+    description: The name assigned to all of the objects defined in this template.
+    required: true
+    value: n8n
+  - name: N8N_IMAGE_NAMESPACE
+    displayName: N8N Image Namespace
+    description: The namespace where the N8N image is stored.
+    required: true
+    value: bf5ef6-tools  
