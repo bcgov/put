@@ -18,5 +18,5 @@ jobs:
         # No recording of results in the cloud
           record: false
         # We need to force the install due to version checking  
-          install-command: npm ci -f
+          install-command: npm ci
           working-directory: testing
