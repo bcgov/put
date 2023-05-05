@@ -1,0 +1,3 @@
+- Backing up the system and configurations
+- Troubleshooting common issues
+- Monitoring resource usage and optimizing performance
