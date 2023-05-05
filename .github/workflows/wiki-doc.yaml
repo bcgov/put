@@ -8,7 +8,7 @@ on:
     paths:
       - docs/** # This includes all sub folders
     branches:
-      - dev # This can be changed to any branch of your preference
+      - main # This can be changed to any branch of your preference
 
 env:
   USER_TOKEN: ${{ secrets.WIKI_ACTION_TOKEN }} # This is the repository secret
