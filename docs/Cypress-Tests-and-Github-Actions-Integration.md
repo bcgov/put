@@ -1,0 +1,3 @@
+- Configuring Cypress for end-to-end testing
+- Integrating Cypress tests with Github Actions
+- Analyzing test results and troubleshooting
