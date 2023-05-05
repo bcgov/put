@@ -94,7 +94,7 @@ objects:
       selector:
         name: "${NAME}-webhook"
       sessionAffinity: None
-      type: ClusterIP     
+      type: ClusterIP
   - kind: Service
     apiVersion: v1
     metadata:
@@ -114,7 +114,7 @@ objects:
       selector:
         name: "${NAME}-worker"
       sessionAffinity: None
-      type: ClusterIP           
+      type: ClusterIP
   - kind: Service
     apiVersion: v1
     metadata:
@@ -161,7 +161,7 @@ objects:
       annotations:
         haproxy.router.openshift.io/balance: leastconn
         haproxy.router.openshift.io/timeout: 1d
-        openshift.io/host.generated: 'true'
+        openshift.io/host.generated: "true"
         router.openshift.io/cookie_name: "${NAME}"
     spec:
       host: "${NAME}-${NAMESPACE}.apps.${CLUSTER_NAME}.devops.gov.bc.ca"
@@ -185,7 +185,7 @@ objects:
       annotations:
         haproxy.router.openshift.io/balance: leastconn
         haproxy.router.openshift.io/timeout: 1d
-        openshift.io/host.generated: 'true'
+        openshift.io/host.generated: "true"
         router.openshift.io/cookie_name: ${NAME}-webhook"
     spec:
       host: "${NAME}-${NAMESPACE}.apps.${CLUSTER_NAME}.devops.gov.bc.ca"
@@ -198,7 +198,7 @@ objects:
         name: "${NAME}-webhook"
       port:
         targetPort: 5678-tcp
-      wildcardPolicy: None      
+      wildcardPolicy: None
   - kind: PersistentVolumeClaim
     apiVersion: v1
     metadata:
@@ -216,6 +216,22 @@ objects:
         requests:
           storage: "${PVC_SIZE}"
       storageClassName: netapp-file-standard
+      volumeMode: Filesystem
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: csi.trident.netapp.io
+        volume.beta.kubernetes.io/storage-class: netapp-file-standard
+      name: "${NAME}-backup"
+      namespace: "${NAMESPACE}"
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: "${PVC_SIZE}"
+      storageClassName: netapp-file-backup
       volumeMode: Filesystem
   - kind: PersistentVolumeClaim
     apiVersion: v1
@@ -617,6 +633,8 @@ objects:
               volumeMounts:
                 - mountPath: /data
                   name: "${NAME}-data"
+                - mountPath: /backup
+                  name: "${NAME}-backup"
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           schedulerName: default-scheduler
@@ -626,6 +644,9 @@ objects:
             - name: "${NAME}-data"
               persistentVolumeClaim:
                 claimName: "${NAME}-data"
+            - name: "${NAME}-backup"
+              persistentVolumeClaim:
+                claimName: "${NAME}-backup"
       test: false
       triggers:
         - imageChangeParams:
@@ -772,6 +793,8 @@ objects:
               volumeMounts:
                 - mountPath: /data
                   name: "${NAME}-data"
+                - mountPath: /backup
+                  name: "${NAME}-backup"
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           schedulerName: default-scheduler
@@ -781,6 +804,9 @@ objects:
             - name: "${NAME}-data"
               persistentVolumeClaim:
                 claimName: "${NAME}-data"
+            - name: "${NAME}-backup"
+              persistentVolumeClaim:
+                claimName: "${NAME}-backup"
       test: false
       triggers:
         - imageChangeParams:
@@ -954,6 +980,8 @@ objects:
               volumeMounts:
                 - mountPath: /data
                   name: "${NAME}-data"
+                - mountPath: /backup
+                  name: "${NAME}-backup"
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           schedulerName: default-scheduler
@@ -963,6 +991,9 @@ objects:
             - name: "${NAME}-data"
               persistentVolumeClaim:
                 claimName: "${NAME}-data"
+            - name: "${NAME}-backup"
+              persistentVolumeClaim:
+                claimName: "${NAME}-backup"
       test: false
       triggers:
         - imageChangeParams:
@@ -1025,7 +1056,7 @@ objects:
       selector:
         matchLabels:
           name: "${NAME}-worker"
-      maxUnavailable: 1  
+      maxUnavailable: 1
   - kind: PodDisruptionBudget
     apiVersion: policy/v1
     metadata:
@@ -1037,7 +1068,7 @@ objects:
       selector:
         matchLabels:
           name: "${NAME}-webhook"
-      maxUnavailable: 1           
+      maxUnavailable: 1
   - kind: NetworkPolicy
     apiVersion: networking.k8s.io/v1
     metadata:
