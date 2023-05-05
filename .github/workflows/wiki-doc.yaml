@@ -2,6 +2,8 @@ name: Publish docs to Wiki
 
 # Trigger this action only if there are changes pushed to the docs/** directory under the main branch
 on:
+  workflow_dispatch:
+  
   push:
     paths:
       - docs/** # This includes all sub folders
