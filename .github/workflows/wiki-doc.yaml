@@ -14,7 +14,7 @@ env:
   USER_TOKEN: ${{ secrets.WIKI_ACTION_TOKEN }} # This is the repository secret
   USER_NAME: ${{ secrets.USER_NAME }} # Enter the username of your (bot) account
   USER_EMAIL: ${{ secrets.USER_EMAIL }} # Enter the e-mail of your (bot) account
-  OWNER: ${{ github.event.repository.owner.name }} # This is the repository owner
+  OWNER: "bcgov" # This is the repository owner
   REPOSITORY_NAME: ${{ github.event.repository.name }} # This is the repository name
 
 jobs:
