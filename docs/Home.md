@@ -15,7 +15,7 @@
 - Supported use cases and scenarios
 - Installation Instructions
 
-### [Getting Started](Getting_Started)
+### [Getting Started](Getting-Started)
 
 - Setting up the development environment
 - Running the framework locally
