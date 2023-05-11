@@ -1,0 +1,484 @@
+{
+  "active": false,
+  "connections": {
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Get Config",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Message Params for Error Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params for Error Report": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Error": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Artifactory Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Artifactory Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Config": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Message Params for Error Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artifactory Ping": {
+      "main": [
+        [
+          {
+            "node": "Artifactory Liveness",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artifactory Health": {
+      "main": [
+        [
+          {
+            "node": "Artifactory Ping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artifactory Liveness": {
+      "main": [
+        [
+          {
+            "node": "Artifactory Readiness",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artifactory Readiness": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-08T14:08:46.285Z",
+  "id": "3",
+  "name": "Artifactory Basic Health Check CLAB",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $node[\"Artifactory Health\"].json[\"router\"][\"message\"] }}",
+              "operation": "contains",
+              "value2": "OK"
+            },
+            {
+              "value1": "={{ $node[\"Artifactory Ping\"].json.data }}",
+              "operation": "contains",
+              "value2": "OK"
+            },
+            {
+              "value1": "={{ $node[\"Artifactory Liveness\"].json.data }}",
+              "operation": "contains",
+              "value2": "OK"
+            },
+            {
+              "value1": "={{ $node[\"Artifactory Readiness\"].json.data }}",
+              "operation": "contains",
+              "value2": "OK"
+            }
+          ]
+        }
+      },
+      "id": "cb2dbfce-8389-452d-97ff-6e239d54914d",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        600,
+        660
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3cf820df-a75c-49fe-bef0-3cbbecc0627e",
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "17"
+      },
+      "id": "b5832f26-e972-4c29-a776-c57662e5ba22",
+      "name": "Report Error",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1468,
+        780
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Report the Error",
+        "height": 217.8125,
+        "width": 570.4296383481571
+      },
+      "id": "3660c539-9e1b-46cb-b9ae-5403d7885b9d",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "={{ $vars.rc_group }}"
+            },
+            {
+              "name": "rcMessage",
+              "value": "=## Artifactory Error Found on CLAB https://artifacts.apps.clab.devops.gov.bc.ca\nAt: {{ $now }}\n\nRouter:\n{{$node[\"Artifactory Health\"].json[\"router\"][\"node_id\"]}}: {{$node[\"Artifactory Health\"].json[\"router\"][\"state\"]}}\n\nServices:\n{{$node[\"Artifactory Health\"].json[\"services\"][0][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][0][\"state\"]}}\n{{$node[\"Artifactory Health\"].json[\"services\"][1][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][1][\"state\"]}}\n{{$node[\"Artifactory Health\"].json[\"services\"][2][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][2][\"state\"]}}\n{{$node[\"Artifactory Health\"].json[\"services\"][3][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][3][\"state\"]}}\n{{$node[\"Artifactory Health\"].json[\"services\"][4][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][4][\"state\"]}}\n{{$node[\"Artifactory Health\"].json[\"services\"][5][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][5][\"state\"]}}\n{{$node[\"Artifactory Health\"].json[\"services\"][6][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][6][\"state\"]}}\n\n @cailey.jones and @shelly.han\n"
+            },
+            {
+              "name": "fromAddress",
+              "value": "no-reply@gov.bc.ca"
+            },
+            {
+              "name": "toAddress",
+              "value": "={{ $vars.artifactory }}"
+            },
+            {
+              "name": "textMessage",
+              "value": "=At: {{ $now }}  \n\nRouter: {{$node[\"Artifactory Health\"].json[\"router\"][\"node_id\"]}}: {{$node[\"Artifactory Health\"].json[\"router\"][\"state\"]}}  \n\nServices: {{$node[\"Artifactory Health\"].json[\"services\"][0][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][0][\"state\"]}} {{$node[\"Artifactory Health\"].json[\"services\"][1][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][1][\"state\"]}} {{$node[\"Artifactory Health\"].json[\"services\"][2][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][2][\"state\"]}} {{$node[\"Artifactory Health\"].json[\"services\"][3][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][3][\"state\"]}} {{$node[\"Artifactory Health\"].json[\"services\"][4][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][4][\"state\"]}} {{$node[\"Artifactory Health\"].json[\"services\"][5][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][5][\"state\"]}} {{$node[\"Artifactory Health\"].json[\"services\"][6][\"service_id\"]}}: {{$node[\"Artifactory Health\"].json[\"services\"][6][\"state\"]}}"
+            },
+            {
+              "name": "htmlMessage"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "=Artifactory Error Found on https://artifacts.developer.gov.bc.ca"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2edf4b5d-dd25-4541-8609-e941d54194b7",
+      "name": "Set Message Params for Error Report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        780
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "53eceb43-33d0-4fbd-abac-f9c65c367ca7",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        160
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ee30fd19-9da2-48f4-8b9b-eb863497f362",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Artifactory Test CLAB\n\n",
+        "height": 80,
+        "width": 1076
+      },
+      "id": "2f3c1e8f-6c90-498a-8668-9a52462f5bc8",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        223,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error in {{ $workflow.name }}"
+      },
+      "id": "684720e8-b221-4521-b681-a73ba46309ea",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        780
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "url": "https://artifacts.apps.clab.devops.gov.bc.ca/artifactory/api/system/configuration",
+        "responseFormat": "string",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "41a4e919-e0ea-4217-af52-b227045e3d92",
+      "name": "Get Config",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        760,
+        500
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "33",
+          "name": "CLAB Artifactory"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "40cd465c-2b36-46d8-a578-9d4b444bb5e1",
+      "name": "XML",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        940,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.config.localRepositories.localRepository[0].key }}",
+              "value2": "artifactory-build-info"
+            }
+          ]
+        }
+      },
+      "id": "19a23e34-3f6d-4023-9705-18243bc2b8ce",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://artifacts.apps.clab.devops.gov.bc.ca/router/api/v1/system/ping",
+        "responseFormat": "string",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "ee5e961e-c5b6-4bd7-ba1a-461f4db93e33",
+      "name": "Artifactory Ping",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        140,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://artifacts.apps.clab.devops.gov.bc.ca/router/api/v1/system/health",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "04274721-7408-4823-ad12-16524760ee54",
+      "name": "Artifactory Health",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        20,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://artifacts.apps.clab.devops.gov.bc.ca/router/api/v1/system/liveness",
+        "responseFormat": "string",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "52f89292-dd6f-42f3-9613-87869076326e",
+      "name": "Artifactory Liveness",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        280,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://artifacts.apps.clab.devops.gov.bc.ca/router/api/v1/system/readiness",
+        "responseFormat": "string",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "66c29629-e954-4d45-a164-6472d0198460",
+      "name": "Artifactory Readiness",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        420,
+        660
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-04-29T00:02:25.792Z",
+      "updatedAt": "2023-04-29T00:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
+    },
+    {
+      "createdAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "id": "4",
+      "name": "Test"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-05-10T04:28:35.193Z",
+  "versionId": "173657eb-3d88-4a63-bd5b-905328d8e90c"
+}
