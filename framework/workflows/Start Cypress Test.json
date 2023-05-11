@@ -1,0 +1,128 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Cypress Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-05-05T01:40:42.634Z",
+  "id": "67",
+  "name": "Start Cypress Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "798c60bd-a23e-4fa4-9518-d7aae4fbf9e8",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3120,
+        -640
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "workFlow",
+              "value": "artifactory-smoke"
+            },
+            {
+              "name": "repoOwner",
+              "value": "bcgov"
+            },
+            {
+              "name": "repoName",
+              "value": "put"
+            },
+            {
+              "name": "errorString",
+              "value": "error]Cypress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5060e164-1ad8-4daa-bdec-98bc29c28b35",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -2880,
+        -640
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Running a Cypress test on GHA in your repo (THIS IS AN EXAMPLE!)\n\n**workFlow**: The workflow name you want to run\n**repoOwner**: In our case this is \"bcgov\"\n**repoName**: Your Repository Name\n**errorString**: The string to detect an error in your script (default: \"error]Cypress\")\n\n### Pre-reqs for running a Cypress Scripts in GHA\n* You have a repo that your GitHub Credential, as used in [the test workflow](https://n8n-bf5ef6-prod.apps.gold.devops.gov.bc.ca/workflow/66), has access to.\n* Your GHA Workflow that contains the test invocation has at least:\n\n```yaml\nname: artifactory-smoke\non: [workflow_dispatch, repository_dispatch]\n```\n\nThe `repository_dispatch` is needed for invocation from here.\nThe `name` is the name to use in you `SET` parameters.\n\n\n",
+        "height": 372.2168638864932,
+        "width": 1144.146020658246
+      },
+      "id": "d07d9907-8270-4035-a891-a130f729b22c",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3360,
+        -1060
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "66"
+      },
+      "id": "87f44e33-0702-4f99-b322-db78d41b9810",
+      "name": "Cypress Test",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -2680,
+        -640
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "41"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "id": "6",
+      "name": "Example"
+    },
+    {
+      "createdAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "id": "5",
+      "name": "Template"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-05-05T04:32:34.006Z",
+  "versionId": "3e8b1507-aea4-415c-a32a-a5ff676b2e4b"
+}
