@@ -1,0 +1,163 @@
+{
+  "active": false,
+  "connections": {
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RocketChat": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RocketChat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-23T13:33:52.131Z",
+  "id": "17",
+  "name": "Report Error",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "767bf3f7-842a-462d-ab8a-3f2b18ca6d36",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "channel": "={{ $json.rcChannel }}",
+        "text": "={{ $json.rcMessage }}",
+        "options": {},
+        "attachments": []
+      },
+      "id": "a6f21027-0b68-494b-b22f-913e086a5ec5",
+      "name": "RocketChat",
+      "type": "n8n-nodes-base.rocketchat",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "rocketchatApi": {
+          "id": "4",
+          "name": "Rocket account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $json.fromAddress }}",
+        "toEmail": "={{ $json.toAddress }}",
+        "ccEmail": "={{ $json.ccAddress }}",
+        "bccEmail": "={{ $json.bccAddress }}",
+        "subject": "={{ $json.subJect }}",
+        "text": "={{ $json.textMessage }}",
+        "html": "={{ $json.htmlMessage }}",
+        "options": {}
+      },
+      "id": "fa99f019-1497-481f-bbfc-38a71f275c82",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        0,
+        460
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "1a3522f5-60aa-43bc-a0d9-ef4c0033201d",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        260,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Incoming Parameters\n* **rcChannel:** RC Channel\n* **rcMessage:** RC Message\n* **fromAddress:** Email From\n* **toAddress:** Email To\n* **textMessage:** Message Body Text\n* **htmlMessage:** Message Body HTML, will supersede Text Message body\n* **ccAddress:** Email cc\n* **bccAddress:** email bcc\n* **subJect:** Email Title",
+        "height": 264,
+        "width": 549
+      },
+      "id": "176e95ea-7fc6-480c-8133-ba8b73526d48",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Reporting Common Component (DO NOT CHANGE! THIS COMPONENT IS USED BY OTHER WORKFLOWS)\n\nThis component will be called whenever an error report needs to be emailed and send to RocketChat.\n\nSee this [workflow](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/workflow/14) for an example.\n\nKey is using **Set** to set up your parameters and then call this workflow.\nUse [this stub](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/workflow/16) to get started.",
+        "height": 249,
+        "width": 1231.2389008604762
+      },
+      "id": "d607d86b-8bbc-4c3e-ad54-d03a9ac92f03",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        -240
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-04-29T00:02:25.753Z",
+      "updatedAt": "2023-04-29T00:02:25.753Z",
+      "id": "1",
+      "name": "Common Component"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-05-05T05:29:58.593Z",
+  "versionId": "10a9e72b-063f-4a9b-b87f-2e1491ef29b8"
+}
