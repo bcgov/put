@@ -1,0 +1,165 @@
+{
+  "active": false,
+  "connections": {
+    "Set Message Params": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Error": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Set Message Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-23T13:15:31.821Z",
+  "id": "16",
+  "name": "Report Error Calling Stub",
+  "nodes": [
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "={{ $vars.rc_group }}"
+            },
+            {
+              "name": "rcMessage",
+              "value": "Test 2"
+            },
+            {
+              "name": "fromAddress",
+              "value": "no-reply@gov.bc.ca"
+            },
+            {
+              "name": "toAddress",
+              "value": "={{ $vars.common_Notify }}"
+            },
+            {
+              "name": "textMessage",
+              "value": "Test 2"
+            },
+            {
+              "name": "htmlMessage"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "Error 2 Found!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "32e48548-0c55-460b-9c29-3cdd59fef905",
+      "name": "Set Message Params",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        760,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# How to Use this\n* Copy the 3 last actions into the end of your workflow where you want to report on an error situation\n* Connect it to your error branch\n* Set the right parameters and call the error report WF.\n\nThe errors will be reported by email and RocketChat.\n",
+        "height": 470,
+        "width": 675
+      },
+      "id": "8ebfcc18-d539-435c-8a65-11bb2277a5c6",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        700,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "17"
+      },
+      "id": "d55acb38-41e5-42c5-a92e-89fad560a587",
+      "name": "Report Error",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error in {{ $workflow.name }}"
+      },
+      "id": "b073ca99-07e3-4499-883e-818758927ee8",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        480
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "f1c53aa9-bafb-4dd1-8103-5131b14db93b",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        520,
+        480
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "id": "6",
+      "name": "Example"
+    },
+    {
+      "createdAt": "2023-04-29T00:02:25.753Z",
+      "updatedAt": "2023-04-29T00:02:25.753Z",
+      "id": "1",
+      "name": "Common Component"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-05-10T03:51:32.556Z",
+  "versionId": "a2168f5c-5596-472b-b30d-2906398ffa50"
+}
