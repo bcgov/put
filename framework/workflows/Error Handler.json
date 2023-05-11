@@ -1,0 +1,209 @@
+{
+  "active": false,
+  "connections": {
+    "Report Error": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get URL": {
+      "main": [
+        [
+          {
+            "node": "Set Message Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-03-10T17:39:10.487Z",
+  "id": "41",
+  "name": "Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "position": [
+        220,
+        500
+      ],
+      "typeVersion": 1,
+      "id": "dffb4a27-39c6-4c12-8bdd-b69644e5a8fb"
+    },
+    {
+      "parameters": {},
+      "id": "456f24eb-099b-4359-8703-5c777e00fde8",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "17"
+      },
+      "id": "17d670fe-d71f-4444-95cc-3cea6008585e",
+      "name": "Report Error",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        700,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## In case of a Workflow Error (DO NOT CHANGE!)\n\nThis workflow will automatically be executed.\n",
+        "width": 717
+      },
+      "id": "7735fac7-8ee7-42ef-9e47-5f5b07edae13",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "={{ $vars.rc_group }}"
+            },
+            {
+              "name": "rcMessage",
+              "value": "={{ $now }}\n## Workflow Execution Problem: \n`{{$node[\"Error Trigger\"].data[\"workflow\"][\"name\"]}}`\n* **Error:** \n`{{$node[\"Error Trigger\"].data[\"execution\"][\"error\"][\"message\"]}}`\n* **Stack Trace:** \n`{{$node[\"Error Trigger\"].data[\"execution\"][\"error\"][\"stack\"]}}`\n* **Node with Error:** \n`{{$node[\"Error Trigger\"].data[\"execution\"][\"Error\"][\"lastNodeExecuted\"]}}`\n* **Execution URL:** \n{{ $json.stdout + '/workflow/' + $node[\"Error Trigger\"].data[\"workflow\"][\"id\"] + '/executions/' + $node[\"Error Trigger\"].data[\"execution\"][\"id\"] }}"
+            },
+            {
+              "name": "fromAddress",
+              "value": "no-reply@gov.bc.ca"
+            },
+            {
+              "name": "toAddress",
+              "value": "={{ $vars.common_Notify }}"
+            },
+            {
+              "name": "textMessage",
+              "value": "={{ $now }}\nWorkflow Execution Problem: {{$node[\"Error Trigger\"].data[\"workflow\"][\"name\"]}}  \n* Error: \n{{$node[\"Error Trigger\"].data[\"execution\"][\"error\"][\"message\"]}} \n\n* Stack Trace: \n{{$node[\"Error Trigger\"].data[\"execution\"][\"error\"][\"stack\"]}} \n\n* Node with Error: \n{{$node[\"Error Trigger\"].data[\"execution\"][\"Error\"][\"lastNodeExecuted\"]}} \n\n* Execution URL: \n{{ $env['WEBHOOK_URL'] + '/workflow/' + $node[\"Error Trigger\"].data[\"workflow\"][\"id\"] + '/executions/' + $node[\"Error Trigger\"].data[\"execution\"][\"id\"] }}"
+            },
+            {
+              "name": "htmlMessage"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "=subJect",
+              "value": "=Workflow Execution Problem: {{$node[\"Error Trigger\"].data[\"workflow\"][\"name\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9927bbc2-bd97-40e4-b385-e2eb8e177539",
+      "name": "Set Message Params",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        540,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "command": "echo $WEBHOOK_URL"
+      },
+      "id": "30f83757-dd68-4925-9a79-c28a5da3bd81",
+      "name": "Get URL",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        380,
+        500
+      ],
+      "notesInFlow": false,
+      "notes": "We need to get the the url of the server separately. Somehow the $env option does not seem to work."
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2023-04-29T00:02:25.753Z",
+      "updatedAt": "2023-04-29T00:02:25.753Z",
+      "id": "1",
+      "name": "Common Component"
+    },
+    {
+      "createdAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "id": "9",
+      "name": "Platform"
+    },
+    {
+      "createdAt": "2023-04-29T00:02:25.792Z",
+      "updatedAt": "2023-04-29T00:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
+    },
+    {
+      "createdAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "id": "10",
+      "name": "Utility"
+    },
+    {
+      "createdAt": "2023-04-29T00:02:25.793Z",
+      "updatedAt": "2023-04-29T00:02:25.793Z",
+      "id": "2",
+      "name": "Trigger"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2023-05-10T03:50:06.522Z",
+  "versionId": "dd34f148-4e81-4008-87b6-26eb8c8ea855"
+}
