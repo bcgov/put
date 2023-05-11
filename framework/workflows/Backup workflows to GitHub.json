@@ -334,7 +334,7 @@
     {
       "parameters": {
         "content": "## Workflow Backups\nThis workflow will automatically backup your workflows to your Github account every 12 hours.\n\n### Setup\nOpen Globals and update the values below\n**repo.owner:** This is your Github username\n**repo.name:** This is the name of your repository\n**repo.path:** This is the folder to use within the repository, If it doesn't exist it will be created.\n\nIf your username was `n8n-io` and your repository was called `n8n-backups` and you wanted the workflows to go into a `workflows` folder you would set:\n\nrepo.owner - bcgov\nrepo.name - put\nrepo.path - framework",
-        "height": 339.3505033383823,
+        "height": 376.38861743279494,
         "width": 830.55476973075
       },
       "id": "23127159-11df-4b75-bb7d-61030e4e072a",
@@ -461,6 +461,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-12T01:03:36.762Z",
-  "versionId": "ab293f25-3396-4d40-8212-a54335142bd3"
+  "updatedAt": "2023-05-12T04:08:03.996Z",
+  "versionId": "049b9633-6f95-4b47-b013-948aa88089f4"
 }
