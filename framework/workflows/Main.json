@@ -1,0 +1,270 @@
+{
+  "active": true,
+  "connections": {
+    "Patroni CLAB": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vault Check": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Artifactory CLAB",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Patroni CLAB",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vault Check",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Artifactory Prod",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Artifactory UI CLAB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Artifactory CLAB",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Patroni CLAB",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vault Check",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Artifactory Prod",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Artifactory UI CLAB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artifactory Prod": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artifactory CLAB": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artifactory UI CLAB": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-09T12:26:59.628Z",
+  "id": "7",
+  "name": "Main",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "9841c131-1ee6-4587-bc17-fd4797465ba2",
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        360,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "14"
+      },
+      "id": "c5d13474-8dd4-4f6a-99fc-62de30455a7d",
+      "name": "Patroni CLAB",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "12"
+      },
+      "id": "cfa1dc1b-76a4-47df-b69c-eef657663991",
+      "name": "Vault Check",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        780
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b3e59f23-bf34-45fe-affe-44da20cafd9e",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## The Main Workflow\n\nThis is the workflow that gets triggered and it functions as an umbrella to call all the other workflows containing the tests.\n\nOnce the tests have run, the workflow will report.",
+        "height": 201,
+        "width": 662
+      },
+      "id": "ad28d324-b69a-4d1c-8963-b69e29bf4e24",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 15
+            }
+          ]
+        }
+      },
+      "id": "90cb0684-69bf-4477-bfb8-ed73cdfa01e6",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "59"
+      },
+      "id": "27998616-95c0-4b8a-91af-13fb85c76944",
+      "name": "Artifactory Prod",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "3"
+      },
+      "id": "7e9d7913-9684-4877-bca8-a038bd6ffdf9",
+      "name": "Artifactory CLAB",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "68"
+      },
+      "id": "d5d10f97-f73c-44b5-9d83-e8be995224df",
+      "name": "Artifactory UI CLAB",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        140
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-04-29T00:02:25.792Z",
+      "updatedAt": "2023-04-29T00:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-05-06T01:02:02.092Z",
+  "versionId": "18db469b-ab8d-4a64-a103-973c32741b3b"
+}
