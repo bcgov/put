@@ -15,12 +15,6 @@
 - Supported use cases and scenarios
 - Installation Instructions
 
-### [Getting Started](Getting-Started)
-
-- Setting up the development environment
-- Running the framework locally
-- Running the framework open OpenShift
-
 ### [Common Components Description](Common-Components-Description)
 
 - Workflow components and their functionalities

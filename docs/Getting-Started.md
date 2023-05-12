@@ -1,3 +1,0 @@
-- Setting up the development environment
-- Running the framework locally
-- Running the framework open OpenShift
