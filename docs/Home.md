@@ -15,23 +15,11 @@
 - Supported use cases and scenarios
 - Installation Instructions
 
-### [Common Components Description](Common-Components-Description)
-
-- Workflow components and their functionalities
-- Integration points and dependencies
-- Best practices for component implementation
-
 ### [How-To: Credentials Management](Credentials-Management)
 
 - Setting up and managing user credentials
 - Security considerations and best practices
 - Troubleshooting common issues
-
-### [How-To: Common Checking Actions](Common-Checking-Actions)
-
-- Implementing various checks in the workflow
-- Configuring and customizing checks
-- Monitoring and reporting check results
 
 ### [How-To: Specific Checks and Actions](Specific-Checks-and-Actions)
 

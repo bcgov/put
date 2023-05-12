@@ -97,7 +97,7 @@ N8N can be run locally by just using the [DockerFile](https://github.com/bcgov/p
 ## OpenShift Deployment
 
 Openshift Deployment is more involved and requires a few more steps. The following steps will help you deploy N8N on OpenShift.
-You'll find the [README](https://github.com/bcgov/put/blob/main/containers/workflow/README.md) in the same folder as the DockerFile. This will give you a good idea of how to deploy N8N on OpenShift.
+You'll find the [README](https://github.com/bcgov/put/blob/main/containers/workflow/openshift/README.md) in the same folder as the DockerFile. This will give you a good idea of how to deploy N8N on OpenShift.
 
 N8N on OpenShift will be set up as an enterprise-ready install, meaning that it is ready for production use. Because of this type of install, the requirements for resources are higher than the ephemeral install.
 
