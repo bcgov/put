@@ -1,3 +1,0 @@
-- Implementing various checks in the workflow
-- Configuring and customizing checks
-- Monitoring and reporting check results
