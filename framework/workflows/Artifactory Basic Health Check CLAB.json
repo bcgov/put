@@ -416,7 +416,9 @@
       "position": [
         20,
         160
-      ]
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -455,7 +457,7 @@
   ],
   "pinData": {},
   "settings": {
-    "saveManualExecutions": false,
+    "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
@@ -479,6 +481,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-10T04:28:35.193Z",
-  "versionId": "173657eb-3d88-4a63-bd5b-905328d8e90c"
+  "updatedAt": "2023-05-13T00:09:57.032Z",
+  "versionId": "bfc8984b-902a-43f9-9747-aa062dca0c04"
 }
