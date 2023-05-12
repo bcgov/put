@@ -41,8 +41,12 @@ Connections are used to connect nodes together. They represent the flow of data 
 ### [Sticky notes](https://docs.n8n.io/workflows/components/sticky-notes/)
 Sticky notes are used to document your workflows. They can be used to add comments, instructions, or other information about the workflow.
 
-## Integration points and dependencies
+## PUT (Post Upgrade Testing)
+We implemented a modular, extensible automation test framework for the Platform Services team that will includes test cases for:
+* Patroni database clusters
+* Vault Secret Management platform
+* Artifactory Trusted Repository service
 
+These test cases will be executed after each upgrade of the platform to ensure that the platform is functioning as expected.
+The different applications are deployed in our CLAB environment and upgardes to the platform will first be inmplemeneted there. This give the team the opportunity to evaluate the upgrade and test the functionality of the platform before it is deployed to the production environment.
 
-
-## Best practices for component implementation
