@@ -4,9 +4,9 @@
 
 ### [Introduction](Introduction)
 
-- Overview of the built framework
-- Purpose of the documentation and training materials
-- Benefits for platform users
+- N8N
+- Workflow components and their functionalities
+- PUT (Post Upgrade Testing)
 
 ### [Framework Description](Framework-Description)
 

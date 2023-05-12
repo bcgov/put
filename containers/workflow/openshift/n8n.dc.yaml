@@ -544,7 +544,7 @@ objects:
                 - name: N8N_SMTP_USER
                   value: no-reply@gov.bc.ca
                 - name: N8N_SMTP_PASS
-                  value:
+                  value: nopassword
                 - name: N8N_SMTP_SENDER
                   value: no-reply@gov.bc.ca
                 - name: N8N_SMTP_SSL
@@ -739,7 +739,7 @@ objects:
                 - name: N8N_SMTP_USER
                   value: no-reply@gov.bc.ca
                 - name: N8N_SMTP_PASS
-                  value:
+                  value: nopassword
                 - name: N8N_SMTP_SENDER
                   value: no-reply@gov.bc.ca
                 - name: N8N_SMTP_SSL
@@ -926,7 +926,7 @@ objects:
                 - name: N8N_SMTP_USER
                   value: no-reply@gov.bc.ca
                 - name: N8N_SMTP_PASS
-                  value:
+                  value: nopassword
                 - name: N8N_SMTP_SENDER
                   value: no-reply@gov.bc.ca
                 - name: N8N_SMTP_SSL
