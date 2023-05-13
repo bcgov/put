@@ -1,5 +1,5 @@
 {
-  "active": false,
+  "active": true,
   "connections": {
     "n8n": {
       "main": [
@@ -157,6 +157,17 @@
         [
           {
             "node": "n8n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Workflows",
             "type": "main",
             "index": 0
           }
@@ -447,11 +458,34 @@
         900
       ],
       "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 22
+            }
+          ]
+        }
+      },
+      "id": "d741daca-cd52-4e63-ae28-d10aa0ece6f7",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        740,
+        1100
+      ]
     }
   ],
   "pinData": {},
   "settings": {},
-  "staticData": null,
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
   "tags": [
     {
       "createdAt": "2023-04-29T07:07:24.473Z",
@@ -460,7 +494,7 @@
       "name": "Platform"
     }
   ],
-  "triggerCount": 0,
-  "updatedAt": "2023-05-12T04:08:03.996Z",
-  "versionId": "049b9633-6f95-4b47-b013-948aa88089f4"
+  "triggerCount": 1,
+  "updatedAt": "2023-05-13T03:51:01.985Z",
+  "versionId": "70cba803-c9f9-4c37-a3c1-8768eb4d5d4d"
 }
