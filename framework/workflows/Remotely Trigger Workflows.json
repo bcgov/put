@@ -65,7 +65,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        460,
+        240,
         280
       ]
     }
@@ -98,6 +98,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-05T04:34:39.832Z",
-  "versionId": "28a37282-75b1-4c24-9784-451d8e3021b4"
+  "updatedAt": "2023-05-13T01:06:29.842Z",
+  "versionId": "8fb33490-5064-4f98-9a7d-0f81bf371e34"
 }
