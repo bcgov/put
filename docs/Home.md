@@ -36,5 +36,8 @@
 ### [Maintenance Manual](Maintenance-Manual)
 
 - Backing up the system and configurations
-- Troubleshooting common issues
 - Monitoring resource usage and optimizing performance
+- Making users owner
+- Insert global variables
+
+### [Exercises](Exercises)
