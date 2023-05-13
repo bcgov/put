@@ -167,8 +167,8 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -360,
-        500
+        -840,
+        440
       ]
     },
     {
@@ -202,8 +202,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1,
       "position": [
-        -360,
-        660
+        -840,
+        640
       ]
     },
     {
@@ -265,6 +265,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-06T01:02:02.092Z",
-  "versionId": "18db469b-ab8d-4a64-a103-973c32741b3b"
+  "updatedAt": "2023-05-13T00:56:32.639Z",
+  "versionId": "4e644e37-aa03-49ac-aea5-4c814e6a0cf3"
 }
