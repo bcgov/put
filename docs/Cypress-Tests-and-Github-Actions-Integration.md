@@ -68,6 +68,6 @@ Prequisites for running this component are:
 
 ## Analyzing test results and troubleshooting
 
-If the workflow finds the error detection string in the log output of the test it will send an error message out by email and to RocketChat. This message will contain the link to the log output ([example(https://github.com/bcgov/put/actions/runs/4963098305)]) of the test.
+If the workflow finds the error detection string in the log output of the test it will send an error message out by email and to RocketChat. This message will contain the link to the log output [example](https://github.com/bcgov/put/actions/runs/4963098305) of the test.
 
 The test workflow does not do any analysis, but it is a simple detection of a string in the log output. The test workflow can be extended to do more analysis and send out more detailed messages in the future if needed.
