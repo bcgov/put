@@ -55,26 +55,26 @@
         },
         "options": {}
       },
-      "id": "d033b9f1-7cf2-45d8-8a1c-9e08ad1c4976",
+      "id": "314689fa-c860-4896-b17e-2c13e0b3f4ae",
       "name": "Set Token Name",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        1360,
-        340
+        1560,
+        700
       ]
     },
     {
       "parameters": {
         "workflowId": "28"
       },
-      "id": "14b25078-e9c8-45fe-bda1-236856d63e02",
+      "id": "53607035-3c61-42fa-b2f4-547b1f78cacf",
       "name": "Build Login Command",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1520,
-        340
+        1720,
+        700
       ],
       "alwaysOutputData": true
     },
@@ -82,13 +82,13 @@
       "parameters": {
         "command": "={{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name\"].json.nameSpace }}"
       },
-      "id": "feda7f71-01d4-4ed9-812a-743a7bfb2373",
+      "id": "5c740010-049d-4c09-8c84-832b3821e01f",
       "name": "OC Login",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1680,
-        340
+        1880,
+        700
       ]
     },
     {
@@ -97,24 +97,24 @@
         "height": 322,
         "width": 1058
       },
-      "id": "34429efa-d383-46db-9df5-6299d312699e",
+      "id": "676f6d25-3e95-4da0-ae39-ce9d68adcf0b",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        960,
-        -20
+        1160,
+        340
       ]
     },
     {
       "parameters": {},
-      "id": "a150ed99-4df0-41e7-8bf1-1154a13f0d8b",
+      "id": "fee09261-1ba1-47df-ac17-d83bc0c7c5ad",
       "name": "When clicking \"Execute Workflow\"",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        1180,
-        340
+        1380,
+        700
       ]
     }
   ],
@@ -148,6 +148,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-05T05:06:11.940Z",
-  "versionId": "c219505d-9446-48a3-a376-8716165bff86"
+  "updatedAt": "2023-05-26T05:27:43.909Z",
+  "versionId": "5def53c6-3b27-42f9-b073-f43a6d190c0d"
 }
