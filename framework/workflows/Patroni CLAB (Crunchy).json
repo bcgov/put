@@ -152,7 +152,7 @@
     },
     {
       "parameters": {
-        "command": "=nohup oc port-forward svc/hippo-pgbouncer 15438:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
+        "command": "=echo {{ $node[\"Set Token Name\"].json.nameSpace }}\nnohup oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} port-forward svc/hippo-pgbouncer 15438:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
       },
       "id": "53a0b590-ebf9-4446-9e15-8d4f4bee9447",
       "name": "Set Port Forward Patroni",
@@ -241,7 +241,7 @@
     },
     {
       "parameters": {
-        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name\"].json.nameSpace }}"
+        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}\n"
       },
       "id": "889a321f-714e-470a-b4bb-b0199764108e",
       "name": "OC Login",
@@ -480,6 +480,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-10T04:31:47.983Z",
-  "versionId": "e3476367-f4df-409f-be5a-e95a54bc7730"
+  "updatedAt": "2023-05-26T01:19:14.967Z",
+  "versionId": "63059e40-5366-40a9-a654-d63bedc4acbc"
 }
