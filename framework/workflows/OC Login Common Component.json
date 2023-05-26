@@ -45,63 +45,63 @@
         "height": 217,
         "width": 717
       },
-      "id": "7a878f99-a65b-4205-b354-e24217655eb7",
+      "id": "9b977dfc-7a59-4569-a5b2-66eb0623ae9e",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        180,
-        -40
+        -40,
+        -140
       ]
     },
     {
       "parameters": {
         "command": "=n8n export:credentials --all --decrypted | jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.value' | tr -d '\\n'"
       },
-      "id": "a6df4f34-8c05-4d68-a0c6-3be3cb58e1ad",
+      "id": "d98086d9-16a7-4567-8ff0-58047735bf4a",
       "name": "Get Token",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        420,
-        200
+        200,
+        100
       ]
     },
     {
       "parameters": {
         "command": "=n8n export:credentials --all --decrypted | jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.name' | sed \"s/<token>/{{ $json.stdout }}/g\" "
       },
-      "id": "93d8354c-56c6-4a93-9b05-39c73004e390",
+      "id": "7ebaa3c3-1535-4724-8b6e-75aa8c8ffe2a",
       "name": "Build Login",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        560,
-        200
+        340,
+        100
       ]
     },
     {
       "parameters": {},
-      "id": "1e437650-2955-47d7-b6e6-5001b3f4f96e",
+      "id": "217c912d-0c76-4735-9c34-dec96eb4920b",
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        220,
-        200
+        0,
+        100
       ]
     },
     {
       "parameters": {
         "jsCode": "return [{ \"ocLogin\": $('Build Login').item.json.stdout }];"
       },
-      "id": "0ef6b639-b0d6-497b-bb41-c9e868c0eee7",
+      "id": "e2b00ace-fca3-4bc9-b522-49588b5fef29",
       "name": "Code",
       "type": "n8n-nodes-base.code",
       "typeVersion": 1,
       "position": [
-        720,
-        200
+        500,
+        100
       ]
     }
   ],
@@ -128,6 +128,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-05T05:27:04.066Z",
-  "versionId": "c1ef639c-29e1-42fb-97a8-cc4b4b181fea"
+  "updatedAt": "2023-05-26T03:21:23.724Z",
+  "versionId": "341244a6-d87f-4202-9dbf-ae5fbaed9bdb"
 }
