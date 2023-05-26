@@ -192,7 +192,7 @@
     },
     {
       "parameters": {
-        "command": "=nohup oc port-forward svc/patroni-reference-master 15433:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
+        "command": "=nohup oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} port-forward svc/patroni-reference-master 15433:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
       },
       "id": "cd9d3abe-5973-469d-9b81-b58cfdcb39d8",
       "name": "Set Port Forward Patroni",
@@ -281,7 +281,7 @@
     },
     {
       "parameters": {
-        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name\"].json.nameSpace }}"
+        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}\n"
       },
       "id": "22d04b59-f5f8-4047-966d-da291fcd4513",
       "name": "OC Login",
@@ -486,7 +486,7 @@
     },
     {
       "parameters": {
-        "command": "=oc project {{ $node[\"Set Token Name\"].json.nameSpace }} > /dev/null\noc exec $(oc get pods -o name --selector role=master,cluster-name=patroni-reference) -- /usr/share/scripts/patroni/health_check.sh"
+        "command": "=oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} exec $(oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} get pods -o name --selector role=master,cluster-name=patroni-reference) -- /usr/share/scripts/patroni/health_check.sh"
       },
       "id": "a585feed-cb68-4ad1-8a9a-f1f14d55d44f",
       "name": "Check Readiness",
@@ -596,6 +596,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-10T04:34:45.288Z",
-  "versionId": "050cdb16-d6eb-4834-8f7b-90f40affd2fc"
+  "updatedAt": "2023-05-26T07:19:37.326Z",
+  "versionId": "1f09d753-3103-4cc8-8c84-99f836d0b940"
 }
