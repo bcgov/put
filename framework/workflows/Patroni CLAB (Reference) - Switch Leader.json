@@ -193,8 +193,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        -740,
-        -80
+        -760,
+        -73
       ]
     },
     {
@@ -206,22 +206,22 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -580,
-        -80
+        -600,
+        -73
       ],
       "alwaysOutputData": true
     },
     {
       "parameters": {
-        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name\"].json.nameSpace }}"
+        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}"
       },
       "id": "da06533e-c7f0-4f69-b3a9-93aeae637f8b",
       "name": "OC Login",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -420,
-        -80
+        -440,
+        -73
       ]
     },
     {
@@ -246,13 +246,13 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -780,
-        -186.85356782652548
+        -800,
+        -180
       ]
     },
     {
       "parameters": {
-        "command": "=oc project {{ $node[\"Set Token Name\"].json.nameSpace }} > /dev/null\noc rsh $(oc get pods -o name --selector role=master,cluster-name=patroni-reference) curl -s localhost:8008/cluster | jq -e \".\""
+        "command": "=oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} rsh $(oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} get pods -o name --selector role=master,cluster-name=patroni-reference) curl -s localhost:8008/cluster | jq -e \".\""
       },
       "id": "70f3ed35-c520-487f-95f0-02605e26edde",
       "name": "Check Readiness",
@@ -515,6 +515,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-10T03:57:21.792Z",
-  "versionId": "a566ee5d-5220-4885-a825-c64bb4cb6dd4"
+  "updatedAt": "2023-05-27T04:25:54.284Z",
+  "versionId": "3241baa9-91ea-4abc-8c6b-615493867912"
 }
