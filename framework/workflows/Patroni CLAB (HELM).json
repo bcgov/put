@@ -146,7 +146,7 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -960,
+        -1000,
         -180
       ]
     },
@@ -221,8 +221,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        -740,
-        -80
+        -800,
+        -73
       ]
     },
     {
@@ -234,22 +234,22 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -580,
-        -80
+        -640,
+        -73
       ],
       "alwaysOutputData": true
     },
     {
       "parameters": {
-        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name\"].json.nameSpace }}"
+        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}"
       },
       "id": "c3e3facd-b776-4181-9a41-0cd73da16071",
       "name": "OC Login",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -420,
-        -80
+        -480,
+        -73
       ]
     },
     {
@@ -259,7 +259,7 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -960,
+        -1000,
         0
       ]
     },
@@ -274,8 +274,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -780,
-        -186.85356782652548
+        -840,
+        -180
       ]
     },
     {
@@ -290,7 +290,7 @@
       "typeVersion": 1,
       "position": [
         -300,
-        -186
+        -180
       ]
     },
     {
@@ -468,8 +468,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -520,
-        -440
+        -440,
+        -540
       ]
     }
   ],
@@ -495,6 +495,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-10T04:35:34.748Z",
-  "versionId": "4a1c2f65-2c12-41ca-a462-87d43edab5af"
+  "updatedAt": "2023-05-27T04:25:17.550Z",
+  "versionId": "f4f68551-160f-46bc-a4e7-f43bcb372e63"
 }
