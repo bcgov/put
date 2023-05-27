@@ -1,0 +1,117 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-05-27T07:27:03.814Z",
+  "id": "75",
+  "name": "n8n Audit",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1c8d29f2-524d-4e4b-bd81-bdc7e8f1ad1a",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        780,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "command": "n8n audit"
+      },
+      "id": "46e19401-d006-4223-9860-89f04ada6544",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        960,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@gov.bc.ca",
+        "toEmail": "roland.stens@gov.bc.ca",
+        "subject": "N8N Audit Report",
+        "text": "={{ $node[\"Execute Command\"].json.stdout }}",
+        "options": {}
+      },
+      "id": "da9ee081-f0d1-43b7-87c4-4f0ce4b2ea3a",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        420
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 4
+            }
+          ]
+        }
+      },
+      "id": "10fe7c49-b41f-46f5-baf9-b3a9b29b4b66",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        780,
+        260
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-05-27T07:34:53.579Z",
+  "versionId": "70b65d3b-9549-46f1-98e6-9225fb2bc17d"
+}
