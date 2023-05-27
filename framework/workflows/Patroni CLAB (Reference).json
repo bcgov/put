@@ -138,7 +138,7 @@
       "main": [
         [
           {
-            "node": "Get Result",
+            "node": "Wait",
             "type": "main",
             "index": 0
           }
@@ -173,6 +173,17 @@
           }
         ]
       ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "createdAt": "2023-03-08T17:34:45.027Z",
@@ -199,7 +210,7 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        200,
+        600,
         -100
       ]
     },
@@ -210,8 +221,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1508,
-        -120
+        1948,
+        -124
       ]
     },
     {
@@ -223,8 +234,8 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1320,
-        -120
+        1760,
+        -124
       ]
     },
     {
@@ -236,8 +247,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1128,
-        240
+        1568,
+        236
       ]
     },
     {
@@ -261,7 +272,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        -740,
+        -640,
         -80
       ]
     },
@@ -274,23 +285,27 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -580,
+        -480,
         -80
       ],
-      "alwaysOutputData": true
+      "alwaysOutputData": true,
+      "retryOnFail": false
     },
     {
       "parameters": {
-        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}\n"
+        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}"
       },
       "id": "22d04b59-f5f8-4047-966d-da291fcd4513",
       "name": "OC Login",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -420,
-        -80
-      ]
+        -320,
+        -73
+      ],
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 3000
     },
     {
       "parameters": {},
@@ -306,7 +321,7 @@
     {
       "parameters": {
         "content": "## Login to OpenShift\n\nSee [here](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/workflow/29) for instructions.",
-        "height": 336.5625,
+        "height": 327.72692944534356,
         "width": 471.25
       },
       "id": "6a30141e-acb9-4781-940a-f101f3577dd4",
@@ -314,8 +329,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -780,
-        -186.85356782652548
+        -660,
+        -180
       ]
     },
     {
@@ -329,7 +344,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        140,
+        540,
         -180
       ]
     },
@@ -344,7 +359,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        400,
+        800,
         -180
       ]
     },
@@ -359,7 +374,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        640,
+        1040,
         -180
       ]
     },
@@ -374,7 +389,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
       "position": [
-        460,
+        860,
         -100
       ],
       "credentials": {
@@ -395,8 +410,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1301.7748361069087,
-        -180
+        1522,
+        -184
       ]
     },
     {
@@ -410,7 +425,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        920,
+        1320,
         180
       ]
     },
@@ -430,7 +445,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        708,
+        1080,
         -100
       ]
     },
@@ -480,22 +495,25 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        968,
-        240
+        1408,
+        236
       ]
     },
     {
       "parameters": {
-        "command": "=oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} exec $(oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} get pods -o name --selector role=master,cluster-name=patroni-reference) -- /usr/share/scripts/patroni/health_check.sh"
+        "command": "=PODNAME=$(oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} get pods -o name --selector role=master,cluster-name=patroni-reference)\noc -n {{ $node[\"Set Token Name\"].json.nameSpace }} exec $PODNAME -- /usr/share/scripts/patroni/health_check.sh"
       },
       "id": "a585feed-cb68-4ad1-8a9a-f1f14d55d44f",
       "name": "Check Readiness",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -280,
+        -100,
         -80
       ],
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
       "continueOnFail": true
     },
     {
@@ -507,7 +525,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 1,
       "position": [
-        -140,
+        200,
         -80
       ]
     },
@@ -527,7 +545,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        0,
+        340,
         -80
       ]
     },
@@ -535,15 +553,15 @@
       "parameters": {
         "content": "## Check Readiness",
         "height": 333.5588439233485,
-        "width": 426.71205244578886
+        "width": 601.6563494279864
       },
       "id": "14dd73a6-e4ed-42ef-b0ab-9162a1555ef3",
       "name": "Sticky Note6",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -300,
-        -184.50548411497726
+        -120,
+        -180
       ]
     },
     {
@@ -555,8 +573,8 @@
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        1340,
-        240
+        1780,
+        236
       ]
     },
     {
@@ -569,9 +587,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -560,
-        -500
+        -540,
+        -580
       ]
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "1ad8ddef-5282-4a36-b89c-550297bd1a39",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        60,
+        -80
+      ],
+      "webhookId": "b94e5636-cc6d-4ea8-b048-16be8d0c53f1"
     }
   ],
   "pinData": {},
@@ -596,6 +629,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-26T07:19:37.326Z",
-  "versionId": "1f09d753-3103-4cc8-8c84-99f836d0b940"
+  "updatedAt": "2023-05-27T06:33:15.456Z",
+  "versionId": "7a20b548-3c31-4d77-8c7a-c662820af4ca"
 }
