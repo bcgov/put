@@ -1,5 +1,5 @@
 {
-  "active": true,
+  "active": false,
   "connections": {
     "Patroni CLAB": {
       "main": [
@@ -145,7 +145,10 @@
       "position": [
         -20,
         620
-      ]
+      ],
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -192,7 +195,7 @@
           "interval": [
             {
               "field": "hours",
-              "triggerAtMinute": 15
+              "triggerAtMinute": 42
             }
           ]
         }
@@ -204,7 +207,8 @@
       "position": [
         -840,
         640
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -243,7 +247,10 @@
       "position": [
         -20,
         140
-      ]
+      ],
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     }
   ],
   "pinData": {},
@@ -265,6 +272,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-13T00:56:32.639Z",
-  "versionId": "4e644e37-aa03-49ac-aea5-4c814e6a0cf3"
+  "updatedAt": "2023-05-27T07:45:07.868Z",
+  "versionId": "b3b2ebfb-cc57-48ff-a705-4ae85691a9d4"
 }
