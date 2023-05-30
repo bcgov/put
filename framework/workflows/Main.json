@@ -1,5 +1,5 @@
 {
-  "active": false,
+  "active": true,
   "connections": {
     "Patroni CLAB": {
       "main": [
@@ -195,7 +195,7 @@
           "interval": [
             {
               "field": "hours",
-              "triggerAtMinute": 42
+              "triggerAtMinute": 9
             }
           ]
         }
@@ -207,8 +207,7 @@
       "position": [
         -840,
         640
-      ],
-      "disabled": true
+      ]
     },
     {
       "parameters": {
@@ -272,6 +271,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-27T07:45:07.868Z",
-  "versionId": "b3b2ebfb-cc57-48ff-a705-4ae85691a9d4"
+  "updatedAt": "2023-05-30T04:08:06.152Z",
+  "versionId": "70e00d2c-ee3d-4dce-b2e5-c107b8f65244"
 }
