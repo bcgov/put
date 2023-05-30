@@ -5,7 +5,7 @@
       "main": [
         [
           {
-            "node": "Let it FAIL",
+            "node": "Execute Patroni (Reference) Test",
             "type": "main",
             "index": 0
           }
@@ -16,7 +16,7 @@
       "main": [
         [
           {
-            "node": "Let it FAIL",
+            "node": "Execute Patroni (Reference) Test",
             "type": "main",
             "index": 0
           }
@@ -72,17 +72,6 @@
         [
           {
             "node": "No Operation, do nothing",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Let it FAIL": {
-      "main": [
-        [
-          {
-            "node": "Execute Patroni (Reference) Test",
             "type": "main",
             "index": 0
           }
@@ -219,19 +208,6 @@
       "retryOnFail": false,
       "maxTries": 5,
       "waitBetweenTries": 5000
-    },
-    {
-      "parameters": {
-        "workflowId": "30"
-      },
-      "id": "8e79eaaf-cd80-43d4-a855-ca30cb727663",
-      "name": "Let it FAIL",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        -1380,
-        60
-      ]
     }
   ],
   "pinData": {},
@@ -259,6 +235,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-27T07:40:30.975Z",
-  "versionId": "c5821102-f030-4ec7-9de3-b9e2db7eb4f7"
+  "updatedAt": "2023-05-30T05:27:32.804Z",
+  "versionId": "a23b48cb-9b2c-424e-accc-120c05faa4f4"
 }
