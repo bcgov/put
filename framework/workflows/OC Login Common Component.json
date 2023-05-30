@@ -56,7 +56,7 @@
     },
     {
       "parameters": {
-        "command": "=n8n export:credentials --all --decrypted | jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.value' | tr -d '\\n'"
+        "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]'|jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.value' | tr -d '\\n'"
       },
       "id": "d98086d9-16a7-4567-8ff0-58047735bf4a",
       "name": "Get Token",
@@ -69,7 +69,7 @@
     },
     {
       "parameters": {
-        "command": "=n8n export:credentials --all --decrypted | jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.name' | sed \"s/<token>/{{ $json.stdout }}/g\" "
+        "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]' | jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.name' | sed \"s/<token>/{{ $json.stdout }}/g\" "
       },
       "id": "7ebaa3c3-1535-4724-8b6e-75aa8c8ffe2a",
       "name": "Build Login",
@@ -128,6 +128,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-26T03:21:23.724Z",
-  "versionId": "341244a6-d87f-4202-9dbf-ae5fbaed9bdb"
+  "updatedAt": "2023-05-30T03:18:05.580Z",
+  "versionId": "d35e36e8-f151-4f9a-b434-b1e87d73d423"
 }
