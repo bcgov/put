@@ -22,7 +22,7 @@ import './commands'
 function loginToArtifactory(username, password) {
 
     cy.visit("/");
-    cy.get('input[name="username"]').should('be.visible').type(username);
+    cy.get('input[name="username"]', { timeout: 33_000 }).should('be.visible').type(username);
     cy.get('input[name="password"]').type(password);
     cy.get('input[type="checkbox"]').click({ force: true });
     cy.get('button[type="submit"]').click();
