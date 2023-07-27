@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/nodejs-16:latest
+FROM registry.access.redhat.com/ubi8/nodejs-20:latest
 ENV HOME=/opt/app-root/src \
       TZ=America/Vancouver
 

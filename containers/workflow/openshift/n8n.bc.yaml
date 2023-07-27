@@ -47,7 +47,7 @@ objects:
           from:
             kind: DockerImage
             name: >-
-              artifacts.developer.gov.bc.ca/redhat-docker-remote/ubi8/nodejs-16:latest
+              registry.access.redhat.com/ubi8/nodejs-18:latest
       postCommit: {}
       source:
         type: Dockerfile
