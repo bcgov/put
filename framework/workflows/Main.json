@@ -50,6 +50,11 @@
             "node": "Artifactory UI CLAB",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -81,6 +86,11 @@
             "node": "Artifactory UI CLAB",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -108,6 +118,17 @@
       ]
     },
     "Artifactory UI CLAB": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
       "main": [
         [
           {
@@ -250,6 +271,19 @@
       "retryOnFail": false,
       "maxTries": 5,
       "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "workflowId": "77"
+      },
+      "id": "c7289cdb-3369-4d99-abf4-a1c3135dce38",
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        960
+      ]
     }
   ],
   "pinData": {},
@@ -271,6 +305,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-30T04:08:06.152Z",
-  "versionId": "70e00d2c-ee3d-4dce-b2e5-c107b8f65244"
+  "updatedAt": "2023-08-19T03:04:28.235Z",
+  "versionId": "be276084-6a69-4909-801a-7bc523a96288"
 }
