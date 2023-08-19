@@ -203,7 +203,7 @@
     },
     {
       "parameters": {
-        "command": "=nohup oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} port-forward svc/patroni-reference-master 15433:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
+        "command": "=nohup oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} port-forward svc/patroni-reference-master 15435:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
       },
       "id": "cd9d3abe-5973-469d-9b81-b58cfdcb39d8",
       "name": "Set Port Forward Patroni",
@@ -394,8 +394,8 @@
       ],
       "credentials": {
         "postgres": {
-          "id": "13",
-          "name": "Patroni (Reference)"
+          "id": "39",
+          "name": "Patroni(reference) clab"
         }
       }
     },
@@ -629,6 +629,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-27T06:33:15.456Z",
-  "versionId": "7a20b548-3c31-4d77-8c7a-c662820af4ca"
+  "updatedAt": "2023-08-19T03:26:56.385Z",
+  "versionId": "b00e0430-80f1-4cc0-b103-a4acd1ea3fbe"
 }
