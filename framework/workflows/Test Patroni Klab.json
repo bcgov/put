@@ -1,0 +1,617 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Set Token Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Port Forward Patroni": {
+      "main": [
+        [
+          {
+            "node": "Postgres Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OC Logout": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Error": {
+      "main": [
+        [
+          {
+            "node": "OC Logout",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Token Name": {
+      "main": [
+        [
+          {
+            "node": "Build Login Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Login Command": {
+      "main": [
+        [
+          {
+            "node": "OC Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OC Login": {
+      "main": [
+        [
+          {
+            "node": "Check Readiness",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Token Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Test": {
+      "main": [
+        [
+          {
+            "node": "Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check": {
+      "main": [
+        [
+          {
+            "node": "OC Logout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Message Params for Error Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message Params for Error Report": {
+      "main": [
+        [
+          {
+            "node": "Report Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Readiness": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Result": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Set Port Forward Patroni",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Message Params for Error Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-08-19T02:33:56.852Z",
+  "id": "77",
+  "name": "Test Patroni Klab",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "51cf0fe3-4571-496d-ac1c-a7fee13266c0",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=nohup oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} port-forward svc/mycool-app-patroni-master 15433:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
+      },
+      "id": "5c37c9cb-b75b-4d38-b3e4-c013e755debb",
+      "name": "Set Port Forward Patroni",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        820
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "4570244e-2c98-4c92-b3bd-b29203751053",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3348,
+        796
+      ]
+    },
+    {
+      "parameters": {
+        "command": "oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n"
+      },
+      "id": "b96ff59b-663d-4dce-988a-df06722ff5e7",
+      "name": "OC Logout",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        3160,
+        796
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "17"
+      },
+      "id": "07e07952-8942-4c25-930d-7f8a1140caa0",
+      "name": "Report Error",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        2968,
+        1156
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "tokenName",
+              "value": "KLAB_Token"
+            },
+            {
+              "name": "nameSpace",
+              "value": "shellyxuehan-dev"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0f5329f9-8415-4b7f-aae7-85310e7e9c6f",
+      "name": "Set Token Name",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        760,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "28"
+      },
+      "id": "6a5c13b8-aa73-4141-a037-c343475df26b",
+      "name": "Build Login Command",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        920,
+        840
+      ],
+      "alwaysOutputData": true,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}"
+      },
+      "id": "e35ae9dc-55ce-4f99-bf19-7cf136f4c7e4",
+      "name": "OC Login",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        847
+      ],
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {},
+      "id": "ab114d2c-57b8-40fb-be91-c2842075e737",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        920
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Login to OpenShift\n\nSee [here](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/workflow/29) for instructions.",
+        "height": 327.72692944534356,
+        "width": 471.25
+      },
+      "id": "d254e734-660c-4791-b919-40ebef115f09",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        740,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Forward the DB port to localhost",
+        "height": 324.1121722138173,
+        "width": 252.5
+      },
+      "id": "1b7cfee0-c491-462e-bb7e-0a6361f778ab",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1940,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Run the Test Script",
+        "height": 331.875,
+        "width": 230.71192637418068
+      },
+      "id": "64875c31-8981-437f-85d5-a275ce4b9dc2",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Check the result",
+        "height": 331.875,
+        "width": 233.75
+      },
+      "id": "c60e74b3-661b-4540-814c-b90df3be35f8",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2440,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  commit;  \n\nselect count(*) from lat_longs;\n\ndrop table lat_longs;",
+        "additionalFields": {}
+      },
+      "id": "7bc7d77b-4ba2-4b7d-b133-3ba5b3855034",
+      "name": "Postgres Test",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        2260,
+        820
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "13",
+          "name": "Patroni (Reference)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Close the Workflow",
+        "height": 571.1994768028239,
+        "width": 377.6614346949063
+      },
+      "id": "15ddfd37-2118-4803-b714-70c8c9c34dfd",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2922,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Report the Error",
+        "height": 217.8125,
+        "width": 361.0555345436212
+      },
+      "id": "6da5decd-8e39-45cd-9ff0-a44a3f7ce173",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.count }}",
+              "value2": "10000"
+            }
+          ]
+        }
+      },
+      "id": "0193ce54-6e8c-4aff-987f-97f4275740dc",
+      "name": "Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        820
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rcChannel",
+              "value": "={{ $vars.rc_group }}"
+            },
+            {
+              "name": "rcMessage",
+              "value": "Patroni (Reference) Failed Post Update Test"
+            },
+            {
+              "name": "fromAddress",
+              "value": "no-reply@gov.bc.ca"
+            },
+            {
+              "name": "toAddress",
+              "value": "={{ $vars.crunchy_Notify }}"
+            },
+            {
+              "name": "textMessage",
+              "value": "Test 2"
+            },
+            {
+              "name": "htmlMessage"
+            },
+            {
+              "name": "ccAddress"
+            },
+            {
+              "name": "bccAddress"
+            },
+            {
+              "name": "subJect",
+              "value": "=Patroni (Reference) Failed Post Update Test"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e190ba8c-e798-45cf-92dc-710e132b7851",
+      "name": "Set Message Params for Error Report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2808,
+        1156
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=PODNAME=$(oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} get pods -o name --selector role=master,cluster-name=mycool-app-patroni)\noc -n {{ $node[\"Set Token Name\"].json.nameSpace }} exec $PODNAME -- /usr/share/scripts/patroni/health_check.sh"
+      },
+      "id": "64057c9e-4d34-4243-aa42-9f239df56a75",
+      "name": "Check Readiness",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        840
+      ],
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($('Check Readiness').item.json.stdout);"
+      },
+      "id": "3fca6a71-2bc4-4bc2-88b1-24b1c9bfd493",
+      "name": "Get Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.State }}",
+              "value2": "running"
+            }
+          ]
+        }
+      },
+      "id": "6349dcd2-9542-4ddb-b55b-20e1da311f68",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1740,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Check Readiness",
+        "height": 333.5588439233485,
+        "width": 601.6563494279864
+      },
+      "id": "4998512b-a119-4dac-b38b-bf7b99ac2667",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "=Error in {{ $workflow.name }}"
+      },
+      "id": "aca585f3-0c19-46c5-a34b-5253d5405635",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        3180,
+        1156
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Test Patroni Reference Install\n\nFrom: https://github.com/bcgov/patroni-postgres-container",
+        "width": 1397.880484114978
+      },
+      "id": "1c3ef5fd-2104-4fd6-b598-94d2e2cc3632",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        860,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "d3582371-5a0b-4a93-9d00-ed21b097e652",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        840
+      ],
+      "webhookId": "b94e5636-cc6d-4ea8-b048-16be8d0c53f1"
+    }
+  ],
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2023-08-19T02:58:00.975Z",
+  "versionId": "87272974-62ee-45b4-81f5-ea5e60f1d661"
+}
