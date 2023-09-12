@@ -152,7 +152,7 @@
     },
     {
       "parameters": {
-        "command": "=nohup oc port-forward svc/crunchy-postgres-pgbouncer 5432:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
+        "command": "=nohup oc port-forward svc/crunchy-postgres-pgbouncer 15437:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
       },
       "id": "38d6ffe8-ece8-49f9-9f25-321e51d8b113",
       "name": "Set Port Forward Patroni",
@@ -170,8 +170,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1660,
-        -326
+        1640,
+        -340
       ]
     },
     {
@@ -183,8 +183,8 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1480,
-        -326
+        1400,
+        -340
       ]
     },
     {
@@ -335,7 +335,7 @@
       "typeVersion": 1,
       "position": [
         320,
-        6
+        0
       ],
       "credentials": {
         "postgres": {
@@ -453,8 +453,8 @@
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        1780,
-        60
+        1480,
+        -100
       ]
     }
   ],
@@ -480,6 +480,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-26T06:10:31.051Z",
-  "versionId": "9fbdfe36-779b-497e-b35e-c8dd754f89c9"
+  "updatedAt": "2023-09-12T04:06:20.729Z",
+  "versionId": "8d8efea1-f1b9-41fe-9c8b-1402979c1f5d"
 }
