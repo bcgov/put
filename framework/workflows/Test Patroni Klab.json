@@ -395,7 +395,7 @@
       "credentials": {
         "postgres": {
           "id": "13",
-          "name": "Patroni (Reference)"
+          "name": "Patroni (Reference) Klab"
         }
       }
     },
@@ -612,6 +612,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2023-08-19T02:58:00.975Z",
-  "versionId": "87272974-62ee-45b4-81f5-ea5e60f1d661"
+  "updatedAt": "2023-09-21T01:57:40.066Z",
+  "versionId": "60e788c2-1ca3-47e0-b555-f10ce3ac53e6"
 }
