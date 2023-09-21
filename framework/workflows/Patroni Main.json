@@ -1,0 +1,240 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Execute Patroni (Reference) Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute Patroni (Reference) Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Patroni (Reference) Test": {
+      "main": [
+        [
+          {
+            "node": "Patroni (Reference) Switch Main",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patroni (Reference) Switch Main": {
+      "main": [
+        [
+          {
+            "node": "Execute Patroni (HELM) Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Patroni (HELM) Test": {
+      "main": [
+        [
+          {
+            "node": "Execute Crunchy Test KLAB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Crunchy Test CLAB": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Crunchy Test KLAB": {
+      "main": [
+        [
+          {
+            "node": "Execute Crunchy Test CLAB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2023-02-19T16:37:17.480Z",
+  "id": "14",
+  "name": "Patroni Main",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ede2b8bc-6b66-4f0c-8ce0-4c39c31ff565",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1780,
+        220
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "198e3deb-6cd9-4c88-92fd-10ed0462a8a5",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1780,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "31"
+      },
+      "id": "9d1ec013-cc09-492d-b123-8bce16cc965d",
+      "name": "Execute Patroni (Reference) Test",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1180,
+        -80
+      ],
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "workflowId": "32"
+      },
+      "id": "ea39cb73-ce85-4a28-883a-89ccc08c5923",
+      "name": "Execute Patroni (HELM) Test",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        -80
+      ],
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {},
+      "id": "15d4bf34-c0b3-45b6-b4bf-20ff19e98d3d",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## All the Patroni Variants Tests\n\nThis is the main starting workflow for all Patroni Tests in CLAB.",
+        "height": 117,
+        "width": 470
+      },
+      "id": "8e33065e-bfb4-464f-bcea-cd20c0e531c6",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1620,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "34"
+      },
+      "id": "da425e3c-0797-4d46-8914-f2e888dabc9d",
+      "name": "Patroni (Reference) Switch Main",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1000,
+        -80
+      ],
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "workflowId": "73"
+      },
+      "id": "d0a41172-42c0-4928-b1e3-1f71d1277135",
+      "name": "Execute Crunchy Test KLAB",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -680,
+        -80
+      ],
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "workflowId": "33"
+      },
+      "id": "b77c5c5f-7986-448f-b4dd-b4cacb90eef7",
+      "name": "Execute Crunchy Test CLAB",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -80
+      ],
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "tags": [
+    {
+      "createdAt": "2023-04-29T00:02:25.792Z",
+      "updatedAt": "2023-04-29T00:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
+    },
+    {
+      "createdAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "id": "4",
+      "name": "Test"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2023-09-21T02:10:20.396Z",
+  "versionId": "87749aac-1039-4e77-9076-7b7424899b7a"
+}
