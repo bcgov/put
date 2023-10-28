@@ -5,7 +5,7 @@
       "main": [
         [
           {
-            "node": "Get Config",
+            "node": "NoOp",
             "type": "main",
             "index": 0
           }
@@ -87,20 +87,8 @@
     },
     "IF1": {
       "main": [
-        [
-          {
-            "node": "NoOp",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Set Message Params for Error Report",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [],
+        []
       ]
     },
     "Artifactory Ping": {
@@ -342,8 +330,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
       "position": [
-        760,
-        500
+        700,
+        220
       ],
       "credentials": {
         "httpBasicAuth": {
@@ -361,8 +349,8 @@
       "type": "n8n-nodes-base.xml",
       "typeVersion": 1,
       "position": [
-        940,
-        500
+        880,
+        220
       ]
     },
     {
@@ -381,8 +369,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        1120,
-        500
+        1060,
+        220
       ]
     },
     {
@@ -481,6 +469,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-13T00:09:57.032Z",
-  "versionId": "bfc8984b-902a-43f9-9747-aa062dca0c04"
+  "updatedAt": "2023-10-28T00:21:41.680Z",
+  "versionId": "980ade76-176c-4d05-bb24-37a4c4ae64a7"
 }
