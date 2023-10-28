@@ -34,6 +34,7 @@ function loginToArtifactory(username, password) {
 
     // if username field is found, type in the username (maximum wait 22 seconds)
     cy.get('input[name="username"]', {timeout: 22_000}).should('be.visible').type(username);
+
     cy.get('input[name="password"]').type(password);
     cy.get('input[type="checkbox"]').click({ force: true });
     cy.get('button[type="submit"]').click();
