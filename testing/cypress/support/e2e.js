@@ -22,12 +22,18 @@ import './commands'
 function loginToArtifactory(username, password) {
 
     cy.visit('/');
-    // if username field is not found in 15 seconds, visit the page again (additional layer of wait and a retry through the revisit)
-    if ($body.find('input[name="username"]', { timeout: 15_000 }).length < 0) {
-        cy.visit('/');
-       }
-    // if username field is found, type in the username (maximum wait 15 seconds)
-    cy.get('input[name="username"]', { timeout: 15_000 }).should('be.visible').type(username);
+    // additional layer of wait and a retry through the revisit
+    // wait 3 seconds, then get body and try to find the username input field, if no luck revisit the page and wait for it again
+    cy.wait(3_000)
+    cy.get('body')
+      .then((body) => {
+        if (body.find('input[name="username"]').length != 1) {
+            cy.log('first attempt to find username input did not work, revisiting the login page');
+            cy.visit('/');
+        }})
+
+    // if username field is found, type in the username (maximum wait 22 seconds)
+    cy.get('input[name="username"]', {timeout: 22_000}).should('be.visible').type(username);
     cy.get('input[name="password"]').type(password);
     cy.get('input[type="checkbox"]').click({ force: true });
     cy.get('button[type="submit"]').click();
