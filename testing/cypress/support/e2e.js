@@ -24,7 +24,7 @@ function loginToArtifactory(username, password) {
     cy.visit('/');
     // additional layer of wait and a retry through the revisit
     // wait 3 seconds, then get body and try to find the username input field, if no luck revisit the page and wait for it again
-    cy.wait(3_000)
+    cy.wait(3_000);
     cy.get('body')
       .then((body) => {
         if (body.find('input[name="username"]').length != 1) {
@@ -46,10 +46,10 @@ Cypress.Commands.add('loginToArtifactory', (username, password) => {
         message: [`🔐 Authenticating | ${username}`],
         autoEnd: false,
     })
-    log.snapshot('before')
+    log.snapshot('before');
 
-    loginToArtifactory(username, password)
+    loginToArtifactory(username, password);
 
-    log.snapshot('after')
-    log.end()
+    log.snapshot('after');
+    log.end();
 })
