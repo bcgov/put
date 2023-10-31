@@ -25,7 +25,7 @@ function loginToArtifactory(username, password) {
     // additional layer of wait and a retry through the revisit
     // wait 3 seconds, then get body and try to find the username input field, if no luck revisit the page and wait for it again
     cy.wait(3_000);
-    cy.get('body')
+    cy.get('body', { timeout: 33_000 })
       .then((body) => {
         if (body.find('input[name="username"]').length != 1) {
             cy.log('first attempt to find username input did not work, revisiting the login page');
