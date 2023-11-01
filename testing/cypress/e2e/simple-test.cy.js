@@ -11,6 +11,7 @@ describe('Artifactory Login', () => {
     it('Verifies that error message after auth call to backend and user db is shown after login attempt', () => {
         cy.loginToArtifactory(Cypress.env('username') + 'blah', Cypress.env('password'));
         cy.get('div[role="alert"]').should('be.visible');
+        cy.get('span').contains("Incorrect username/password or locked user.").should('be.visible');
     }
     )
 
@@ -19,5 +20,3 @@ describe('Artifactory Login', () => {
     //     cy.get(".username-text", { timeout: 33_000 }).should("have.text", " admin");
     // })
 })
-          
-
