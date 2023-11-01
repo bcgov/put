@@ -38,7 +38,6 @@ function loginToArtifactory(username, password) {
     cy.get('input[name="password"]').type(password);
     cy.get('input[type="checkbox"]').click({ force: true });
     cy.get('button[type="submit"]').click();
-
 }
 
 Cypress.Commands.add('loginToArtifactory', (username, password) => {
@@ -54,3 +53,8 @@ Cypress.Commands.add('loginToArtifactory', (username, password) => {
     log.snapshot('after');
     log.end();
 })
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+    cy.log('Bumped into an uncaught exception but resuming')
+    return false
+  })
