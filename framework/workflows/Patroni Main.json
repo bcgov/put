@@ -49,7 +49,7 @@
       "main": [
         [
           {
-            "node": "Execute Crunchy Test KLAB",
+            "node": "Execute Crunchy Test CLAB",
             "type": "main",
             "index": 0
           }
@@ -69,13 +69,7 @@
     },
     "Execute Crunchy Test KLAB": {
       "main": [
-        [
-          {
-            "node": "Execute Crunchy Test CLAB",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     }
   },
@@ -189,7 +183,7 @@
       "typeVersion": 1,
       "position": [
         -680,
-        -80
+        -260
       ],
       "retryOnFail": false
     },
@@ -235,6 +229,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-09-21T02:10:20.396Z",
-  "versionId": "87749aac-1039-4e77-9076-7b7424899b7a"
+  "updatedAt": "2023-11-23T08:31:08.937Z",
+  "versionId": "cd7c889e-d336-41be-a474-38da4a1a4121"
 }
