@@ -576,7 +576,7 @@ objects:
                 - name: GENERIC_TIMEZONE
                   value: America/Vancouver
                 - name: EXECUTIONS_PROCESS
-                  value: own
+                  value: queue
                 - name: EXECUTIONS_MODE
                   value: queue
                 - name: WEBHOOK_TUNNEL_URL
@@ -771,7 +771,7 @@ objects:
                 - name: GENERIC_TIMEZONE
                   value: America/Vancouver
                 - name: EXECUTIONS_PROCESS
-                  value: own
+                  value: queue
                 - name: EXECUTIONS_MODE
                   value: queue
                 - name: NODE_ENV
@@ -958,7 +958,7 @@ objects:
                 - name: GENERIC_TIMEZONE
                   value: America/Vancouver
                 - name: EXECUTIONS_PROCESS
-                  value: own
+                  value: queue
                 - name: EXECUTIONS_MODE
                   value: queue
                 - name: NODE_ENV
