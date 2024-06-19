@@ -14,47 +14,50 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import "./commands";
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
 function loginToArtifactory(username, password) {
+  cy.visit("/ui/login");
 
-    cy.visit('/');
-    // additional layer of wait and a retry through the revisit
-    // wait 3 seconds, then get body and try to find the username input field, if no luck revisit the page and wait for it again
-    cy.wait(3_000);
-    cy.get('body', { timeout: 33_000 })
-      .then((body) => {
-        if (body.find('input[name="username"]').length != 1) {
-            cy.log('first attempt to find username input did not work, revisiting the login page');
-            cy.visit('/');
-        }})
+  cy.wait(10_000); // explicit wait to make sure that page was approached (sometimes redirects slow the process)
 
-    // if username field is found, type in the username (maximum wait 22 seconds)
-    cy.get('input[name="username"]', {timeout: 22_000}).should('be.visible').type(username);
+  // get page body and try to find the username input field, if no luck revisit the page and wait for it again
+  cy.get("body", { timeout: 33_000 }).then((body) => {
+    if (body.find('input[name="username"]').length < 1) {
+      cy.log(
+        "first attempt to find username input did not work, revisiting the login page"
+      );
+      return cy.visit("/ui/login");
+    }
+  });
 
-    cy.get('input[name="password"]').type(password);
-    cy.get('input[type="checkbox"]').click({ force: true });
-    cy.get('button[type="submit"]').click();
+  // if username field is found, type in the username (maximum wait 22 seconds)
+  cy.get('input[name="username"]', { timeout: 22_000 })
+    .should("be.visible")
+    .type(username);
+  cy.get('input[name="password"]').type(password);
+  cy.get('input[type="checkbox"]').click({ force: true });
+  cy.get('button[type="submit"]').click();
 }
 
-Cypress.Commands.add('loginToArtifactory', (username, password) => {
-    const log = Cypress.log({
-        displayName: 'Login to Artifactory',
-        message: [`🔐 Authenticating | ${username}`],
-        autoEnd: false,
-    })
-    log.snapshot('before');
+Cypress.Commands.add("loginToArtifactory", (username, password) => {
+  const log = Cypress.log({
+    displayName: "Login to Artifactory",
+    message: [`🔐 Authenticating | ${username}`],
+    autoEnd: false,
+  });
+  log.snapshot("before");
 
-    loginToArtifactory(username, password);
+  loginToArtifactory(username, password);
 
-    log.snapshot('after');
-    log.end();
-})
+  log.snapshot("after");
+  log.end();
+});
 
-Cypress.on('uncaught:exception', (err, runnable) => {
-    cy.log('Bumped into an uncaught exception but resuming')
-    return false
-  })
+Cypress.on("uncaught:exception", (err, runnable) => {
+  cy.log("Bumped into an uncaught exception but resuming");
+  return false;
+});
