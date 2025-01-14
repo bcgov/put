@@ -294,7 +294,7 @@
         "requestMethod": "POST",
         "url": "=https://api.github.com/repos/{{ $json[\"repoOwner\"] }}/{{ $json[\"repoName\"] }}/dispatches",
         "options": {
-          "timeout": 2000
+          "timeout": 10000
         },
         "bodyParametersUi": {
           "parameter": [
@@ -733,6 +733,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-10T03:52:36.502Z",
-  "versionId": "0a669a71-5d50-401c-b4b8-b53a6a22b1f5"
+  "updatedAt": "2025-01-14T03:40:57.429Z",
+  "versionId": "0c2fcac2-0ac7-4c3d-99a4-d0de00e27e01"
 }
