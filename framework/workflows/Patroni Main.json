@@ -27,7 +27,7 @@
       "main": [
         [
           {
-            "node": "Patroni (Reference) Switch Main",
+            "node": "Wait",
             "type": "main",
             "index": 0
           }
@@ -67,9 +67,15 @@
         ]
       ]
     },
-    "Execute Crunchy Test KLAB": {
+    "Wait": {
       "main": [
-        []
+        [
+          {
+            "node": "Patroni (Reference) Switch Main",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -124,7 +130,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -840,
+        -620,
         -80
       ],
       "retryOnFail": false,
@@ -138,7 +144,7 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        -320,
+        -100,
         60
       ]
     },
@@ -166,7 +172,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -1000,
+        -780,
         -80
       ],
       "retryOnFail": false,
@@ -196,12 +202,27 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -480,
+        -260,
         -80
       ],
       "retryOnFail": false,
       "maxTries": 5,
       "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "amount": 60,
+        "unit": "seconds"
+      },
+      "id": "d1ec1aec-1c75-4cf5-9861-c028df714dd7",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -980,
+        -80
+      ],
+      "webhookId": "d24d24d1-8b77-4644-97e5-d8a69cf7b1b8"
     }
   ],
   "pinData": {},
@@ -229,6 +250,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-11-23T08:31:08.937Z",
-  "versionId": "cd7c889e-d336-41be-a474-38da4a1a4121"
+  "updatedAt": "2025-02-05T03:08:31.005Z",
+  "versionId": "2ee8871f-3260-4795-92cc-cd9a906b5fd2"
 }
