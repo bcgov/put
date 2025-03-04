@@ -247,7 +247,7 @@
     },
     {
       "parameters": {
-        "command": "=oc project {{ $node[\"General Parameters\"].json.nameSpace }}\noc scale deployment/vault-test --replicas=0\nsleep 20\noc scale deployment/vault-test --replicas=1\nsleep 40\noc rsh $(oc get pods -o name --selector app=vault-test) cat /vault/secrets/helloworld > test.txt\n "
+        "command": "=oc rsh $(oc get pods -o name --selector app=vault-test | head -n 1) cat /vault/secrets/helloworld > test.txt"
       },
       "id": "a507c191-5696-4b29-acb5-56d1f7f1440f",
       "name": "Vault health check",
@@ -621,6 +621,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-10T03:56:20.407Z",
-  "versionId": "47c018c1-ccce-4b96-a11d-abfb6f2f082d"
+  "updatedAt": "2025-03-04T07:29:33.548Z",
+  "versionId": "db184fcf-7ef0-49c1-8eb0-03852ad52b7d"
 }
