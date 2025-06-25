@@ -25,13 +25,7 @@
     },
     "Execute Workflow Trigger": {
       "main": [
-        [
-          {
-            "node": "Set",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     }
   },
@@ -151,6 +145,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-10T05:41:46.983Z",
-  "versionId": "f949fb24-44ef-44f1-8416-8dd9ad790052"
+  "updatedAt": "2025-06-24T01:57:23.354Z",
+  "versionId": "3fa4c580-446a-45f3-90d3-2f666886ef7c"
 }
