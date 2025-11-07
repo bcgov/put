@@ -52,7 +52,7 @@
             "index": 0
           },
           {
-            "node": "Execute Workflow",
+            "node": "Klab Patroni check",
             "type": "main",
             "index": 0
           }
@@ -88,7 +88,7 @@
             "index": 0
           },
           {
-            "node": "Execute Workflow",
+            "node": "Klab Patroni check",
             "type": "main",
             "index": 0
           }
@@ -128,7 +128,7 @@
         ]
       ]
     },
-    "Execute Workflow": {
+    "Klab Patroni check": {
       "main": [
         [
           {
@@ -277,7 +277,7 @@
         "workflowId": "77"
       },
       "id": "c7289cdb-3369-4d99-abf4-a1c3135dce38",
-      "name": "Execute Workflow",
+      "name": "Klab Patroni check",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
@@ -305,6 +305,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-08-19T03:04:28.235Z",
-  "versionId": "be276084-6a69-4909-801a-7bc523a96288"
+  "updatedAt": "2025-10-31T06:48:49.055Z",
+  "versionId": "c06a0d1a-1ef8-44bb-9404-dda263bcc06e"
 }
