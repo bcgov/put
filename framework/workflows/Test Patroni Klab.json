@@ -203,7 +203,7 @@
     },
     {
       "parameters": {
-        "command": "=nohup oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} port-forward svc/mycool-app-patroni-master 15433:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
+        "command": "=nohup oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} port-forward svc/put-test-patroni-master 15433:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
       },
       "id": "5c37c9cb-b75b-4d38-b3e4-c013e755debb",
       "name": "Set Port Forward Patroni",
@@ -261,7 +261,7 @@
             },
             {
               "name": "nameSpace",
-              "value": "shellyxuehan-dev"
+              "value": "d8d909-test"
             }
           ]
         },
@@ -501,7 +501,7 @@
     },
     {
       "parameters": {
-        "command": "=PODNAME=$(oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} get pods -o name --selector role=master,cluster-name=mycool-app-patroni)\noc -n {{ $node[\"Set Token Name\"].json.nameSpace }} exec $PODNAME -- /usr/share/scripts/patroni/health_check.sh"
+        "command": "=PODNAME=$(oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} get pods -o name --selector role=master,cluster-name=put-test-patroni)\noc -n {{ $node[\"Set Token Name\"].json.nameSpace }} exec $PODNAME -- /usr/share/scripts/patroni/health_check.sh"
       },
       "id": "64057c9e-4d34-4243-aa42-9f239df56a75",
       "name": "Check Readiness",
@@ -612,6 +612,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2023-09-21T01:57:40.066Z",
-  "versionId": "60e788c2-1ca3-47e0-b555-f10ce3ac53e6"
+  "updatedAt": "2025-10-31T06:47:43.375Z",
+  "versionId": "c51e03ac-46c2-4b79-879c-da8433aafdd2"
 }
