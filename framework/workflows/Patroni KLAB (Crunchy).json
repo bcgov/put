@@ -326,7 +326,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  commit;  \n\nselect count(*) from lat_longs;\n\ndrop table lat_longs;",
+        "query": "CREATE TEMP TABLE lat_longs (\n  c1 BIGSERIAL,\n  c2 DOUBLE PRECISION\n);\n\nINSERT INTO lat_longs (c2)\nSELECT random() * 100 FROM generate_series(1, 10000) AS g(id);\n\nSELECT count(*) FROM lat_longs;",
         "additionalFields": {}
       },
       "id": "cbfda6bd-f8c2-4d33-a752-1d48721a4a8f",
@@ -480,6 +480,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2024-02-21T05:56:34.657Z",
-  "versionId": "aadb42b9-82d7-4395-8c87-97e1ad97053d"
+  "updatedAt": "2025-10-30T03:24:54.085Z",
+  "versionId": "7a4ef585-daf5-4387-9322-30f818392452"
 }
