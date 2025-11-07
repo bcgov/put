@@ -49,7 +49,7 @@
       "main": [
         [
           {
-            "node": "Execute Crunchy Test CLAB",
+            "node": "Execute Crunchy Test KLAB",
             "type": "main",
             "index": 0
           }
@@ -72,6 +72,17 @@
         [
           {
             "node": "Patroni (Reference) Switch Main",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Crunchy Test KLAB": {
+      "main": [
+        [
+          {
+            "node": "Execute Crunchy Test CLAB",
             "type": "main",
             "index": 0
           }
@@ -188,8 +199,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -680,
-        -260
+        -460,
+        -80
       ],
       "retryOnFail": false
     },
@@ -250,6 +261,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2025-02-05T03:08:31.005Z",
-  "versionId": "2ee8871f-3260-4795-92cc-cd9a906b5fd2"
+  "updatedAt": "2025-10-31T06:49:35.984Z",
+  "versionId": "76de2306-698d-4971-80b8-547d57d898e7"
 }
