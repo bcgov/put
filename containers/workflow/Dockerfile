@@ -1,34 +1,31 @@
-FROM registry.access.redhat.com/ubi8/nodejs-20:latest
+# Node 22 LTS on UBI9 so globalThis.File is present
+FROM registry.access.redhat.com/ubi9/nodejs-22:latest
+
 ENV HOME=/opt/app-root/src \
-      TZ=America/Vancouver
+      TZ=America/Vancouver \
+      NPM_CONFIG_PREFIX=$HOME/.npm-global \
+      PATH=$HOME/.npm-global/bin:$PATH \
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 
-USER root
+USER 0
 
-RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm && \
+      microdnf install -y GraphicsMagick gcc-c++ make jq python3 curl tar && \
+      microdnf clean all
 
-RUN yum update -y
+RUN curl -fsSL https://downloads-openshift-console.apps.gold.devops.gov.bc.ca/amd64/linux/oc.tar -o /tmp/oc.tar && \
+      tar -xf /tmp/oc.tar -C /tmp && \
+      mv /tmp/oc /usr/bin/oc && \
+      rm -f /tmp/oc.tar
 
-RUN yum install -y GraphicsMagick gcc-c++ make jq python3
+RUN npm install -g npm && npm install -g n8n
 
-RUN yum clean all
-
-RUN curl https://downloads-openshift-console.apps.gold.devops.gov.bc.ca/amd64/linux/oc.tar --output oc.tar
-RUN tar -xvf oc.tar
-RUN cp oc /usr/bin
-RUN rm oc.tar oc
-
-RUN npm install -g npm
-
-RUN mkdir -p $HOME
-
-WORKDIR $HOME
-
-ENV PATH ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-
-RUN npm install -g n8n
+# ---- OpenShift-friendly writable dirs ----
+# Random UID must be able to write to $HOME and /data via gid 0
+RUN mkdir -p /data $HOME/.n8n && \
+      chgrp -R 0 /data $HOME && \
+      chmod -R g+rwX /data $HOME
 
 WORKDIR /data
-
 EXPOSE 5678/tcp
-
 CMD ["n8n"]
