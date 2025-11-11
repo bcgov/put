@@ -1,5 +1,5 @@
 # Node 22 LTS on UBI9 so globalThis.File is present
-FROM registry.access.redhat.com/ubi9/nodejs-22:latest
+FROM registry.access.redhat.com/ubi9/nodejs-22
 
 ENV HOME=/opt/app-root/src \
       TZ=America/Vancouver \
@@ -9,9 +9,8 @@ ENV HOME=/opt/app-root/src \
 
 USER 0
 
-RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm && \
-      microdnf install -y GraphicsMagick gcc-c++ make jq python3 curl tar && \
-      microdnf clean all
+RUN dnf -y install ImageMagick gcc-c++ make jq python3 && dnf clean all
+
 
 RUN curl -fsSL https://downloads-openshift-console.apps.gold.devops.gov.bc.ca/amd64/linux/oc.tar -o /tmp/oc.tar && \
       tar -xf /tmp/oc.tar -C /tmp && \

@@ -27,6 +27,20 @@ objects:
         buildconfig: "${NAME}"
     spec:
       nodeSelector: null
+      successfulBuildsHistoryLimit: 3
+      failedBuildsHistoryLimit: 3
+      completionDeadlineSeconds: 600
+      source:
+        type: Git
+        git:
+          uri: "${GIT_URI}"
+          ref: "${GIT_REF}"
+        contextDir: "${CONTEXT_DIR}"
+      strategy:
+        type: Docker
+        dockerStrategy:
+          # Do not specify 'from' so the Dockerfile's own FROM is used
+          dockerfilePath: "${DOCKERFILE_PATH}"
       output:
         to:
           kind: ImageStreamTag
@@ -38,77 +52,8 @@ objects:
         requests:
           cpu: 500m
           memory: 512Mi
-      successfulBuildsHistoryLimit: 3
-      failedBuildsHistoryLimit: 3
-      completionDeadlineSeconds: 600
-      strategy:
-        type: Docker
-        dockerStrategy:
-          from:
-            kind: DockerImage
-            name: >-
-              registry.access.redhat.com/ubi8/nodejs-18:latest
-      postCommit: {}
-      source:
-        type: Dockerfile
-        dockerfile: >-
-          FROM BuildConfig
-
-          ENV HOME=/opt/app-root/src \
-              TZ=America/Vancouver
-
-          USER root
-
-          RUN rpm -ivh
-          https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-
-          RUN yum update -y
-
-          RUN yum install -y GraphicsMagick gcc-c++ make jq python3
-
-          RUN yum clean all
-
-          RUN curl
-          https://downloads-openshift-console.apps.gold.devops.gov.bc.ca/amd64/linux/oc.tar
-          --output oc.tar
-
-          RUN tar -xvf oc.tar
-
-          RUN cp oc /usr/bin
-
-          RUN rm oc.tar oc
-
-
-          RUN npm install -g npm
-
-
-          RUN mkdir -p $HOME
-
-          WORKDIR $HOME
-
-
-          ENV PATH
-          ${HOME}/node_modules/.bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-
-          RUN npm install -g n8n
-
-
-          RUN chgrp -R 0 $HOME && \
-              chmod -R g=u $HOME
-
-          RUN chown -R 1001:0 $HOME
-
-          RUN chmod -R 775 $HOME
-
-          USER 1001
-
-
-          WORKDIR /data
-
-          EXPOSE 5678/tcp
       triggers:
         - type: ConfigChange
-      runPolicy: SerialLatestOnly
 parameters:
   - name: NAME
     displayName: Name
@@ -119,4 +64,20 @@ parameters:
     displayName: N8N Image Namespace
     description: The namespace where the N8N image is stored.
     required: true
-    value: bf5ef6-tools  
+    value: bf5ef6-tools
+  - name: GIT_URI
+    displayName: Git Repository URL
+    required: true
+    value: https://github.com/bcgov/put.git
+  - name: GIT_REF
+    displayName: Git Reference (branch/tag/commit)
+    required: true
+    value: main
+  - name: CONTEXT_DIR
+    displayName: Context Directory (relative to repo root)
+    required: false
+    value: ""
+  - name: DOCKERFILE_PATH
+    displayName: Dockerfile Path (relative to context dir)
+    required: true
+    value: containers/workflow/Dockerfile
