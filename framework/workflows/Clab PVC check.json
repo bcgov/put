@@ -169,8 +169,10 @@
       ]
     }
   },
-  "createdAt": "2023-06-02T03:54:11.516Z",
+  "createdAt": "2023-06-01T20:54:11.516Z",
   "id": "76",
+  "isArchived": false,
+  "meta": null,
   "name": "Clab PVC check",
   "nodes": [
     {
@@ -493,6 +495,15 @@
     "callerPolicy": "workflowsFromSameOwner",
     "executionTimeout": 60
   },
+  "shared": [
+    {
+      "updatedAt": "2023-06-01T20:54:11.516Z",
+      "createdAt": "2023-06-01T20:54:11.516Z",
+      "role": "workflow:owner",
+      "workflowId": "76",
+      "projectId": "8TL7f7Zh5T94reb3"
+    }
+  ],
   "staticData": {
     "node:Schedule Trigger": {
       "recurrencyRules": []
@@ -500,6 +511,6 @@
   },
   "tags": [],
   "triggerCount": 1,
-  "updatedAt": "2024-05-16T03:04:31.076Z",
+  "updatedAt": "2024-05-15T20:04:31.076Z",
   "versionId": "2b592954-c38c-4fbe-bf33-42df3786dfc9"
 }
