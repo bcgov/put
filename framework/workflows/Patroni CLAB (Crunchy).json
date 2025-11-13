@@ -135,8 +135,10 @@
       ]
     }
   },
-  "createdAt": "2023-03-08T18:02:24.816Z",
+  "createdAt": "2023-03-08T10:02:24.816Z",
   "id": "33",
+  "isArchived": false,
+  "meta": null,
   "name": "Patroni CLAB (Crunchy)",
   "nodes": [
     {
@@ -464,22 +466,31 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "33",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
-      "createdAt": "2023-04-29T00:06:56.029Z",
-      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-28T17:06:56.029Z",
+      "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-27T04:25:33.803Z",
+  "updatedAt": "2023-05-26T21:25:33.803Z",
   "versionId": "6fd7726c-854b-426d-ba7d-9989a8845e41"
 }
