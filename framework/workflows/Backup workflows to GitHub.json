@@ -175,8 +175,10 @@
       ]
     }
   },
-  "createdAt": "2023-05-12T01:02:38.293Z",
+  "createdAt": "2023-05-11T18:02:38.293Z",
   "id": "72",
+  "isArchived": false,
+  "meta": null,
   "name": "Backup workflows to GitHub",
   "nodes": [
     {
@@ -481,20 +483,30 @@
   ],
   "pinData": {},
   "settings": {},
+  "shared": [
+    {
+      "updatedAt": "2023-05-11T18:02:38.293Z",
+      "createdAt": "2023-05-11T18:02:38.293Z",
+      "role": "workflow:owner",
+      "workflowId": "72",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": {
     "node:Schedule Trigger": {
-      "recurrencyRules": []
+      "recurrencyRules": [],
+      "recurrenceRules": []
     }
   },
   "tags": [
     {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
       "id": "9",
       "name": "Platform"
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-13T03:51:01.985Z",
+  "updatedAt": "2023-05-12T20:51:01.985Z",
   "versionId": "70cba803-c9f9-4c37-a3c1-8768eb4d5d4d"
 }
