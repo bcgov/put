@@ -24,8 +24,10 @@
       ]
     }
   },
-  "createdAt": "2023-05-05T01:40:42.634Z",
+  "createdAt": "2023-05-04T18:40:42.634Z",
   "id": "67",
+  "isArchived": false,
+  "meta": null,
   "name": "Start Cypress Test",
   "nodes": [
     {
@@ -107,22 +109,31 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-05-04T18:40:42.634Z",
+      "createdAt": "2023-05-04T18:40:42.634Z",
+      "role": "workflow:owner",
+      "workflowId": "67",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
-      "id": "6",
-      "name": "Example"
-    },
-    {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
       "id": "5",
       "name": "Template"
+    },
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "id": "6",
+      "name": "Example"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-05T04:32:34.006Z",
+  "updatedAt": "2023-05-04T21:32:34.006Z",
   "versionId": "3e8b1507-aea4-415c-a32a-a5ff676b2e4b"
 }
