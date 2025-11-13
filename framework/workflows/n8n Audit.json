@@ -35,8 +35,10 @@
       ]
     }
   },
-  "createdAt": "2023-05-27T07:27:03.814Z",
+  "createdAt": "2023-05-27T00:27:03.814Z",
   "id": "75",
+  "isArchived": false,
+  "meta": null,
   "name": "n8n Audit",
   "nodes": [
     {
@@ -109,9 +111,18 @@
   ],
   "pinData": {},
   "settings": {},
+  "shared": [
+    {
+      "updatedAt": "2023-05-27T00:27:03.814Z",
+      "createdAt": "2023-05-27T00:27:03.814Z",
+      "role": "workflow:owner",
+      "workflowId": "75",
+      "projectId": "8TL7f7Zh5T94reb3"
+    }
+  ],
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2023-05-27T07:34:53.579Z",
+  "updatedAt": "2023-05-27T00:34:53.579Z",
   "versionId": "70b65d3b-9549-46f1-98e6-9225fb2bc17d"
 }
