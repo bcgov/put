@@ -35,8 +35,10 @@
       ]
     }
   },
-  "createdAt": "2023-03-08T13:17:18.589Z",
+  "createdAt": "2023-03-08T05:17:18.589Z",
   "id": "28",
+  "isArchived": false,
+  "meta": null,
   "name": "OC Login Common Component",
   "nodes": [
     {
@@ -110,24 +112,36 @@
     "saveDataSuccessExecution": "none",
     "saveManualExecutions": false,
     "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": "41"
+    "errorWorkflow": "41",
+    "executionTimeout": 3600,
+    "executionOrder": "v0",
+    "availableInMCP": false
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "28",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.753Z",
-      "updatedAt": "2023-04-29T00:02:25.753Z",
-      "id": "1",
-      "name": "Common Component"
-    },
-    {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
       "id": "3",
       "name": "PUT"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.753Z",
+      "createdAt": "2023-04-28T17:02:25.753Z",
+      "id": "1",
+      "name": "Common Component"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-30T03:18:05.580Z",
-  "versionId": "d35e36e8-f151-4f9a-b434-b1e87d73d423"
+  "updatedAt": "2025-11-13T01:05:43.640Z",
+  "versionId": "b68a28f9-76a1-4ff0-85c5-c296d6174b93"
 }
