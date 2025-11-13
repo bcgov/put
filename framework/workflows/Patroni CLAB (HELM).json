@@ -135,8 +135,10 @@
       ]
     }
   },
-  "createdAt": "2023-03-08T17:55:40.447Z",
+  "createdAt": "2023-03-08T09:55:40.447Z",
   "id": "32",
+  "isArchived": false,
+  "meta": null,
   "name": "Patroni CLAB (HELM)",
   "nodes": [
     {
@@ -479,22 +481,31 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "32",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
-      "createdAt": "2023-04-29T00:06:56.029Z",
-      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-28T17:06:56.029Z",
+      "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-27T04:25:17.550Z",
+  "updatedAt": "2023-05-26T21:25:17.550Z",
   "versionId": "f4f68551-160f-46bc-a4e7-f43bcb372e63"
 }
