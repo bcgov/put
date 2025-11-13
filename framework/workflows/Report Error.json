@@ -40,8 +40,10 @@
       ]
     }
   },
-  "createdAt": "2023-02-23T13:33:52.131Z",
+  "createdAt": "2023-02-23T05:33:52.131Z",
   "id": "17",
+  "isArchived": false,
+  "meta": null,
   "name": "Report Error",
   "nodes": [
     {
@@ -148,16 +150,25 @@
   ],
   "pinData": {},
   "settings": {},
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "17",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.753Z",
-      "updatedAt": "2023-04-29T00:02:25.753Z",
+      "updatedAt": "2023-04-28T17:02:25.753Z",
+      "createdAt": "2023-04-28T17:02:25.753Z",
       "id": "1",
       "name": "Common Component"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-05T05:29:58.593Z",
+  "updatedAt": "2023-05-04T22:29:58.593Z",
   "versionId": "10a9e72b-063f-4a9b-b87f-2e1491ef29b8"
 }
