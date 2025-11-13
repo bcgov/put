@@ -68,8 +68,10 @@
       ]
     }
   },
-  "createdAt": "2023-03-08T16:49:30.663Z",
+  "createdAt": "2023-03-08T08:49:30.663Z",
   "id": "30",
+  "isArchived": false,
+  "meta": null,
   "name": "Let it Fail",
   "nodes": [
     {
@@ -201,6 +203,15 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "30",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": {
     "node:Schedule Trigger": {
       "recurrencyRules": []
@@ -208,6 +219,6 @@
   },
   "tags": [],
   "triggerCount": 1,
-  "updatedAt": "2023-05-27T07:35:10.114Z",
+  "updatedAt": "2023-05-27T00:35:10.114Z",
   "versionId": "fcfff655-e21d-42c1-92fe-959ee79ebc7c"
 }
