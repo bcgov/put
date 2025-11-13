@@ -186,8 +186,10 @@
       ]
     }
   },
-  "createdAt": "2023-02-15T17:21:02.688Z",
+  "createdAt": "2023-02-15T09:21:02.688Z",
   "id": "12",
+  "isArchived": false,
+  "meta": null,
   "name": "Vault Check",
   "nodes": [
     {
@@ -601,6 +603,15 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "12",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": {
     "node:Schedule Trigger": {
       "recurrencyRules": []
@@ -608,19 +619,19 @@
   },
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
-      "createdAt": "2023-04-29T00:06:56.029Z",
-      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-28T17:06:56.029Z",
+      "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2025-03-04T07:29:33.548Z",
+  "updatedAt": "2025-03-03T23:29:33.548Z",
   "versionId": "db184fcf-7ef0-49c1-8eb0-03852ad52b7d"
 }
