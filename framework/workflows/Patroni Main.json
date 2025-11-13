@@ -90,8 +90,10 @@
       ]
     }
   },
-  "createdAt": "2023-02-19T16:37:17.480Z",
+  "createdAt": "2023-02-19T08:37:17.480Z",
   "id": "14",
+  "isArchived": false,
+  "meta": null,
   "name": "Patroni Main",
   "nodes": [
     {
@@ -241,6 +243,15 @@
     "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "14",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": {
     "node:Schedule Trigger": {
       "recurrencyRules": []
@@ -248,19 +259,19 @@
   },
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
-      "createdAt": "2023-04-29T00:06:56.029Z",
-      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-28T17:06:56.029Z",
+      "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2025-10-31T06:49:35.984Z",
+  "updatedAt": "2025-10-30T23:49:35.984Z",
   "versionId": "76de2306-698d-4971-80b8-547d57d898e7"
 }
