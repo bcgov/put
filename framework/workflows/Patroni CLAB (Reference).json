@@ -186,8 +186,10 @@
       ]
     }
   },
-  "createdAt": "2023-03-08T17:34:45.027Z",
+  "createdAt": "2023-03-08T09:34:45.027Z",
   "id": "31",
+  "isArchived": false,
+  "meta": null,
   "name": "Patroni CLAB (Reference)",
   "nodes": [
     {
@@ -613,22 +615,31 @@
     "errorWorkflow": "41",
     "saveManualExecutions": true
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "31",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
-      "createdAt": "2023-04-29T00:06:56.029Z",
-      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-28T17:06:56.029Z",
+      "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-08-19T03:26:56.385Z",
+  "updatedAt": "2023-08-18T20:26:56.385Z",
   "versionId": "b00e0430-80f1-4cc0-b103-a4acd1ea3fbe"
 }
