@@ -140,8 +140,10 @@
       ]
     }
   },
-  "createdAt": "2023-02-09T12:26:59.628Z",
+  "createdAt": "2023-02-09T04:26:59.628Z",
   "id": "7",
+  "isArchived": false,
+  "meta": null,
   "name": "Main",
   "nodes": [
     {
@@ -291,20 +293,30 @@
     "saveManualExecutions": false,
     "callerPolicy": "workflowsFromSameOwner"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "7",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": {
     "node:Schedule Trigger": {
-      "recurrencyRules": []
+      "recurrencyRules": [],
+      "recurrenceRules": []
     }
   },
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
       "id": "3",
       "name": "PUT"
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2025-10-31T06:48:49.055Z",
+  "updatedAt": "2025-10-30T23:48:49.055Z",
   "versionId": "c06a0d1a-1ef8-44bb-9404-dda263bcc06e"
 }
