@@ -97,8 +97,10 @@
       ]
     }
   },
-  "createdAt": "2023-03-08T10:21:02.700Z",
+  "createdAt": "2023-03-08T02:21:02.700Z",
   "id": "27",
+  "isArchived": false,
+  "meta": null,
   "name": "Trigger N8N image build on Version Change",
   "nodes": [
     {
@@ -273,26 +275,36 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "27",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": {
     "node:Schedule Trigger": {
-      "recurrencyRules": []
+      "recurrencyRules": [],
+      "recurrenceRules": []
     }
   },
   "tags": [
     {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
-      "id": "9",
-      "name": "Platform"
-    },
-    {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
       "id": "10",
       "name": "Utility"
+    },
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "id": "9",
+      "name": "Platform"
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-05T05:30:45.412Z",
+  "updatedAt": "2023-05-04T22:30:45.412Z",
   "versionId": "c0bb40b6-7571-4a9a-8b45-b6cd30fed4ba"
 }
