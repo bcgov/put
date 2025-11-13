@@ -108,8 +108,10 @@
       ]
     }
   },
-  "createdAt": "2023-04-26T08:48:20.829Z",
+  "createdAt": "2023-04-26T01:48:20.829Z",
   "id": "59",
+  "isArchived": false,
+  "meta": null,
   "name": "Artifactory Basic Health Check Prod",
   "nodes": [
     {
@@ -361,6 +363,15 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "59",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": {
     "node:Schedule Trigger": {
       "recurrencyRules": []
@@ -368,19 +379,19 @@
   },
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
-      "createdAt": "2023-04-29T00:06:56.029Z",
-      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-28T17:06:56.029Z",
+      "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-10T04:26:49.840Z",
+  "updatedAt": "2023-05-09T21:26:49.840Z",
   "versionId": "401c8643-9218-4286-ae8f-ee584d23da29"
 }
