@@ -46,8 +46,10 @@
       ]
     }
   },
-  "createdAt": "2023-03-10T17:39:10.487Z",
+  "createdAt": "2023-03-10T09:39:10.487Z",
   "id": "41",
+  "isArchived": false,
+  "meta": null,
   "name": "Error Handler",
   "nodes": [
     {
@@ -170,40 +172,49 @@
     "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "41",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.753Z",
-      "updatedAt": "2023-04-29T00:02:25.753Z",
-      "id": "1",
-      "name": "Common Component"
+      "updatedAt": "2023-04-28T17:02:25.793Z",
+      "createdAt": "2023-04-28T17:02:25.793Z",
+      "id": "2",
+      "name": "Trigger"
     },
     {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
-      "id": "9",
-      "name": "Platform"
-    },
-    {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
       "id": "10",
       "name": "Utility"
     },
     {
-      "createdAt": "2023-04-29T00:02:25.793Z",
-      "updatedAt": "2023-04-29T00:02:25.793Z",
-      "id": "2",
-      "name": "Trigger"
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
+    },
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "id": "9",
+      "name": "Platform"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.753Z",
+      "createdAt": "2023-04-28T17:02:25.753Z",
+      "id": "1",
+      "name": "Common Component"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-10T03:50:06.522Z",
+  "updatedAt": "2023-05-09T20:50:06.522Z",
   "versionId": "dd34f148-4e81-4008-87b6-26eb8c8ea855"
 }
