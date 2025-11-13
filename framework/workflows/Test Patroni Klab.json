@@ -186,8 +186,10 @@
       ]
     }
   },
-  "createdAt": "2023-08-19T02:33:56.852Z",
+  "createdAt": "2023-08-18T19:33:56.852Z",
   "id": "77",
+  "isArchived": false,
+  "meta": null,
   "name": "Test Patroni Klab",
   "nodes": [
     {
@@ -609,9 +611,18 @@
   ],
   "pinData": {},
   "settings": {},
+  "shared": [
+    {
+      "updatedAt": "2023-08-18T19:33:56.852Z",
+      "createdAt": "2023-08-18T19:33:56.852Z",
+      "role": "workflow:owner",
+      "workflowId": "77",
+      "projectId": "8TL7f7Zh5T94reb3"
+    }
+  ],
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2025-10-31T06:47:43.375Z",
+  "updatedAt": "2025-10-30T23:47:43.375Z",
   "versionId": "c51e03ac-46c2-4b79-879c-da8433aafdd2"
 }
