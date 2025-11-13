@@ -135,8 +135,10 @@
       ]
     }
   },
-  "createdAt": "2023-05-12T01:10:35.168Z",
+  "createdAt": "2023-05-11T18:10:35.168Z",
   "id": "73",
+  "isArchived": false,
+  "meta": null,
   "name": "Patroni KLAB (Crunchy)",
   "nodes": [
     {
@@ -464,22 +466,31 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-05-11T18:10:35.168Z",
+      "createdAt": "2023-05-11T18:10:35.168Z",
+      "role": "workflow:owner",
+      "workflowId": "73",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
-      "createdAt": "2023-04-29T00:06:56.029Z",
-      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-28T17:06:56.029Z",
+      "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2025-10-30T03:24:54.085Z",
+  "updatedAt": "2025-10-29T20:24:54.085Z",
   "versionId": "7a4ef585-daf5-4387-9322-30f818392452"
 }
