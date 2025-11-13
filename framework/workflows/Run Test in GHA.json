@@ -219,8 +219,10 @@
       ]
     }
   },
-  "createdAt": "2023-05-04T23:58:09.500Z",
+  "createdAt": "2023-05-04T16:58:09.500Z",
   "id": "66",
+  "isArchived": false,
+  "meta": null,
   "name": "Run Test in GHA",
   "nodes": [
     {
@@ -711,28 +713,37 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-05-04T16:58:09.500Z",
+      "createdAt": "2023-05-04T16:58:09.500Z",
+      "role": "workflow:owner",
+      "workflowId": "66",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.753Z",
-      "updatedAt": "2023-04-29T00:02:25.753Z",
-      "id": "1",
-      "name": "Common Component"
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "id": "10",
+      "name": "Utility"
     },
     {
-      "createdAt": "2023-04-29T00:06:56.029Z",
-      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-28T17:06:56.029Z",
+      "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
     },
     {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
-      "id": "10",
-      "name": "Utility"
+      "updatedAt": "2023-04-28T17:02:25.753Z",
+      "createdAt": "2023-04-28T17:02:25.753Z",
+      "id": "1",
+      "name": "Common Component"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2025-01-14T03:40:57.429Z",
+  "updatedAt": "2025-01-13T19:40:57.429Z",
   "versionId": "0c2fcac2-0ac7-4c3d-99a4-d0de00e27e01"
 }
