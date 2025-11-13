@@ -122,8 +122,10 @@
       ]
     }
   },
-  "createdAt": "2023-03-02T15:56:18.172Z",
+  "createdAt": "2023-03-02T07:56:18.172Z",
   "id": "23",
+  "isArchived": false,
+  "meta": null,
   "name": "Duplicate github issue",
   "nodes": [
     {
@@ -412,16 +414,25 @@
   ],
   "pinData": {},
   "settings": {},
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "23",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
       "id": "10",
       "name": "Utility"
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-05T05:06:35.396Z",
+  "updatedAt": "2023-05-04T22:06:35.396Z",
   "versionId": "1e24fb51-69ae-4492-90f3-caaa9653bd49"
 }
