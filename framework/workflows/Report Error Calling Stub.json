@@ -35,8 +35,10 @@
       ]
     }
   },
-  "createdAt": "2023-02-23T13:15:31.821Z",
+  "createdAt": "2023-02-23T05:15:31.821Z",
   "id": "16",
+  "isArchived": false,
+  "meta": null,
   "name": "Report Error Calling Stub",
   "nodes": [
     {
@@ -144,22 +146,31 @@
   ],
   "pinData": {},
   "settings": {},
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "16",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
-      "id": "6",
-      "name": "Example"
-    },
-    {
-      "createdAt": "2023-04-29T00:02:25.753Z",
-      "updatedAt": "2023-04-29T00:02:25.753Z",
+      "updatedAt": "2023-04-28T17:02:25.753Z",
+      "createdAt": "2023-04-28T17:02:25.753Z",
       "id": "1",
       "name": "Common Component"
+    },
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "id": "6",
+      "name": "Example"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-10T03:51:32.556Z",
+  "updatedAt": "2023-05-09T20:51:32.556Z",
   "versionId": "a2168f5c-5596-472b-b30d-2906398ffa50"
 }
