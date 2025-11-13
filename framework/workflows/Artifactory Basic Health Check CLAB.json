@@ -136,8 +136,10 @@
       ]
     }
   },
-  "createdAt": "2023-02-08T14:08:46.285Z",
+  "createdAt": "2023-02-08T06:08:46.285Z",
   "id": "3",
+  "isArchived": false,
+  "meta": null,
   "name": "Artifactory Basic Health Check CLAB",
   "nodes": [
     {
@@ -449,6 +451,15 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "3",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": {
     "node:Schedule Trigger": {
       "recurrencyRules": []
@@ -456,19 +467,19 @@
   },
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
-      "createdAt": "2023-04-29T00:06:56.029Z",
-      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-28T17:06:56.029Z",
+      "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-10-28T00:21:41.680Z",
+  "updatedAt": "2023-10-27T17:21:41.680Z",
   "versionId": "980ade76-176c-4d05-bb24-37a4c4ae64a7"
 }
