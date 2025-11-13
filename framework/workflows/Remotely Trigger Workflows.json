@@ -13,8 +13,10 @@
       ]
     }
   },
-  "createdAt": "2023-03-31T10:37:03.120Z",
+  "createdAt": "2023-03-31T03:37:03.120Z",
   "id": "47",
+  "isArchived": false,
+  "meta": null,
   "name": "Remotely Trigger Workflows",
   "nodes": [
     {
@@ -76,28 +78,37 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "47",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
+      "updatedAt": "2023-04-28T17:02:25.793Z",
+      "createdAt": "2023-04-28T17:02:25.793Z",
+      "id": "2",
+      "name": "Trigger"
     },
     {
-      "createdAt": "2023-04-29T07:07:24.473Z",
-      "updatedAt": "2023-04-29T07:07:24.473Z",
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
       "id": "10",
       "name": "Utility"
     },
     {
-      "createdAt": "2023-04-29T00:02:25.793Z",
-      "updatedAt": "2023-04-29T00:02:25.793Z",
-      "id": "2",
-      "name": "Trigger"
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2023-05-16T04:24:03.659Z",
+  "updatedAt": "2023-05-15T21:24:03.659Z",
   "versionId": "cd58c814-f7ca-49d4-ba82-469c2b42f21e"
 }
