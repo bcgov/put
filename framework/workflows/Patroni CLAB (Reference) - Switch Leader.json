@@ -157,8 +157,10 @@
       ]
     }
   },
-  "createdAt": "2023-03-09T11:20:06.220Z",
+  "createdAt": "2023-03-09T03:20:06.220Z",
   "id": "34",
+  "isArchived": false,
+  "meta": null,
   "name": "Patroni CLAB (Reference) - Switch Leader",
   "nodes": [
     {
@@ -499,22 +501,31 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41"
   },
+  "shared": [
+    {
+      "updatedAt": "2023-04-29T00:07:24.473Z",
+      "createdAt": "2023-04-29T00:07:24.473Z",
+      "role": "workflow:owner",
+      "workflowId": "34",
+      "projectId": "MxmmiRthvum7lvDL"
+    }
+  ],
   "staticData": null,
   "tags": [
     {
-      "createdAt": "2023-04-29T00:02:25.792Z",
-      "updatedAt": "2023-04-29T00:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
-      "createdAt": "2023-04-29T00:06:56.029Z",
-      "updatedAt": "2023-04-29T00:06:56.029Z",
+      "updatedAt": "2023-04-28T17:06:56.029Z",
+      "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-27T04:25:54.284Z",
+  "updatedAt": "2023-05-26T21:25:54.284Z",
   "versionId": "3241baa9-91ea-4abc-8c6b-615493867912"
 }
