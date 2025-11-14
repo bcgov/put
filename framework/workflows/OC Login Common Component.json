@@ -109,13 +109,14 @@
   ],
   "pinData": {},
   "settings": {
-    "saveDataSuccessExecution": "none",
+    "saveDataSuccessExecution": "all",
     "saveManualExecutions": false,
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "41",
     "executionTimeout": 3600,
-    "executionOrder": "v0",
-    "availableInMCP": false
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "saveDataErrorExecution": "all"
   },
   "shared": [
     {
@@ -142,6 +143,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2025-11-13T01:05:43.640Z",
-  "versionId": "b68a28f9-76a1-4ff0-85c5-c296d6174b93"
+  "updatedAt": "2025-11-13T22:59:03.514Z",
+  "versionId": "d45966ca-4b0b-4921-9767-c0427b0b4b26"
 }
