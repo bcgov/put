@@ -611,9 +611,9 @@
   ],
   "pinData": {},
   "settings": {
-    "callerPolicy": "workflowsFromSameOwner",
-    "executionOrder": "v1",
-    "availableInMCP": false
+    "callerPolicy": "any",
+    "availableInMCP": false,
+    "executionOrder": "v1"
   },
   "shared": [
     {
