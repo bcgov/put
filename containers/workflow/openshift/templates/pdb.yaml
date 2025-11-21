@@ -1,0 +1,48 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: n8n-pdb
+objects:
+  - kind: PodDisruptionBudget
+    apiVersion: policy/v1
+    metadata:
+      name: "${NAME}"
+      namespace: "${NAMESPACE}"
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
+    spec:
+      selector:
+        matchLabels:
+          app: "${NAME}"
+      maxUnavailable: 1
+  - kind: PodDisruptionBudget
+    apiVersion: policy/v1
+    metadata:
+      name: "${NAME}-worker"
+      namespace: "${NAMESPACE}"
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
+    spec:
+      selector:
+        matchLabels:
+          app: "${NAME}-worker"
+      maxUnavailable: 1
+  - kind: PodDisruptionBudget
+    apiVersion: policy/v1
+    metadata:
+      name: "${NAME}-webhook"
+      namespace: "${NAMESPACE}"
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
+    spec:
+      selector:
+        matchLabels:
+          app: "${NAME}-webhook"
+      maxUnavailable: 1
+parameters:
+  - name: NAME
+    value: n8n
+  - name: NAMESPACE
+    required: true
+

@@ -1,0 +1,26 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: n8n-networkpolicy
+objects:
+  - kind: NetworkPolicy
+    apiVersion: networking.k8s.io/v1
+    metadata:
+      name: allow-all-ingress
+      namespace: "${NAMESPACE}"
+      labels:
+        app: "${NAME}"
+        app.kubernetes.io/part-of: "${NAME}-app"
+    spec:
+      podSelector: {}
+      ingress:
+        - {}
+      policyTypes:
+        - Ingress
+parameters:
+  - name: NAME
+    value: n8n
+  - name: NAMESPACE
+    required: true
+

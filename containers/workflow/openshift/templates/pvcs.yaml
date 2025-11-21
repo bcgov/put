@@ -1,0 +1,88 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: n8n-pvcs
+objects:
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: csi.trident.netapp.io
+        volume.beta.kubernetes.io/storage-class: netapp-file-standard
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
+      name: "${NAME}-data"
+      namespace: "${NAMESPACE}"
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: "${PVC_SIZE}"
+      storageClassName: netapp-file-standard
+      volumeMode: Filesystem
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: csi.trident.netapp.io
+        volume.beta.kubernetes.io/storage-class: netapp-file-standard
+      name: "${NAME}-backup"
+      namespace: "${NAMESPACE}"
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: "${PVC_SIZE}"
+      storageClassName: netapp-file-backup
+      volumeMode: Filesystem
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: csi.trident.netapp.io
+        volume.beta.kubernetes.io/storage-class: netapp-file-standard
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
+      name: "redis-${NAME}-0"
+      namespace: "${NAMESPACE}"
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: "${REDIS_PVC_SIZE}"
+      storageClassName: netapp-file-standard
+      volumeMode: Filesystem
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: csi.trident.netapp.io
+        volume.beta.kubernetes.io/storage-class: netapp-file-standard
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
+      name: "postgresql-${NAME}-0"
+      namespace: "${NAMESPACE}"
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: "${PSQL_PVC_SIZE}"
+      storageClassName: netapp-file-standard
+      volumeMode: Filesystem
+parameters:
+  - name: NAME
+    value: n8n
+  - name: NAMESPACE
+    required: true
+  - name: PVC_SIZE
+    value: 5Gi
+  - name: REDIS_PVC_SIZE
+    value: 1Gi
+  - name: PSQL_PVC_SIZE
+    value: 10Gi
+

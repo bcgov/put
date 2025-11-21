@@ -1,0 +1,93 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: postgresql-statefulset
+objects:
+  - kind: StatefulSet
+    apiVersion: apps/v1
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
+        template: "${NAME}-template"
+        role: db
+      name: "postgresql-${NAME}"
+      namespace: "${NAMESPACE}"
+    spec:
+      serviceName: "postgresql-${NAME}"
+      replicas: 1
+      selector:
+        matchLabels:
+          app: "postgresql-${NAME}"
+      template:
+        metadata:
+          labels:
+            app: "postgresql-${NAME}"
+        spec:
+          containers:
+            - env:
+                - name: POSTGRESQL_USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-user
+                      name: "postgresql-${NAME}"
+                - name: POSTGRESQL_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-password
+                      name: "postgresql-${NAME}"
+                - name: POSTGRESQL_DATABASE
+                  valueFrom:
+                    secretKeyRef:
+                      key: database-name
+                      name: "postgresql-${NAME}"
+              imagePullPolicy: IfNotPresent
+              image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql@sha256:e7ab7f1f5ac562d25e0b334a16ff722092d4a996da63a6489848ebf735869783
+              livenessProbe:
+                exec:
+                  command:
+                    - /usr/libexec/check-container
+                    - --live
+                failureThreshold: 3
+                initialDelaySeconds: 120
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 10
+              name: postgresql
+              ports:
+                - containerPort: 5432
+                  protocol: TCP
+              readinessProbe:
+                exec:
+                  command:
+                    - /usr/libexec/check-container
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  memory: 512Mi
+              securityContext:
+                capabilities: {}
+                privileged: false
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /var/lib/pgsql/data
+                  name: postgresql-data
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - name: postgresql-data
+              persistentVolumeClaim:
+                claimName: "postgresql-${NAME}"
+parameters:
+  - name: NAME
+    value: n8n
+  - name: NAMESPACE
+    required: true
+

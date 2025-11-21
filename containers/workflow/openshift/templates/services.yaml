@@ -1,0 +1,110 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: n8n-services
+objects:
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      labels:
+        app: "${NAME}"
+        app.kubernetes.io/component: "${NAME}"
+        app.kubernetes.io/instance: "${NAME}"
+        app.kubernetes.io/part-of: "${NAME}-app"
+      name: "${NAME}"
+      namespace: "${NAMESPACE}"
+    spec:
+      ports:
+        - name: 5678-tcp
+          port: 5678
+          protocol: TCP
+          targetPort: 5678
+      selector:
+        app: "${NAME}"
+      sessionAffinity: None
+      type: ClusterIP
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      labels:
+        app: "${NAME}-webhook"
+        app.kubernetes.io/component: "${NAME}-webhook"
+        app.kubernetes.io/instance: "${NAME}-webhook"
+        app.kubernetes.io/part-of: "${NAME}-app"
+      name: "${NAME}-webhook"
+      namespace: "${NAMESPACE}"
+    spec:
+      ports:
+        - name: 5678-tcp
+          port: 5678
+          protocol: TCP
+          targetPort: 5678
+      selector:
+        app: "${NAME}-webhook"
+      sessionAffinity: None
+      type: ClusterIP
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      labels:
+        app: "${NAME}-worker"
+        app.kubernetes.io/component: "${NAME}-worker"
+        app.kubernetes.io/instance: "${NAME}-worker"
+        app.kubernetes.io/part-of: "${NAME}-app"
+      name: "${NAME}-worker"
+      namespace: "${NAMESPACE}"
+    spec:
+      ports:
+        - name: 5678-tcp
+          port: 5678
+          protocol: TCP
+          targetPort: 5678
+      selector:
+        app: "${NAME}-worker"
+      sessionAffinity: None
+      type: ClusterIP
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      labels:
+        app: "${NAME}"
+        app.kubernetes.io/part-of: "${NAME}-app"
+      name: "postgresql-${NAME}"
+      namespace: "${NAMESPACE}"
+    spec:
+      ports:
+        - name: postgresql
+          port: 5432
+          protocol: TCP
+          targetPort: 5432
+      selector:
+        app: "postgresql-${NAME}"
+      sessionAffinity: None
+      type: ClusterIP
+      clusterIP: None
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      labels:
+        app: "${NAME}"
+        app.kubernetes.io/part-of: "${NAME}-app"
+      name: "redis-${NAME}"
+      namespace: "${NAMESPACE}"
+    spec:
+      ports:
+        - name: redis
+          port: 6379
+          protocol: TCP
+          targetPort: 6379
+      selector:
+        app: "redis-${NAME}"
+      sessionAffinity: None
+      type: ClusterIP
+      clusterIP: None
+parameters:
+  - name: NAME
+    value: n8n
+  - name: NAMESPACE
+    required: true
+
