@@ -10,7 +10,7 @@ ENV HOME=/opt/app-root/src \
 USER 0
 
 RUN dnf -y install \
-      ImageMagick \
+      imagemagick \
       gcc-c++ \
       make \
       jq \
