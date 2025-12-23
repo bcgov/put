@@ -124,7 +124,8 @@ objects:
                   value: "false"
               image: "image-registry.openshift-image-registry.svc:5000/${N8N_IMAGE_NAMESPACE}/${NAME}:latest"
               imagePullPolicy: Always
-              command: ["n8n"]
+              command: ["tini", "--"]
+              args: ["n8n"]
               livenessProbe:
                 failureThreshold: 3
                 httpGet:
