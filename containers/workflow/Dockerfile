@@ -5,9 +5,16 @@ ENV HOME=/opt/app-root/src \
       TZ=America/Vancouver \
       NPM_CONFIG_PREFIX=$HOME/.npm-global \
       PATH=$HOME/.npm-global/bin:$PATH \
-      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true \
+      TINI_VERSION=v0.19.0
 
 USER 0
+
+# Tini version can be pinned as needed
+
+# Install tini (static binary)
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /usr/bin/tini
+RUN chmod +x /usr/bin/tini
 
 RUN dnf -y install \
       gcc-c++ \
@@ -30,4 +37,5 @@ RUN mkdir -p /data $HOME/.n8n && \
 
 WORKDIR /data
 EXPOSE 5678/tcp
+ENTRYPOINT ["tini", "--"]
 CMD ["n8n"]
