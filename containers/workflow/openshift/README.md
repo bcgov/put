@@ -47,44 +47,82 @@ roleRef:
 
 ## Deploy N8N
 
-Once your N8N image has been successfully built, you can then deploy it in your project by using the following command (replace anything in angle brackets with the correct value):
+> **Note**: The deployment has been refactored into separate template files for better modularity and easier updates.
 
-```sh
-export NAMESPACE=<bf5ef6-dev>
-export N8N_IMAGE_NAMESPACE=<bf5ef6-tools>
-oc process -n $NAMESPACE -f n8n.dc.yaml NAMESPACE=$NAMESPACE -o yaml | oc apply -n $NAMESPACE -f -
+N8N deployment uses OpenShift templates with environment-specific parameter files. This allows you to deploy the same templates to different environments (dev/test/prod) with different configurations.
+
+### Quick Deployment
+
+For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md) and [QUICK-START.md](QUICK-START.md).
+
+**Quick deploy to production:**
+```bash
+cd containers/workflow/openshift
+export ENV_FILE="values-prod.env"
+
+# Create secrets first (passwords auto-generated)
+oc process -f templates/secrets.yaml --param-file=${ENV_FILE} | oc create -f -
+
+# Deploy remaining components
+for template in services routes postgresql-statefulset redis-statefulset n8n-deployment n8n-worker-deployment n8n-webhook-deployment hpa pdb networkpolicy; do 
+  oc process -f templates/${template}.yaml --param-file=${ENV_FILE} | oc apply -f -
+done
+
+# Save generated passwords for future reference
+echo "N8N Password: $(oc get secret n8n -o jsonpath='{.data.password}' | base64 -d)"
+echo "Encryption Key: $(oc get secret n8n -o jsonpath='{.data.encryption-key}' | base64 -d)"
 ```
 
-This will create the following:
+**Quick deploy to development (new installation):**
+```bash
+cd containers/workflow/openshift
+export ENV_FILE="values-dev.env"
 
-|    Application    |       Object        | Description                                                                                                        |
-| :---------------: | :-----------------: | ------------------------------------------------------------------------------------------------------------------ |
-|  **N8N (Main)**   |       Secret        | Main Secret for N8N                                                                                                |
-|                   |  Deployment Config  | Deploys the Main Application                                                                                       |
-|                   |       Service       | The service is responsible for making the pod available for the router                                             |
-|                   |        Route        | Exposes an external URL for connecting to the UI                                                                   |
-|                   | PodDisruptionBudget | Makes sure we have at least one pod running                                                                        |
-|                   |         PVC         | Persistent Storage for N8N                                                                                         |
-| **N8N (Worker)**  |  Deployment Config  | Deploys N8N worker Pods, they use the same storage, database and configuration as the main N8N pod                 |
-|                   |       Service       | The service is responsible for enabling access to a **set** of worker pods                                         |
-|                   |  HorizontalScaler   | Scales up the number of pods depending on load, this allows for automatic scalability                              |
-|                   | PodDisruptionBudget | Makes sure we have at least one pod running                                                                        |
-| **N8N (Webhook)** |  Deployment Config  | Deploys N8N webhook Pods, they use the same storage, database and configuration as the main N8N pod                |
-|                   |       Service       | The service is responsible for enabling access to a **set** of webhook pods and making it available for the router |
-|                   |  HorizontalScaler   | Scales up the number of pods depending on load, this allows for automatic scalability                              |
-|                   | PodDisruptionBudget | Makes sure we have at least one pod running                                                                        |
-|                   |        Route        | Exposes an external URL for connecting to the webhooks                                                             |
-|  **PostgreSQL**   |       Secret        | Main Secret for PostgreSQL                                                                                         |
-|                   |  Deployment Config  | The database that is used by N8N as the repository for all workflows, credentials and execution data               |
-|                   |       Service       | The service is responsible for making the database available for the application                                   |
-|                   |         PVC         | Persistent Storage for PostgreSQL database server                                                                  |
-|     **Redis**     |       Secret        | Main Secret for Redis (The open source, in-memory data store)                                                      |
-|                   |  Deployment Config  | The data store that is used by N8N to manage queuing of workflow runs                                              |
-|                   |       Service       | The service is responsible for making the data store available for the application                                 |
-|                   |         PVC         | Persistent Storage for Redis data store                                                                            |
-|      **ALL**      |    NetworkPolicy    | To make sure that all pods can talk to each other                                                                  |
+# Create secrets first (passwords auto-generated)
+oc process -f templates/secrets.yaml --param-file=${ENV_FILE} | oc create -f -
 
-The Deployment Configs for N8N have liveliness and readiness checks built in, and handles image updates via Recreation strategy.
+# Deploy remaining components
+for template in services routes postgresql-statefulset redis-statefulset n8n-deployment n8n-worker-deployment n8n-webhook-deployment hpa pdb networkpolicy; do 
+  oc process -f templates/${template}.yaml --param-file=${ENV_FILE} | oc apply -f -
+done
+
+# Save generated passwords for future reference
+echo "N8N Password: $(oc get secret n8n -o jsonpath='{.data.password}' | base64 -d)"
+echo "Encryption Key: $(oc get secret n8n -o jsonpath='{.data.encryption-key}' | base64 -d)"
+```
+
+### Architecture
+
+This deployment creates the following:
+
+|    Application    |       Object        | Description                                                                                                        | Template File                   |
+| :---------------: | :-----------------: | ------------------------------------------------------------------------------------------------------------------ | ------------------------------- |
+|  **N8N (Main)**   |       Secret        | Main Secret for N8N                                                                                                | `secrets.yaml`                  |
+|                   |     Deployment      | Deploys the Main Application                                                                                       | `n8n-deployment.yaml`           |
+|                   |       Service       | The service is responsible for making the pod available for the router                                             | `services.yaml`                 |
+|                   |        Route        | Exposes an external URL for connecting to the UI                                                                   | `routes.yaml`                   |
+|                   | PodDisruptionBudget | Makes sure we have at least one pod running                                                                        | `pdb.yaml`                      |
+|                   |         PVC         | Persistent Storage for N8N                                                                                         | `pvcs.yaml`                     |
+| **N8N (Worker)**  |     Deployment      | Deploys N8N worker Pods, they use the same storage, database and configuration as the main N8N pod                 | `n8n-worker-deployment.yaml`    |
+|                   |       Service       | The service is responsible for enabling access to a **set** of worker pods                                         | `services.yaml`                 |
+|                   |  HorizontalScaler   | Scales up the number of pods depending on load, this allows for automatic scalability                              | `hpa.yaml`                      |
+|                   | PodDisruptionBudget | Makes sure we have at least one pod running                                                                        | `pdb.yaml`                      |
+| **N8N (Webhook)** |     Deployment      | Deploys N8N webhook Pods, they use the same storage, database and configuration as the main N8N pod                | `n8n-webhook-deployment.yaml`   |
+|                   |       Service       | The service is responsible for enabling access to a **set** of webhook pods and making it available for the router | `services.yaml`                 |
+|                   |  HorizontalScaler   | Scales up the number of pods depending on load, this allows for automatic scalability                              | `hpa.yaml`                      |
+|                   | PodDisruptionBudget | Makes sure we have at least one pod running                                                                        | `pdb.yaml`                      |
+|                   |        Route        | Exposes an external URL for connecting to the webhooks                                                             | `routes.yaml`                   |
+|  **PostgreSQL**   |       Secret        | Main Secret for PostgreSQL                                                                                         | `secrets.yaml`                  |
+|                   |    StatefulSet      | The database that is used by N8N as the repository for all workflows, credentials and execution data               | `postgresql-statefulset.yaml`   |
+|                   |       Service       | The service is responsible for making the database available for the application                                   | `services.yaml`                 |
+|                   |         PVC         | Persistent Storage for PostgreSQL database server                                                                  | `pvcs.yaml`                     |
+|     **Redis**     |       Secret        | Main Secret for Redis (The open source, in-memory data store)                                                      | `secrets.yaml`                  |
+|                   |    StatefulSet      | The data store that is used by N8N to manage queuing of workflow runs                                              | `redis-statefulset.yaml`        |
+|                   |       Service       | The service is responsible for making the data store available for the application                                 | `services.yaml`                 |
+|                   |         PVC         | Persistent Storage for Redis data store                                                                            | `pvcs.yaml`                     |
+|      **ALL**      |    NetworkPolicy    | To make sure that all pods can talk to each other                                                                  | `networkpolicy.yaml`            |
+
+All deployments have liveliness and readiness checks built in, and handle image updates via RollingUpdate strategy. Databases use StatefulSets for stable network identities and persistent storage.
 
 ## Initial Setup
 
@@ -94,7 +132,55 @@ Once N8N is up and functional (this will take between 3 to 5 minutes), you will 
 
 In general, N8N should generally take up very little CPU (<0.01 cores) and float between 700 to 800mb of memory usage during operation. The template has some reasonable requests and limits set for both CPU and Memory, but you may change it should your needs be different. For inspecting the official N8N documentation [here](https://docs.n8n.io/).
 
+## File Structure
+
+```
+containers/workflow/openshift/
+├── templates/                          # All template files
+│   ├── secrets.yaml                    # Secrets for n8n, PostgreSQL, Redis
+│   ├── services.yaml                   # Services for all components
+│   ├── routes.yaml                     # Routes for n8n and webhook
+│   ├── pvcs.yaml                       # PersistentVolumeClaims
+│   ├── redis-statefulset.yaml         # Redis StatefulSet
+│   ├── postgresql-statefulset.yaml    # PostgreSQL StatefulSet
+│   ├── n8n-deployment.yaml            # N8N main Deployment
+│   ├── n8n-worker-deployment.yaml     # N8N worker Deployment
+│   ├── n8n-webhook-deployment.yaml    # N8N webhook Deployment
+│   ├── hpa.yaml                        # HorizontalPodAutoscalers
+│   ├── pdb.yaml                        # PodDisruptionBudgets
+│   └── networkpolicy.yaml              # NetworkPolicy
+├── values-prod.env                     # Production environment parameters
+├── values-dev.env                      # Development environment parameters
+├── n8n.bc.yaml                         # BuildConfig for n8n image
+├── DEPLOYMENT.md                       # Detailed deployment guide
+├── QUICK-START.md                      # Quick start commands
+└── README.md                           # This file
+```
+
 ## Overall Resource Requirements
 
-N8N requires 1 Main Pod, up to 3 worker pods and up to 3 Webhook pods.
+N8N requires:
+- 1 Main Pod (always on)
+- 1-3 Worker Pods (auto-scales based on load)
+- 1-3 Webhook Pods (auto-scales based on load)
+- 1 PostgreSQL Pod (StatefulSet)
+- 1 Redis Pod (StatefulSet)
 
+Default resource requests/limits per n8n pod:
+- CPU Request: 100m, Limit: 1 core
+- Memory Request: 256Mi, Limit: 4Gi
+
+## Migration from DeploymentConfig
+
+If you're migrating from the old `n8n.dc.yaml` (DeploymentConfig), note the following changes:
+
+1. **DeploymentConfig → Deployment**: Main n8n components now use Deployment instead of DeploymentConfig
+2. **DeploymentConfig → StatefulSet**: PostgreSQL and Redis now use StatefulSet for better persistence
+3. **Separate Templates**: Each component type is now in its own template file for easier management
+4. **Parameter Files**: Use `values-prod.env` and `values-dev.env` for environment-specific configuration
+5. **PVC Names**: StatefulSet PVCs are named with `-0` suffix (e.g., `redis-n8n-0`, `postgresql-n8n-0`)
+
+## Additional Documentation
+
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Comprehensive deployment guide with troubleshooting
+- **[QUICK-START.md](QUICK-START.md)** - Quick command reference for common operations

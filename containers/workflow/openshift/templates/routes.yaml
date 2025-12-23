@@ -1,0 +1,62 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: n8n-routes
+objects:
+  - kind: Route
+    apiVersion: v1
+    metadata:
+      name: "${NAME}"
+      namespace: "${NAMESPACE}"
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
+      annotations:
+        haproxy.router.openshift.io/balance: leastconn
+        haproxy.router.openshift.io/timeout: 1d
+        openshift.io/host.generated: "true"
+        router.openshift.io/cookie_name: "${NAME}"
+    spec:
+      host: "${NAME}-${NAMESPACE}.apps.${CLUSTER_NAME}.devops.gov.bc.ca"
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: edge
+      path: "/"
+      to:
+        kind: Service
+        name: "${NAME}"
+      port:
+        targetPort: 5678-tcp
+      wildcardPolicy: None
+  - kind: Route
+    apiVersion: v1
+    metadata:
+      name: "${NAME}-webhook"
+      namespace: "${NAMESPACE}"
+      labels:
+        app.kubernetes.io/part-of: "${NAME}-app"
+      annotations:
+        haproxy.router.openshift.io/balance: leastconn
+        haproxy.router.openshift.io/timeout: 1d
+        openshift.io/host.generated: "true"
+        router.openshift.io/cookie_name: "${NAME}-webhook"
+    spec:
+      host: "${NAME}-${NAMESPACE}.apps.${CLUSTER_NAME}.devops.gov.bc.ca"
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: edge
+      path: "/webhook"
+      to:
+        kind: Service
+        name: "${NAME}-webhook"
+      port:
+        targetPort: 5678-tcp
+      wildcardPolicy: None
+parameters:
+  - name: NAME
+    value: n8n
+  - name: NAMESPACE
+    required: true
+  - name: CLUSTER_NAME
+    required: true
+

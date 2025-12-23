@@ -9,22 +9,33 @@ ENV HOME=/opt/app-root/src \
 
 USER 0
 
-RUN dnf -y install ImageMagick gcc-c++ make jq python3 && dnf clean all
+# Install tooling
+RUN dnf -y install \
+      ImageMagick \
+      gcc-c++ \
+      make \
+      jq \
+      python3 \
+      tini \
+      && dnf clean all
 
-
+# Install oc
 RUN curl -fsSL https://downloads-openshift-console.apps.gold.devops.gov.bc.ca/amd64/linux/oc.tar -o /tmp/oc.tar && \
       tar -xf /tmp/oc.tar -C /tmp && \
       mv /tmp/oc /usr/bin/oc && \
       rm -f /tmp/oc.tar
 
+# Install n8n
 RUN npm install -g npm && npm install -g n8n
 
 # ---- OpenShift-friendly writable dirs ----
-# Random UID must be able to write to $HOME and /data via gid 0
 RUN mkdir -p /data $HOME/.n8n && \
       chgrp -R 0 /data $HOME && \
       chmod -R g+rwX /data $HOME
 
 WORKDIR /data
 EXPOSE 5678/tcp
+
+# tini must now be present in PATH
+ENTRYPOINT ["tini", "--"]
 CMD ["n8n"]
