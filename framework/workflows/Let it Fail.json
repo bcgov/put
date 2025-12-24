@@ -1,5 +1,208 @@
 {
-  "active": false,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-23T22:20:38.124Z",
+    "createdAt": "2025-12-23T22:20:38.124Z",
+    "versionId": "fcfff655-e21d-42c1-92fe-959ee79ebc7c",
+    "workflowId": "30",
+    "nodes": [
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "tokenName",
+                "value": "CLAB_Token"
+              },
+              {
+                "name": "nameSpace",
+                "value": "e31b6b-dev"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "e8ea7aba-ced1-4c43-96cc-291bfb30ec4c",
+        "name": "Set Token Name",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          780,
+          -120
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "28"
+        },
+        "id": "2fd328b0-75ef-450f-87b1-e99c0657adc2",
+        "name": "Build Login Command",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          940,
+          -120
+        ],
+        "alwaysOutputData": true,
+        "retryOnFail": false
+      },
+      {
+        "parameters": {
+          "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}"
+        },
+        "id": "5292bcb9-6bd4-406d-9f46-eeb11662ec1e",
+        "name": "OC Login",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1100,
+          -120
+        ],
+        "retryOnFail": false,
+        "maxTries": 5,
+        "waitBetweenTries": 3000
+      },
+      {
+        "parameters": {},
+        "id": "7bffc4e9-543b-4347-8067-beec45f50ba9",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          460,
+          -40
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Login to OpenShift\n\nSee [here](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/workflow/29) for instructions.",
+          "height": 327.72692944534356,
+          "width": 471.25
+        },
+        "id": "615c44ef-0464-4413-8ac1-28433ff8c380",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          760,
+          -220
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "0ebaec5c-6723-4ada-995f-42ed2f9adb87",
+        "name": "No Operation, do nothing",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1668,
+          -120
+        ]
+      },
+      {
+        "parameters": {
+          "command": "oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n"
+        },
+        "id": "31d47c85-257f-44e6-a20f-deee628c9118",
+        "name": "OC Logout",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1480,
+          -120
+        ]
+      },
+      {
+        "parameters": {
+          "command": "=oc whoami"
+        },
+        "id": "02daaf1a-4647-4ab9-bfeb-51c7d6527c68",
+        "name": "OC Who Am I",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1280,
+          -120
+        ],
+        "retryOnFail": false,
+        "maxTries": 5,
+        "waitBetweenTries": 3000
+      }
+    ],
+    "connections": {
+      "Set Token Name": {
+        "main": [
+          [
+            {
+              "node": "Build Login Command",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Login Command": {
+        "main": [
+          [
+            {
+              "node": "OC Login",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OC Login": {
+        "main": [
+          [
+            {
+              "node": "OC Who Am I",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set Token Name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OC Logout": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OC Who Am I": {
+        "main": [
+          [
+            {
+              "node": "OC Logout",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "fcfff655-e21d-42c1-92fe-959ee79ebc7c",
   "connections": {
     "Set Token Name": {
       "main": [
@@ -218,7 +421,7 @@
     }
   },
   "tags": [],
-  "triggerCount": 1,
+  "triggerCount": 0,
   "updatedAt": "2023-05-27T00:35:10.114Z",
   "versionId": "fcfff655-e21d-42c1-92fe-959ee79ebc7c"
 }
