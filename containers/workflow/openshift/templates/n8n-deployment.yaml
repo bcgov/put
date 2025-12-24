@@ -11,6 +11,7 @@ objects:
         app.kubernetes.io/part-of: "${NAME}-app"
         template: "${NAME}-template"
         role: api
+        component: main
       name: "${NAME}"
       namespace: "${NAMESPACE}"
     spec:
@@ -19,6 +20,7 @@ objects:
       selector:
         matchLabels:
           app: "${NAME}"
+          component: main
       strategy:
         type: RollingUpdate
         rollingUpdate:
@@ -28,6 +30,7 @@ objects:
         metadata:
           labels:
             app: "${NAME}"
+            component: main
         spec:
           containers:
             - env:
@@ -110,6 +113,8 @@ objects:
                   value: America/Vancouver
                 - name: EXECUTIONS_PROCESS
                   value: queue
+                - name: NODES_EXCLUDE
+                  value: ""
                 - name: EXECUTIONS_MODE
                   value: queue
                 - name: WEBHOOK_URL

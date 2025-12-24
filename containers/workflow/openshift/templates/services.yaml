@@ -22,6 +22,7 @@ objects:
           targetPort: 5678
       selector:
         app: "${NAME}"
+        component: main
       sessionAffinity: None
       type: ClusterIP
   - kind: Service

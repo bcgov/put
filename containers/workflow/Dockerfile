@@ -32,6 +32,7 @@ RUN npm install -g npm && npm install -g n8n
 
 # ---- OpenShift-friendly writable dirs ----
 RUN mkdir -p /data $HOME/.n8n && \
+      mkdir -p /opt/app-root/src/.n8n-files && \
       chgrp -R 0 /data $HOME && \
       chmod -R g+rwX /data $HOME
 
