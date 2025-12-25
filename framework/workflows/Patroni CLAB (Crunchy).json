@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2025-12-24T04:55:53.323Z",
-    "createdAt": "2025-12-24T04:55:51.657Z",
-    "versionId": "03213bda-7ee2-42b2-a9cc-3eea261b68ed",
+    "updatedAt": "2025-12-24T09:24:11.067Z",
+    "createdAt": "2025-12-24T09:24:09.086Z",
+    "versionId": "a9892a0f-96e6-4a59-ba5c-6020e25a3e4f",
     "workflowId": "33",
     "nodes": [
       {
@@ -20,7 +20,7 @@
       },
       {
         "parameters": {
-          "command": "=set -u\n\nNAMESPACE=\"{{ $node[\"Set Token Name\"].json.nameSpace }}\"\nSERVICE=\"put-test-patroni-master\"\nLOCAL_PORT=15435\nREMOTE_PORT=5432\nPID_FILE=\"/tmp/patroni-portforward.pid\"\n\necho \"Starting port-forward to svc/$SERVICE in namespace $NAMESPACE on ${LOCAL_PORT} -> ${REMOTE_PORT}\"\n\n# Best-effort cleanup of previous port-forward\nif [ -f \"$PID_FILE\" ]; then\n  OLD_PID=\"$(cat \"$PID_FILE\" 2>/dev/null || true)\"\n  if [ -n \"${OLD_PID:-}\" ] && ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n    echo \"Killing existing port-forward PID $OLD_PID\"\n    kill \"$OLD_PID\" 2>/dev/null || true\n    sleep 1\n    if ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n      kill -9 \"$OLD_PID\" 2>/dev/null || true\n    fi\n  fi\nfi\n\n# Start port-forward in background (silent)\noc -n \"$NAMESPACE\" port-forward \"svc/$SERVICE\" \"${LOCAL_PORT}:${REMOTE_PORT}\" \\\n  > /dev/null 2>&1 &\n\nPFPID=$!\necho \"$PFPID\" > \"$PID_FILE\"\n\necho \"Port-forward started with PID $PFPID on port $LOCAL_PORT\"\n\n# Give it time to establish\nsleep 10\n\n# Always succeed so workflow continues\nexit 0\n"
+          "command": "=set -u\n\nNAMESPACE=\"{{ $node[\"Set Token Name\"].json.nameSpace }}\"\nSERVICE=\"hippo-pgbouncer\"\nLOCAL_PORT=15438\nREMOTE_PORT=5432\nPID_FILE=\"/tmp/patroni-portforward.pid\"\n\necho \"Starting port-forward to svc/$SERVICE in namespace $NAMESPACE on ${LOCAL_PORT} -> ${REMOTE_PORT}\"\n\n# Best-effort cleanup of previous port-forward\nif [ -f \"$PID_FILE\" ]; then\n  OLD_PID=\"$(cat \"$PID_FILE\" 2>/dev/null || true)\"\n  if [ -n \"${OLD_PID:-}\" ] && ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n    echo \"Killing existing port-forward PID $OLD_PID\"\n    kill \"$OLD_PID\" 2>/dev/null || true\n    sleep 1\n    if ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n      kill -9 \"$OLD_PID\" 2>/dev/null || true\n    fi\n  fi\nfi\n\n# Start port-forward in background (silent)\noc -n \"$NAMESPACE\" port-forward \"svc/$SERVICE\" \"${LOCAL_PORT}:${REMOTE_PORT}\" \\\n  > /dev/null 2>&1 &\n\nPFPID=$!\necho \"$PFPID\" > \"$PID_FILE\"\n\necho \"Port-forward started with PID $PFPID on port $LOCAL_PORT\"\n\n# Give it time to establish\nsleep 10\n\n# Always succeed so workflow continues\nexit 0\n"
         },
         "id": "53a0b590-ebf9-4446-9e15-8d4f4bee9447",
         "name": "Set Port Forward Patroni",
@@ -464,11 +464,11 @@
       }
     },
     "authors": "Billy li",
-    "name": "Version 03213bda",
+    "name": "Version a9892a0f",
     "description": "",
     "autosaved": false
   },
-  "activeVersionId": "03213bda-7ee2-42b2-a9cc-3eea261b68ed",
+  "activeVersionId": "a9892a0f-96e6-4a59-ba5c-6020e25a3e4f",
   "connections": {
     "When clicking \"Execute Workflow\"": {
       "main": [
@@ -624,7 +624,7 @@
     },
     {
       "parameters": {
-        "command": "=set -u\n\nNAMESPACE=\"{{ $node[\"Set Token Name\"].json.nameSpace }}\"\nSERVICE=\"put-test-patroni-master\"\nLOCAL_PORT=15435\nREMOTE_PORT=5432\nPID_FILE=\"/tmp/patroni-portforward.pid\"\n\necho \"Starting port-forward to svc/$SERVICE in namespace $NAMESPACE on ${LOCAL_PORT} -> ${REMOTE_PORT}\"\n\n# Best-effort cleanup of previous port-forward\nif [ -f \"$PID_FILE\" ]; then\n  OLD_PID=\"$(cat \"$PID_FILE\" 2>/dev/null || true)\"\n  if [ -n \"${OLD_PID:-}\" ] && ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n    echo \"Killing existing port-forward PID $OLD_PID\"\n    kill \"$OLD_PID\" 2>/dev/null || true\n    sleep 1\n    if ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n      kill -9 \"$OLD_PID\" 2>/dev/null || true\n    fi\n  fi\nfi\n\n# Start port-forward in background (silent)\noc -n \"$NAMESPACE\" port-forward \"svc/$SERVICE\" \"${LOCAL_PORT}:${REMOTE_PORT}\" \\\n  > /dev/null 2>&1 &\n\nPFPID=$!\necho \"$PFPID\" > \"$PID_FILE\"\n\necho \"Port-forward started with PID $PFPID on port $LOCAL_PORT\"\n\n# Give it time to establish\nsleep 10\n\n# Always succeed so workflow continues\nexit 0\n"
+        "command": "=set -u\n\nNAMESPACE=\"{{ $node[\"Set Token Name\"].json.nameSpace }}\"\nSERVICE=\"hippo-pgbouncer\"\nLOCAL_PORT=15438\nREMOTE_PORT=5432\nPID_FILE=\"/tmp/patroni-portforward.pid\"\n\necho \"Starting port-forward to svc/$SERVICE in namespace $NAMESPACE on ${LOCAL_PORT} -> ${REMOTE_PORT}\"\n\n# Best-effort cleanup of previous port-forward\nif [ -f \"$PID_FILE\" ]; then\n  OLD_PID=\"$(cat \"$PID_FILE\" 2>/dev/null || true)\"\n  if [ -n \"${OLD_PID:-}\" ] && ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n    echo \"Killing existing port-forward PID $OLD_PID\"\n    kill \"$OLD_PID\" 2>/dev/null || true\n    sleep 1\n    if ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n      kill -9 \"$OLD_PID\" 2>/dev/null || true\n    fi\n  fi\nfi\n\n# Start port-forward in background (silent)\noc -n \"$NAMESPACE\" port-forward \"svc/$SERVICE\" \"${LOCAL_PORT}:${REMOTE_PORT}\" \\\n  > /dev/null 2>&1 &\n\nPFPID=$!\necho \"$PFPID\" > \"$PID_FILE\"\n\necho \"Port-forward started with PID $PFPID on port $LOCAL_PORT\"\n\n# Give it time to establish\nsleep 10\n\n# Always succeed so workflow continues\nexit 0\n"
       },
       "id": "53a0b590-ebf9-4446-9e15-8d4f4bee9447",
       "name": "Set Port Forward Patroni",
@@ -950,19 +950,19 @@
   "staticData": null,
   "tags": [
     {
-      "updatedAt": "2023-04-28T17:02:25.792Z",
-      "createdAt": "2023-04-28T17:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
       "updatedAt": "2023-04-28T17:06:56.029Z",
       "createdAt": "2023-04-28T17:06:56.029Z",
       "id": "4",
       "name": "Test"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2025-12-24T04:55:51.655Z",
-  "versionId": "03213bda-7ee2-42b2-a9cc-3eea261b68ed"
+  "updatedAt": "2025-12-24T09:24:09.084Z",
+  "versionId": "a9892a0f-96e6-4a59-ba5c-6020e25a3e4f"
 }
