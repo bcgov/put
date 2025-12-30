@@ -3,7 +3,7 @@
 
 > **NOTE!!!!!!!**  
 > This guide describes an **unsupported hack** against n8n Community Edition internals.  
-> It may break on upgrades, and n8n won’t officially support issues caused by these changes.  
+> It may break on upgrades, and n8n won't officially support issues caused by these changes.  
 > Use **only** if you understand the risks and always test in a non‑production environment first.
 
 ---
@@ -14,9 +14,9 @@ In newer n8n versions(Version 1.119.1), workflows can have a **caller policy** t
 
 On **n8n Community Edition**:
 
-- You do **not** have the UI options (like *“This workflow can be called by: Any workflow”*).
+- You do **not** have the UI options (like *"This workflow can be called by: Any workflow"*).
 - The default policy is effectively **`workflowsFromSameOwner`**, so:
-  - Workflow A can only call Workflow B if n8n considers them to have the same “owner” (or same project, depending on schema/version).
+  - Workflow A can only call Workflow B if n8n considers them to have the same "owner" (or same project, depending on schema/version).
 - As a result, if:
   - The *parent* workflow was created by one user, and
   - The *sub-workflow* was created by another user,
@@ -24,10 +24,10 @@ On **n8n Community Edition**:
 
     ```text
     The sub-workflow (XX) cannot be called by this workflow
-    The sub-workflow you’re trying to execute limits which workflows it can be called by. Update sub-workflow settings to allow other workflows to call it.
+    The sub-workflow you're trying to execute limits which workflows it can be called by. Update sub-workflow settings to allow other workflows to call it.
     ```
 
-Because the Community Edition does not expose the caller policy in the UI, you cannot simply switch it to *“Any workflow”* from the frontend.
+Because the Community Edition does not expose the caller policy in the UI, you cannot simply switch it to *"Any workflow"* from the frontend.
 
 ---
 
@@ -35,8 +35,8 @@ Because the Community Edition does not expose the caller policy in the UI, you c
 
 We work around this limitation by **editing the n8n Postgres database directly** to:
 
-1. Ensure all workflows live under the **same project** (so they effectively share the same “owner/project”).
-2. Change the specific sub-workflow’s **`callerPolicy`** from:
+1. Ensure all workflows live under the **same project** (so they effectively share the same "owner/project").
+2. Change the specific sub-workflow's **`callerPolicy`** from:
    - `workflowsFromSameOwner` → `any`
 
 After this, the parent workflow can successfully call the sub-workflow, even though they were originally created by different users.
@@ -59,13 +59,33 @@ Redis is used by n8n as a **queue / cache backend**, not the source of truth for
 
 ---
 
+## 4. Step 0 – Backup the Database (Mandatory)
 
+Before touching Postgres, **always create a backup**.
+
+1. Enter the backup container (example):
+
+   ```bash
+   oc exec -it <backup-pod-name> -- bash
+   ```
+
+2. Run the backup script:
+
+   ```bash
+   ./backup.sh -1
+   ```
+
+   This should create a full database backup (check your internal backup docs for where the file is stored and how to restore it).
+
+3. Exit the container after confirming the backup completed without errors.
+
+If anything goes wrong later, you can restore from this backup.
 
 ---
 
-## 4. Step 0 – Change the Sub-Workflow `callerPolicy` to `any`
+## 5. Step 1 – Change the Sub-Workflow `callerPolicy` to `any`
 
-Even with projects aligned, the sub-workflow is still restricted by its internal **caller policy**, which by default is `workflowsFromSameOwner`. On Community Edition, you can’t change this from the UI, but it is stored in the `settings` JSON column in `workflow_entity`.
+Even with projects aligned, the sub-workflow is still restricted by its internal **caller policy**, which by default is `workflowsFromSameOwner`. On Community Edition, you can't change this from the UI, but it is stored in the `settings` JSON column in `workflow_entity`.
 
 ### 5.1 Inspect current settings for the sub-workflow
 
@@ -94,7 +114,7 @@ Example output:
 
 Note `"callerPolicy":"workflowsFromSameOwner"`.
 
-### 6.2 Update `callerPolicy` to `any`
+### 5.2 Update `callerPolicy` to `any`
 
 Use `jsonb_set` to update **only** the `callerPolicy` field in the JSON:
 
@@ -132,7 +152,7 @@ At this point, you have:
 
 ---
 
-## 7. (Optional) Step 4 – Clear Redis Workflow Cache
+## 6. (Optional) Step 2 – Clear Redis Workflow Cache
 
 In some setups, n8n caches workflow → project mappings in Redis under a key like:
 
@@ -170,7 +190,7 @@ If you suspect stale cache is interfering, you can clear it.
 
 ---
 
-## 8. Step 5 – Restart n8n and Test
+## 7. Step 3 – Restart n8n and Test
 
 After updating the DB:
 
@@ -182,16 +202,16 @@ If everything was applied correctly, the previous error:
 
 ```text
 The sub-workflow (28) cannot be called by this workflow
-The sub-workflow you’re trying to execute limits which workflows it can be called by. Update sub-workflow settings to allow other workflows to call it.
+The sub-workflow you're trying to execute limits which workflows it can be called by. Update sub-workflow settings to allow other workflows to call it.
 ```
 
 should disappear, and the sub-workflow should run as expected.
 
 ---
 
-## 9. Why This Works (and Why It’s a Hack)
+## 8. Why This Works (and Why It's a Hack)
 
-### 10.1 Caller Policy Logic
+### 8.1 Caller Policy Logic
 
 Internally, n8n uses a **caller policy** per workflow to decide which workflows are allowed to execute it as a sub-workflow. Values include (among others):
 
@@ -199,22 +219,16 @@ Internally, n8n uses a **caller policy** per workflow to decide which workflows 
 - `workflowsFromSameOwner` / `workflowsFromSameProject` – only workflows from the same owner/project can call this.
 - `workflowsFromAList` – only specific workflows can call this.
 
-On commercial editions, you can configure these via the UI. On Community Edition, the setting is present in the DB but **not exposed** in the UI, so you can’t change it normally.
+On commercial editions, you can configure these via the UI. On Community Edition, the setting is present in the DB but **not exposed** in the UI, so you can't change it normally.
 
 By manually editing the `settings` JSON, we are:
 
 - Bypassing the lack of UI controls.
 - Forcing the sub-workflow to use `callerPolicy: "any"`, effectively disabling the restriction.
 
-
-
-
-
-
-
 ---
 
-## 10. Rollback Strategy
+## 9. Rollback Strategy
 
 If something goes wrong, you have two main rollback options:
 
@@ -237,45 +251,21 @@ If something goes wrong, you have two main rollback options:
      WHERE id = '28';
      ```
 
-   This is more fragile than a full restore, so only do it if you’re confident in the scope of your changes.
+   This is more fragile than a full restore, so only do it if you're confident in the scope of your changes.
 
 ---
 
-## Summary
+## 10. Summary
 
 - This is an **unsupported hack** but can be useful in controlled environments where upgrading to a commercial edition or redesigning workflows is not immediately feasible.
 
-
-
-
-## Some attemption that I tried but doesn't work.
-Worth to keep the record so that we don't try that again in the future:
-
-### -1. Step 0 – Backup the Database (Mandatory)
-
-Before touching Postgres, **always create a backup**.
-
-1. Enter the backup container (example):
-
-   ```bash
-   oc exec -it <backup-pod-name> -- bash
-   ```
-
-2. Run the backup script:
-
-   ```bash
-   ./backup.sh -1
-   ```
-
-   This should create a full database backup (check your internal backup docs for where the file is stored and how to restore it).
-
-3. Exit the container after confirming the backup completed without errors.
-
-If anything goes wrong later, you can restore from this backup.
-
 ---
 
-### . Step 1 – Inspect Users and Workflows
+## Appendix: Attempts That Didn't Work
+
+Worth keeping this record so we don't try these again in the future.
+
+### A.1 Inspect Users and Workflows
 
 Connect to Postgres (for example, via `psql`):
 
@@ -283,7 +273,7 @@ Connect to Postgres (for example, via `psql`):
 psql -U n8n -d n8n
 ```
 
-### 5.1 List users
+#### List users
 
 ```sql
 SELECT id, email FROM "user";
@@ -301,7 +291,7 @@ dd971dd1-ac27-4b54-a6b2-a6f703068a8d | billy.li@gov.bc.ca
 
 Note your own user ID (e.g. `dd971dd1-ac27-4b54-a6b2-a6f703068a8d`).
 
-#### 5.2 List workflows
+#### List workflows
 
 ```sql
 SELECT id, name FROM workflow_entity ORDER BY id;
@@ -329,13 +319,13 @@ In the example, the problematic sub-workflow is **ID `28`**.
 
 ---
 
-### 6. Step 2 – Align All Workflows to a Single Project
+### A.2 Align All Workflows to a Single Project (Did Not Work Alone)
 
-Newer n8n versions use **projects** internally, and workflow permissions can depend on the `projectId`. To simplify ownership logic, we assign **all workflows** to a single project.
+Newer n8n versions use **projects** internally, and workflow permissions can depend on the `projectId`. To simplify ownership logic, we tried assigning **all workflows** to a single project.
 
 > ⚠️ This is heavy-handed. In a more complex, multi-team setup you might prefer to only update a subset of workflows rather than everything.
 
-#### 6.1 Check the `shared_workflow` table
+#### Check the `shared_workflow` table
 
 ```sql
 SELECT "workflowId", "projectId", role
@@ -343,9 +333,9 @@ FROM shared_workflow
 ORDER BY "workflowId";
 ```
 
-You’ll see rows for each workflow, with a `projectId` and `role` like `workflow:owner`.
+You'll see rows for each workflow, with a `projectId` and `role` like `workflow:owner`.
 
-#### 6.2 Choose a project ID
+#### Choose a project ID
 
 List existing projects:
 
@@ -355,9 +345,9 @@ SELECT id, name FROM project;
 
 Pick a project ID to use globally (e.g. `8TL7f7Zh5T94reb3`).
 
-#### 6.3 Point all workflows to that project
+#### Point all workflows to that project
 
-Update **every** workflow’s `projectId`:
+Update **every** workflow's `projectId`:
 
 ```sql
 UPDATE shared_workflow
@@ -375,4 +365,4 @@ ORDER BY "workflowId";
 
 You should now see all rows using the same `projectId` (`8TL7f7Zh5T94reb3`) with role `workflow:owner`.
 
-
+> **Result**: This alone did NOT fix the issue. The `callerPolicy` change (Section 5) was still required.
