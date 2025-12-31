@@ -1,5 +1,83 @@
 {
   "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-23T22:20:38.124Z",
+    "createdAt": "2025-12-23T22:20:38.124Z",
+    "versionId": "cd58c814-f7ca-49d4-ba82-469c2b42f21e",
+    "workflowId": "47",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "start_workflow",
+          "options": {
+            "responseHeaders": {
+              "entries": [
+                {
+                  "name": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "id": "67465315-899e-451a-90fd-fa21870348c7",
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1,
+        "position": [
+          880,
+          480
+        ],
+        "webhookId": "64895dcd-e86d-4c14-85fe-33ce4655c155"
+      },
+      {
+        "parameters": {
+          "workflowId": "={{ $json.query.id }}"
+        },
+        "id": "f43ed6b4-e389-40d3-862f-e80e7f69127f",
+        "name": "Execute Workflow",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          1100,
+          480
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## This Workflow is used to trigger any other workflow \n\nBy simply providing the workflow ID as a query parameter to the webhook. \n\nhttps://n8n-bf5ef6-prod.apps.gold.devops.gov.bc.ca/webhook/start_workflow?id=1\n\nid \t                   Name                    \n1\t N8N Basic Health Check\n3\t Artifactory Basic Health Check\n7\t Main (All Tests)\n12\t Vault Check\n14\t Patroni CLAB Main (All Patroni Tests)\n31\t Patroni CLAB (Reference)\n32\t Patroni CLAB (HELM)\n33\t Patroni CLAB (Crunchy)\n34\t Patroni CLAB (Reference) - Switch Leader\n",
+          "height": 424,
+          "width": 1054
+        },
+        "id": "0cacf005-9dbd-47dc-b390-74f0b10938f1",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          280,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Execute Workflow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "cd58c814-f7ca-49d4-ba82-469c2b42f21e",
   "connections": {
     "Webhook": {
       "main": [
