@@ -1,5 +1,131 @@
 {
-  "active": false,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-23T22:20:38.191Z",
+    "createdAt": "2025-12-23T22:20:38.191Z",
+    "versionId": "af79f37a-dffc-4346-bacf-98af58dd338e",
+    "workflowId": "68",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "abdc34a9-4133-4297-97ad-ced5a064591b",
+        "name": "When clicking \"Execute Workflow\"",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -3120,
+          -640
+        ],
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "workFlow",
+                "value": "artifactory-smoke"
+              },
+              {
+                "name": "repoOwner",
+                "value": "bcgov"
+              },
+              {
+                "name": "repoName",
+                "value": "put"
+              },
+              {
+                "name": "errorString",
+                "value": "error]Cypress"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "b25f3a7e-5722-40e8-89d9-bee09f166a28",
+        "name": "Set",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          -2880,
+          -640
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Running a Cypress test on GHA in your repo\n\n**workFlow**: The workflow name you want to run\n**repoOwner**: In our case this is \"bcgov\"\n**repoName**: Your Repository Name\n**errorString**: The string to detect an error in your script (default: \"error]Cypress\")\n\n### Pre-reqs for running a Cypress Scripts in GHA\n* You have a repo that your GitHub Credential, as used in [the test workflow](https://n8n-bf5ef6-prod.apps.gold.devops.gov.bc.ca/workflow/66), has access to.\n* Your GHA Workflow that contains the test invocation has at least:\n\n```yaml\nname: artifactory-smoke\non: [workflow_dispatch, repository_dispatch]\n```\n\nThe `repository_dispatch` is needed for invocation from here.\nThe `name` is the name to use in you `SET` parameters.\n\n\n",
+          "height": 372.2168638864932,
+          "width": 1144.146020658246
+        },
+        "id": "e8069eb6-48c1-446a-bbb1-6ed9a90900e5",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -3360,
+          -1060
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "66"
+        },
+        "id": "05ad160b-acb8-4e20-bca8-cf4b2f5cb422",
+        "name": "Cypress Test",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          -2680,
+          -640
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "78eb1852-c14b-4b73-8678-3bed98597830",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          -3120,
+          -460
+        ]
+      }
+    ],
+    "connections": {
+      "When clicking \"Execute Workflow\"": {
+        "main": [
+          [
+            {
+              "node": "Set",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set": {
+        "main": [
+          [
+            {
+              "node": "Cypress Test",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "af79f37a-dffc-4346-bacf-98af58dd338e",
   "connections": {
     "When clicking \"Execute Workflow\"": {
       "main": [
@@ -44,7 +170,8 @@
       "position": [
         -3120,
         -640
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -157,5 +284,5 @@
   ],
   "triggerCount": 0,
   "updatedAt": "2025-06-23T18:57:23.354Z",
-  "versionId": "3fa4c580-446a-45f3-90d3-2f666886ef7c"
+  "versionId": "af79f37a-dffc-4346-bacf-98af58dd338e"
 }
