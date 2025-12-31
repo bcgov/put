@@ -1,22 +1,197 @@
 {
-  "active": false,
-  "connections": {
-    "Report Error": {
-      "main": [
-        [
-          {
-            "node": "No Operation, do nothing",
-            "type": "main",
-            "index": 0
-          }
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-30T18:19:35.542Z",
+    "createdAt": "2025-12-30T18:19:33.465Z",
+    "versionId": "0720f1a5-70d7-4b7d-9c2c-6c604e49b834",
+    "workflowId": "41",
+    "nodes": [
+      {
+        "parameters": {},
+        "name": "Error Trigger",
+        "type": "n8n-nodes-base.errorTrigger",
+        "position": [
+          -48,
+          464
+        ],
+        "typeVersion": 1,
+        "id": "dffb4a27-39c6-4c12-8bdd-b69644e5a8fb"
+      },
+      {
+        "parameters": {},
+        "id": "456f24eb-099b-4359-8703-5c777e00fde8",
+        "name": "No Operation, do nothing",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          976,
+          512
         ]
-      ]
+      },
+      {
+        "parameters": {
+          "content": "## In case of a Workflow Error (DO NOT CHANGE!)\n\nThis workflow will automatically be executed.\n",
+          "width": 717
+        },
+        "id": "7735fac7-8ee7-42ef-9e47-5f5b07edae13",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          320,
+          272
+        ]
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "rcChannel",
+                "value": "={{ $vars.rc_group }}"
+              },
+              {
+                "name": "rcMessage",
+                "value": "={{ $now }}\n## [{{$json.errorCategory}}] {{$json.workflowName}}\n\n* **Workflow**: {{$json.workflowName}} (ID: {{$json.workflowId}})\n* **Node**: {{$json.nodeName || 'unknown'}} {{ $json.nodeType ? '(' + $json.nodeType + ')' : '' }}\n* **Error type**: {{$json.errorName}}\n* **Message**: {{$json.errorMessageShort}}\n* **Likely cause**: {{$json.likelyCause}}\n* **Suggestion**: {{$json.suggestion}}\n{{ $json.httpCode ? '* HTTP code:* ' + $json.httpCode : '' }}\n* **Execution URL**: {{$json.executionUrl || 'n/a'}}\n\n`{{$json.stackFirstLine}}`\n"
+              },
+              {
+                "name": "fromAddress",
+                "value": "no-reply@gov.bc.ca"
+              },
+              {
+                "name": "toAddress",
+                "value": "={{ $vars.common_Notify }}"
+              },
+              {
+                "name": "textMessage",
+                "value": "={{ $now }}\nWorkflow Execution Problem: {{$json.workflowName}}\n\nCategory: {{$json.errorCategory}}\nWorkflow: {{$json.workflowName}} (ID: {{$json.workflowId}})\nNode: {{$json.nodeName || 'unknown'}} {{ $json.nodeType ? '(' + $json.nodeType + ')' : '' }}\nError type: {{$json.errorName}}\nMessage: {{$json.errorMessageShort}}\n\nLikely cause:\n{{$json.likelyCause}}\n\nSuggestion:\n{{$json.suggestion}}\n\n{{ $json.httpCode ? 'HTTP code: ' + $json.httpCode : '' }}\n\nExecution URL:\n{{$json.executionUrl || 'n/a'}}\n\nStack (first line only):\n{{$json.stackFirstLine}}\n"
+              },
+              {
+                "name": "htmlMessage"
+              },
+              {
+                "name": "ccAddress"
+              },
+              {
+                "name": "bccAddress"
+              },
+              {
+                "name": "=subJect",
+                "value": "=Workflow Execution Problem: {{$node[\"Error Trigger\"].data[\"workflow\"][\"name\"]}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "9927bbc2-bd97-40e4-b385-e2eb8e177539",
+        "name": "Set Message Params",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          544,
+          512
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get raw data from Error Trigger\nconst trigger = $node[\"Error Trigger\"].json;\nconst wf = trigger.workflow || {};\nconst exec = trigger.execution || {};\nconst err = exec.error || {};\n\nconst workflowId = wf.id || '';\nconst workflowName = wf.name || '';\nconst executionId = exec.id || '';\nconst lastNodeExecuted = exec.lastNodeExecuted || '';\n// We already have a full execution URL in the input payload\n\n// Execution URL: normalize to your public n8n route (no $env usage)\nconst baseUrl = 'https://n8n-bf5ef6-prod.apps.gold.devops.gov.bc.ca/'\nlet executionUrl = exec.url || '';\n\nif (baseUrl) {\n  if (executionUrl) {\n    // Replace whatever host n8n used (often http://localhost:5678) with the real base URL\n    executionUrl = executionUrl.replace(/^https?:\\/\\/[^/]+/i, baseUrl);\n  } else if (workflowId && executionId) {\n    // Build it if not provided\n    executionUrl = `${baseUrl}/workflow/${workflowId}/executions/${executionId}`;\n  }\n}\n\n// Error basics\nconst errorName = err.name || 'UnknownError';\nconst errorMessage = err.message || '';\nconst stack = err.stack || '';\nconst stackFirstLine = stack.split('\\n')[0] || '';\n\nfunction shorten(str, max = 600) {\n  if (!str) return '';\n  if (str.length <= max) return str;\n  return str.slice(0, max) + '… [truncated]';\n}\n\nconst errorMessageShort = shorten(errorMessage, 800);\nconst stackFirstLineShort = shorten(stackFirstLine, 300);\n\n// HTTP code detection (for NodeApiError etc.)\nconst httpCode =\n  err.httpCode ||\n  (err.cause && err.cause.response && err.cause.response.statusCode) ||\n  undefined;\n\n// Try to get node name/type\nconst nodeName = (err.node && err.node.name) || lastNodeExecuted || '';\nconst nodeType = (err.node && err.node.type) || '';\n\n// Classify error\nlet errorCategory = 'Unknown';\nlet likelyCause = 'Unknown – check details in n8n.';\nlet suggestion = 'Open the execution in n8n and inspect the failing node.';\n\nif (errorName === 'NodeApiError') {\n  errorCategory = 'External service / API';\n\n  if (httpCode === 503 || httpCode === '503') {\n    likelyCause =\n      'Target service or route is unavailable (HTTP 503). Could be service down, route/proxy issue, or TLS problem.';\n    suggestion =\n      'Check target service status, OpenShift route, network policies, and credentials. If this is an n8n node calling n8n over HTTPS, consider using HTTP Request node or internal HTTP endpoint.';\n  } else if (httpCode === 401 || httpCode === '401') {\n    likelyCause = 'Authentication failure (HTTP 401).';\n    suggestion = 'Check API keys / tokens / credentials used by the node.';\n  } else if (httpCode === 403 || httpCode === '403') {\n    likelyCause = 'Authorization failure (HTTP 403).';\n    suggestion = 'Check permissions / roles / IP allowlists for the service.';\n  } else if (httpCode === 404 || httpCode === '404') {\n    likelyCause = 'Endpoint not found (HTTP 404).';\n    suggestion = 'Check the URL / path used in the node.';\n  } else {\n    likelyCause = `External service error (HTTP ${httpCode || 'unknown'}).`;\n    suggestion = 'Check the service logs and the node configuration.';\n  }\n} else if (errorName === 'NodeOperationError') {\n  if (nodeName === 'Stop and Error') {\n    errorCategory = 'Intentional workflow failure';\n    likelyCause =\n      'StopAndError node executed, so the workflow intentionally failed.';\n    suggestion =\n      'Check the conditions leading to the StopAndError node – this is a controlled fail.';\n  } else {\n    errorCategory = 'Workflow configuration / logic';\n    likelyCause =\n      'A node in the workflow threw a NodeOperationError (misconfiguration, bad input, or expression).';\n    suggestion =\n      'Check the node configuration and the input data for this execution.';\n  }\n}\n\n// Return a clean, flattened object for templating\nreturn [\n  {\n    json: {\n      workflowId,\n      workflowName,\n      executionId,\n      nodeName,\n      nodeType,\n      errorName,\n      errorMessage,\n      errorMessageShort,\n      errorCategory,\n      httpCode,\n      likelyCause,\n      suggestion,\n      stackFirstLine: stackFirstLineShort,\n      executionUrl,\n    },\n  },\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          272,
+          512
+        ],
+        "id": "a0a5c080-ed66-499e-9000-dff1f070ce96",
+        "name": "Classify Error"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "17",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/17",
+            "cachedResultName": "Report Error"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          752,
+          512
+        ],
+        "id": "fd7b0e04-5e02-4238-a69e-13545ca17671",
+        "name": "Call 'Report Error'"
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Classify Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Message Params": {
+        "main": [
+          [
+            {
+              "node": "Call 'Report Error'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Classify Error": {
+        "main": [
+          [
+            {
+              "node": "Set Message Params",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call 'Report Error'": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
     },
+    "authors": "Billy li",
+    "name": "Version 0720f1a5",
+    "description": "",
+    "autosaved": false
+  },
+  "activeVersionId": "0720f1a5-70d7-4b7d-9c2c-6c604e49b834",
+  "connections": {
     "Error Trigger": {
       "main": [
         [
           {
-            "node": "Get URL",
+            "node": "Classify Error",
             "type": "main",
             "index": 0
           }
@@ -27,18 +202,29 @@
       "main": [
         [
           {
-            "node": "Report Error",
+            "node": "Call 'Report Error'",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get URL": {
+    "Classify Error": {
       "main": [
         [
           {
             "node": "Set Message Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Report Error'": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
             "type": "main",
             "index": 0
           }
@@ -57,8 +243,8 @@
       "name": "Error Trigger",
       "type": "n8n-nodes-base.errorTrigger",
       "position": [
-        220,
-        500
+        -48,
+        464
       ],
       "typeVersion": 1,
       "id": "dffb4a27-39c6-4c12-8bdd-b69644e5a8fb"
@@ -70,21 +256,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        860,
-        500
-      ]
-    },
-    {
-      "parameters": {
-        "workflowId": "17"
-      },
-      "id": "17d670fe-d71f-4444-95cc-3cea6008585e",
-      "name": "Report Error",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        700,
-        500
+        976,
+        512
       ]
     },
     {
@@ -98,7 +271,7 @@
       "typeVersion": 1,
       "position": [
         320,
-        260
+        272
       ]
     },
     {
@@ -111,7 +284,7 @@
             },
             {
               "name": "rcMessage",
-              "value": "={{ $now }}\n## Workflow Execution Problem: \n`{{$node[\"Error Trigger\"].data[\"workflow\"][\"name\"]}}`\n* **Error:** \n`{{$node[\"Error Trigger\"].data[\"execution\"][\"error\"][\"message\"]}}`\n* **Stack Trace:** \n`{{$node[\"Error Trigger\"].data[\"execution\"][\"error\"][\"stack\"]}}`\n* **Node with Error:** \n`{{$node[\"Error Trigger\"].data[\"execution\"][\"Error\"][\"lastNodeExecuted\"]}}`\n* **Execution URL:** \n{{ $json.stdout + '/workflow/' + $node[\"Error Trigger\"].data[\"workflow\"][\"id\"] + '/executions/' + $node[\"Error Trigger\"].data[\"execution\"][\"id\"] }}"
+              "value": "={{ $now }}\n## [{{$json.errorCategory}}] {{$json.workflowName}}\n\n* **Workflow**: {{$json.workflowName}} (ID: {{$json.workflowId}})\n* **Node**: {{$json.nodeName || 'unknown'}} {{ $json.nodeType ? '(' + $json.nodeType + ')' : '' }}\n* **Error type**: {{$json.errorName}}\n* **Message**: {{$json.errorMessageShort}}\n* **Likely cause**: {{$json.likelyCause}}\n* **Suggestion**: {{$json.suggestion}}\n{{ $json.httpCode ? '* HTTP code:* ' + $json.httpCode : '' }}\n* **Execution URL**: {{$json.executionUrl || 'n/a'}}\n\n`{{$json.stackFirstLine}}`\n"
             },
             {
               "name": "fromAddress",
@@ -123,7 +296,7 @@
             },
             {
               "name": "textMessage",
-              "value": "={{ $now }}\nWorkflow Execution Problem: {{$node[\"Error Trigger\"].data[\"workflow\"][\"name\"]}}  \n* Error: \n{{$node[\"Error Trigger\"].data[\"execution\"][\"error\"][\"message\"]}} \n\n* Stack Trace: \n{{$node[\"Error Trigger\"].data[\"execution\"][\"error\"][\"stack\"]}} \n\n* Node with Error: \n{{$node[\"Error Trigger\"].data[\"execution\"][\"Error\"][\"lastNodeExecuted\"]}} \n\n* Execution URL: \n{{ $env['WEBHOOK_URL'] + '/workflow/' + $node[\"Error Trigger\"].data[\"workflow\"][\"id\"] + '/executions/' + $node[\"Error Trigger\"].data[\"execution\"][\"id\"] }}"
+              "value": "={{ $now }}\nWorkflow Execution Problem: {{$json.workflowName}}\n\nCategory: {{$json.errorCategory}}\nWorkflow: {{$json.workflowName}} (ID: {{$json.workflowId}})\nNode: {{$json.nodeName || 'unknown'}} {{ $json.nodeType ? '(' + $json.nodeType + ')' : '' }}\nError type: {{$json.errorName}}\nMessage: {{$json.errorMessageShort}}\n\nLikely cause:\n{{$json.likelyCause}}\n\nSuggestion:\n{{$json.suggestion}}\n\n{{ $json.httpCode ? 'HTTP code: ' + $json.httpCode : '' }}\n\nExecution URL:\n{{$json.executionUrl || 'n/a'}}\n\nStack (first line only):\n{{$json.stackFirstLine}}\n"
             },
             {
               "name": "htmlMessage"
@@ -147,24 +320,50 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        540,
-        500
+        544,
+        512
       ]
     },
     {
       "parameters": {
-        "command": "echo $WEBHOOK_URL"
+        "jsCode": "// Get raw data from Error Trigger\nconst trigger = $node[\"Error Trigger\"].json;\nconst wf = trigger.workflow || {};\nconst exec = trigger.execution || {};\nconst err = exec.error || {};\n\nconst workflowId = wf.id || '';\nconst workflowName = wf.name || '';\nconst executionId = exec.id || '';\nconst lastNodeExecuted = exec.lastNodeExecuted || '';\n// We already have a full execution URL in the input payload\n\n// Execution URL: normalize to your public n8n route (no $env usage)\nconst baseUrl = 'https://n8n-bf5ef6-prod.apps.gold.devops.gov.bc.ca/'\nlet executionUrl = exec.url || '';\n\nif (baseUrl) {\n  if (executionUrl) {\n    // Replace whatever host n8n used (often http://localhost:5678) with the real base URL\n    executionUrl = executionUrl.replace(/^https?:\\/\\/[^/]+/i, baseUrl);\n  } else if (workflowId && executionId) {\n    // Build it if not provided\n    executionUrl = `${baseUrl}/workflow/${workflowId}/executions/${executionId}`;\n  }\n}\n\n// Error basics\nconst errorName = err.name || 'UnknownError';\nconst errorMessage = err.message || '';\nconst stack = err.stack || '';\nconst stackFirstLine = stack.split('\\n')[0] || '';\n\nfunction shorten(str, max = 600) {\n  if (!str) return '';\n  if (str.length <= max) return str;\n  return str.slice(0, max) + '… [truncated]';\n}\n\nconst errorMessageShort = shorten(errorMessage, 800);\nconst stackFirstLineShort = shorten(stackFirstLine, 300);\n\n// HTTP code detection (for NodeApiError etc.)\nconst httpCode =\n  err.httpCode ||\n  (err.cause && err.cause.response && err.cause.response.statusCode) ||\n  undefined;\n\n// Try to get node name/type\nconst nodeName = (err.node && err.node.name) || lastNodeExecuted || '';\nconst nodeType = (err.node && err.node.type) || '';\n\n// Classify error\nlet errorCategory = 'Unknown';\nlet likelyCause = 'Unknown – check details in n8n.';\nlet suggestion = 'Open the execution in n8n and inspect the failing node.';\n\nif (errorName === 'NodeApiError') {\n  errorCategory = 'External service / API';\n\n  if (httpCode === 503 || httpCode === '503') {\n    likelyCause =\n      'Target service or route is unavailable (HTTP 503). Could be service down, route/proxy issue, or TLS problem.';\n    suggestion =\n      'Check target service status, OpenShift route, network policies, and credentials. If this is an n8n node calling n8n over HTTPS, consider using HTTP Request node or internal HTTP endpoint.';\n  } else if (httpCode === 401 || httpCode === '401') {\n    likelyCause = 'Authentication failure (HTTP 401).';\n    suggestion = 'Check API keys / tokens / credentials used by the node.';\n  } else if (httpCode === 403 || httpCode === '403') {\n    likelyCause = 'Authorization failure (HTTP 403).';\n    suggestion = 'Check permissions / roles / IP allowlists for the service.';\n  } else if (httpCode === 404 || httpCode === '404') {\n    likelyCause = 'Endpoint not found (HTTP 404).';\n    suggestion = 'Check the URL / path used in the node.';\n  } else {\n    likelyCause = `External service error (HTTP ${httpCode || 'unknown'}).`;\n    suggestion = 'Check the service logs and the node configuration.';\n  }\n} else if (errorName === 'NodeOperationError') {\n  if (nodeName === 'Stop and Error') {\n    errorCategory = 'Intentional workflow failure';\n    likelyCause =\n      'StopAndError node executed, so the workflow intentionally failed.';\n    suggestion =\n      'Check the conditions leading to the StopAndError node – this is a controlled fail.';\n  } else {\n    errorCategory = 'Workflow configuration / logic';\n    likelyCause =\n      'A node in the workflow threw a NodeOperationError (misconfiguration, bad input, or expression).';\n    suggestion =\n      'Check the node configuration and the input data for this execution.';\n  }\n}\n\n// Return a clean, flattened object for templating\nreturn [\n  {\n    json: {\n      workflowId,\n      workflowName,\n      executionId,\n      nodeName,\n      nodeType,\n      errorName,\n      errorMessage,\n      errorMessageShort,\n      errorCategory,\n      httpCode,\n      likelyCause,\n      suggestion,\n      stackFirstLine: stackFirstLineShort,\n      executionUrl,\n    },\n  },\n];\n"
       },
-      "id": "30f83757-dd68-4925-9a79-c28a5da3bd81",
-      "name": "Get URL",
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        380,
-        500
+        272,
+        512
       ],
-      "notesInFlow": false,
-      "notes": "We need to get the the url of the server separately. Somehow the $env option does not seem to work."
+      "id": "a0a5c080-ed66-499e-9000-dff1f070ce96",
+      "name": "Classify Error"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "17",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/17",
+          "cachedResultName": "Report Error"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        752,
+        512
+      ],
+      "id": "fd7b0e04-5e02-4238-a69e-13545ca17671",
+      "name": "Call 'Report Error'"
     }
   ],
   "pinData": {},
@@ -215,6 +414,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-09T20:50:06.522Z",
-  "versionId": "dd34f148-4e81-4008-87b6-26eb8c8ea855"
+  "updatedAt": "2025-12-30T18:19:33.462Z",
+  "versionId": "0720f1a5-70d7-4b7d-9c2c-6c604e49b834"
 }
