@@ -1,15 +1,152 @@
 {
-  "active": false,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-24T01:40:31.698Z",
+    "createdAt": "2025-12-24T00:27:15.818Z",
+    "versionId": "fadc1ae1-891e-4c87-8be5-55708385c484",
+    "workflowId": "17",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "767bf3f7-842a-462d-ab8a-3f2b18ca6d36",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          -368,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "channel": "={{ $json.rcChannel }}",
+          "text": "={{ $json.rcMessage }}",
+          "options": {},
+          "attachments": []
+        },
+        "id": "a6f21027-0b68-494b-b22f-913e086a5ec5",
+        "name": "RocketChat",
+        "type": "n8n-nodes-base.rocketchat",
+        "typeVersion": 1,
+        "position": [
+          0,
+          208
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "rocketchatApi": {
+            "id": "4",
+            "name": "Rocket account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "fromEmail": "={{ $json.fromAddress }}",
+          "toEmail": "={{ $json.toAddress }}",
+          "ccEmail": "={{ $json.ccAddress }}",
+          "bccEmail": "={{ $json.bccAddress }}",
+          "subject": "={{ $json.subJect }}",
+          "text": "={{ $json.textMessage }}",
+          "html": "={{ $json.htmlMessage }}",
+          "options": {}
+        },
+        "id": "fa99f019-1497-481f-bbfc-38a71f275c82",
+        "name": "Send Email",
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 1,
+        "position": [
+          0,
+          464
+        ],
+        "credentials": {
+          "smtp": {
+            "id": "1",
+            "name": "SMTP account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "id": "1a3522f5-60aa-43bc-a0d9-ef4c0033201d",
+        "name": "No Operation, do nothing",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          272,
+          288
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Incoming Parameters\n* **rcChannel:** RC Channel\n* **rcMessage:** RC Message\n* **fromAddress:** Email From\n* **toAddress:** Email To\n* **textMessage:** Message Body Text\n* **htmlMessage:** Message Body HTML, will supersede Text Message body\n* **ccAddress:** Email cc\n* **bccAddress:** email bcc\n* **subJect:** Email Title",
+          "height": 264,
+          "width": 549
+        },
+        "id": "176e95ea-7fc6-480c-8133-ba8b73526d48",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -736,
+          48
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Reporting Common Component (DO NOT CHANGE! THIS COMPONENT IS USED BY OTHER WORKFLOWS)\n\nThis component will be called whenever an error report needs to be emailed and send to RocketChat.\n\nSee this [workflow](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/workflow/14) for an example.\n\nKey is using **Set** to set up your parameters and then call this workflow.\nUse [this stub](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/workflow/16) to get started.",
+          "height": 249,
+          "width": 1231.2389008604762
+        },
+        "id": "d607d86b-8bbc-4c3e-ad54-d03a9ac92f03",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -736,
+          -240
+        ]
+      }
+    ],
+    "connections": {
+      "Send Email": {
+        "main": [
+          []
+        ]
+      },
+      "RocketChat": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "RocketChat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Billy li",
+    "name": "Version fadc1ae1",
+    "description": "",
+    "autosaved": false
+  },
+  "activeVersionId": "fadc1ae1-891e-4c87-8be5-55708385c484",
   "connections": {
     "Send Email": {
       "main": [
-        [
-          {
-            "node": "No Operation, do nothing",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "RocketChat": {
@@ -26,11 +163,6 @@
     "Execute Workflow Trigger": {
       "main": [
         [
-          {
-            "node": "Send Email",
-            "type": "main",
-            "index": 0
-          },
           {
             "node": "RocketChat",
             "type": "main",
@@ -53,7 +185,7 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -360,
+        -368,
         320
       ]
     },
@@ -70,7 +202,7 @@
       "typeVersion": 1,
       "position": [
         0,
-        200
+        208
       ],
       "alwaysOutputData": true,
       "credentials": {
@@ -97,7 +229,7 @@
       "typeVersion": 1,
       "position": [
         0,
-        460
+        464
       ],
       "credentials": {
         "smtp": {
@@ -113,8 +245,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        260,
-        280
+        272,
+        288
       ]
     },
     {
@@ -128,8 +260,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -740,
-        40
+        -736,
+        48
       ]
     },
     {
@@ -143,13 +275,15 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -740,
+        -736,
         -240
       ]
     }
   ],
   "pinData": {},
-  "settings": {},
+  "settings": {
+    "callerPolicy": "any"
+  },
   "shared": [
     {
       "updatedAt": "2023-04-29T00:07:24.473Z",
@@ -169,6 +303,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-04T22:29:58.593Z",
-  "versionId": "10a9e72b-063f-4a9b-b87f-2e1491ef29b8"
+  "updatedAt": "2025-12-24T00:27:15.815Z",
+  "versionId": "fadc1ae1-891e-4c87-8be5-55708385c484"
 }
