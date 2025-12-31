@@ -1,5 +1,718 @@
 {
-  "active": false,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-23T22:20:38.124Z",
+    "createdAt": "2025-12-23T22:20:38.124Z",
+    "versionId": "0c2fcac2-0ac7-4c3d-99a4-d0de00e27e01",
+    "workflowId": "66",
+    "nodes": [
+      {
+        "parameters": {
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "url": "=https://api.github.com/repos/{{ $node[\"Execute Workflow Trigger\"].json[\"repoOwner\"] }}/{{ $node[\"Execute Workflow Trigger\"].json[\"repoName\"]}}/actions/workflows/{{ $node[\"Return Workflow JSON\"].json[\"id\"] }}/runs",
+          "options": {},
+          "headerParametersUi": {
+            "parameter": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          }
+        },
+        "id": "138319b6-0279-4251-8ebd-8fb544bc682e",
+        "name": "Get Workflows Runs",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 2,
+        "position": [
+          -2660,
+          -220
+        ],
+        "alwaysOutputData": true,
+        "executeOnce": true,
+        "credentials": {
+          "githubApi": {
+            "id": "6",
+            "name": "GitHub PUT"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "jsonToBinary",
+          "options": {}
+        },
+        "id": "92def7c1-9928-4729-a7cd-d2885cb4ba09",
+        "name": "Move Binary Data",
+        "type": "n8n-nodes-base.moveBinaryData",
+        "typeVersion": 1,
+        "position": [
+          -2480,
+          -525
+        ]
+      },
+      {
+        "parameters": {
+          "fileName": "/data/workflows.json",
+          "options": {}
+        },
+        "id": "b4317b8b-3b70-4e8e-8c5e-bff4dc57af18",
+        "name": "Write Binary File",
+        "type": "n8n-nodes-base.writeBinaryFile",
+        "typeVersion": 1,
+        "position": [
+          -2320,
+          -525
+        ]
+      },
+      {
+        "parameters": {
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "requestMethod": "POST",
+          "url": "=https://api.github.com/repos/{{ $json[\"repoOwner\"] }}/{{ $json[\"repoName\"] }}/dispatches",
+          "options": {
+            "timeout": 10000
+          },
+          "bodyParametersUi": {
+            "parameter": [
+              {
+                "name": "event_type",
+                "value": "={{ $json.workFlow }}"
+              }
+            ]
+          },
+          "headerParametersUi": {
+            "parameter": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        "id": "f599aac9-56eb-4284-b5b3-4cd25db14ca6",
+        "name": "Dispatch the Workflow",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 2,
+        "position": [
+          -3000,
+          -520
+        ],
+        "alwaysOutputData": true,
+        "executeOnce": true,
+        "credentials": {
+          "githubApi": {
+            "id": "6",
+            "name": "GitHub PUT"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "url": "=https://api.github.com/repos/{{ $node[\"Execute Workflow Trigger\"].json[\"repoOwner\"] }}/{{ $node[\"Execute Workflow Trigger\"].json[\"repoName\"] }}/actions/workflows",
+          "options": {},
+          "headerParametersUi": {
+            "parameter": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          }
+        },
+        "id": "4d8839dd-18e5-4808-8027-618877516a1f",
+        "name": "Get Workflows IDs",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 2,
+        "position": [
+          -2800,
+          -520
+        ],
+        "alwaysOutputData": true,
+        "executeOnce": true,
+        "credentials": {
+          "githubApi": {
+            "id": "6",
+            "name": "GitHub PUT"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## Store and Process output\nProcess output to find the correct id for the workflow runs.\n",
+          "height": 248,
+          "width": 654
+        },
+        "id": "26134176-7f1a-45d3-8ea6-7e47f9ba42f4",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -2520,
+          -620
+        ]
+      },
+      {
+        "parameters": {
+          "command": "=cat workflows.json | jq '.workflows[] | select(.name==\"{{ $node[\"Execute Workflow Trigger\"].json[\"workFlow\"] }}\")'"
+        },
+        "id": "5ce7101e-e288-432c-82c4-b18ff1a71018",
+        "name": "Parse JSON for ID",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          -2160,
+          -520
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "\nreturn JSON.parse($('Parse JSON for ID').item.json.stdout);"
+        },
+        "id": "7bba10eb-ad50-4d08-bbdb-b5c242743607",
+        "name": "Return Workflow JSON",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 1,
+        "position": [
+          -2000,
+          -520
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Running a Cypress test on GHA in your repo\n\n**workFlow**: The workflow name you want to run\n**repoOwner**: In our case this is \"bcgov\"\n**repoName**: Your Repository Name\n**errorString**: The string to detect an error in your script (default: )\n\n",
+          "height": 183.33634311512316,
+          "width": 644.1681715575614
+        },
+        "id": "8ff24807-e638-453f-b1d0-5e2fd191685d",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -3200,
+          -760
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "ed50c2e4-1515-4842-8bfe-4205ed068487",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          -3180,
+          -520
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "string": [
+              {
+                "value1": "={{$node[\"Check for Error\"].json[\"stdout\"]}}",
+                "operation": "isNotEmpty"
+              }
+            ]
+          }
+        },
+        "id": "d7fe04eb-8bae-40be-8042-5f89d4700cdf",
+        "name": "IF",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          -1620,
+          -240
+        ]
+      },
+      {
+        "parameters": {
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "url": "=https://api.github.com/repos/{{ $node['Execute Workflow Trigger'].json.repoOwner }}/{{ $node['Execute Workflow Trigger'].json.repoName }}/actions/runs/{{$node[\"Get Workflows Runs\"].json[\"workflow_runs\"][0][\"id\"]}}/logs",
+          "responseFormat": "file",
+          "options": {},
+          "headerParametersUi": {
+            "parameter": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          }
+        },
+        "id": "272339d5-ba6b-442d-b4b1-61f3ae3215e0",
+        "name": "Get Run Log",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 2,
+        "position": [
+          -2300,
+          -240
+        ],
+        "alwaysOutputData": true,
+        "executeOnce": true,
+        "credentials": {
+          "githubApi": {
+            "id": "6",
+            "name": "GitHub PUT"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "id": "cc499551-cd5c-43f0-b766-22147acac0b0",
+        "name": "Unzip Log",
+        "type": "n8n-nodes-base.compression",
+        "typeVersion": 1,
+        "position": [
+          -2140,
+          -240
+        ]
+      },
+      {
+        "parameters": {
+          "fileName": "/data/log.txt",
+          "dataPropertyName": "=file_1",
+          "options": {}
+        },
+        "id": "68420858-c807-4e88-b04c-3eb43ddc7e05",
+        "name": "Store Log",
+        "type": "n8n-nodes-base.writeBinaryFile",
+        "typeVersion": 1,
+        "position": [
+          -1980,
+          -240
+        ]
+      },
+      {
+        "parameters": {
+          "command": "=cat /data/log.txt | grep {{ $node['Execute Workflow Trigger'].json.errorString }}"
+        },
+        "id": "332d6c95-d337-4799-ae82-c9be6a8fdc6a",
+        "name": "Check for Error",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          -1820,
+          -240
+        ],
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "continueOnFail": true
+      },
+      {
+        "parameters": {},
+        "id": "d81f639d-36f8-40bb-a76b-90ea6643878e",
+        "name": "NoOp",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          -1120,
+          -140
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "string": [
+              {
+                "value1": "={{$node[\"Get Workflows Runs\"].json[\"workflow_runs\"][0][\"status\"]}}",
+                "value2": "completed"
+              }
+            ]
+          }
+        },
+        "id": "5f92ae1f-ec2e-4544-90a9-2252e89cd7ab",
+        "name": "Has Run Completed?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          -2480,
+          -220
+        ]
+      },
+      {
+        "parameters": {
+          "command": "rm /data/log.txt\nrm /data/workflows.json\n"
+        },
+        "id": "25aa8bb0-42e8-4dc0-a21b-a4538f23704b",
+        "name": "Clean Up log file",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          -1300,
+          -140
+        ],
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "amount": 20,
+          "unit": "seconds"
+        },
+        "id": "46ca038e-230e-4943-b02a-dd9536ec5c57",
+        "name": "Wait 20 Secs",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1,
+        "position": [
+          -2660,
+          0
+        ],
+        "webhookId": "de2ca669-45f4-46c0-84a0-6b4644f4a772"
+      },
+      {
+        "parameters": {
+          "workflowId": "17"
+        },
+        "id": "ca2bbb76-2797-41de-bce1-906ac3f1e3bd",
+        "name": "Report Error",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          -1152,
+          -340
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Report the Error",
+          "height": 217.8125,
+          "width": 361.0555345436212
+        },
+        "id": "6eded36d-b841-4c7b-bf92-ef60d639eb2f",
+        "name": "Sticky Note5",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -1360,
+          -400
+        ]
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "rcChannel",
+                "value": "={{ $vars.rc_group }}"
+              },
+              {
+                "name": "rcMessage",
+                "value": "=## Cypress Test {{ $node[\"Execute Workflow Trigger\"].json[\"workFlow\"] }} Failed\n\nThe following Cypress Test in https://github.com/{{ $node[\"Execute Workflow Trigger\"].json[\"repoOwner\"] }}/{{$node[\"Execute Workflow Trigger\"].json[\"repoName\"]}} failed: {{ $node[\"Execute Workflow Trigger\"].json[\"workFlow\"] }} The test run can be reviewed here: {{$node[\"Get Workflows Runs\"].json[\"workflow_runs\"][0][\"html_url\"]}}"
+              },
+              {
+                "name": "fromAddress",
+                "value": "no-reply@gov.bc.ca"
+              },
+              {
+                "name": "toAddress",
+                "value": "={{ $vars.common_Notify }}"
+              },
+              {
+                "name": "textMessage",
+                "value": "=The following Cypress Test in https://github.com/{{ $node[\"Execute Workflow Trigger\"].json[\"repoOwner\"] }}/{{$node[\"Execute Workflow Trigger\"].json[\"repoName\"]}} failed: {{ $node[\"Execute Workflow Trigger\"].json[\"workFlow\"] }} The test run can be reviewed here: {{$node[\"Get Workflows Runs\"].json[\"workflow_runs\"][0][\"html_url\"]}}"
+              },
+              {
+                "name": "htmlMessage"
+              },
+              {
+                "name": "ccAddress"
+              },
+              {
+                "name": "bccAddress"
+              },
+              {
+                "name": "subJect",
+                "value": "=Cypress Test {{ $node[\"Execute Workflow Trigger\"].json[\"workFlow\"] }} Failed"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "a3f93323-4bff-40f0-9421-5e9e1e382775",
+        "name": "Set Message Params for Error Report",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          -1312,
+          -340
+        ]
+      },
+      {
+        "parameters": {
+          "errorMessage": "=Error in {{ $workflow.name }}"
+        },
+        "id": "dafeb6af-d030-4efb-8d34-41fb6897e01d",
+        "name": "Stop and Error",
+        "type": "n8n-nodes-base.stopAndError",
+        "typeVersion": 1,
+        "position": [
+          -940,
+          -340
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Run the Test and check for error",
+          "height": 479.4314562464586,
+          "width": 1299.1674601856178
+        },
+        "id": "55ba77ef-8377-46e3-9981-7a38b2a6c442",
+        "name": "Sticky Note2",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -2760,
+          -300
+        ]
+      }
+    ],
+    "connections": {
+      "Move Binary Data": {
+        "main": [
+          [
+            {
+              "node": "Write Binary File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Write Binary File": {
+        "main": [
+          [
+            {
+              "node": "Parse JSON for ID",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Dispatch the Workflow": {
+        "main": [
+          [
+            {
+              "node": "Get Workflows IDs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Workflows IDs": {
+        "main": [
+          [
+            {
+              "node": "Move Binary Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse JSON for ID": {
+        "main": [
+          [
+            {
+              "node": "Return Workflow JSON",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Return Workflow JSON": {
+        "main": [
+          [
+            {
+              "node": "Wait 20 Secs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Dispatch the Workflow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF": {
+        "main": [
+          [
+            {
+              "node": "Clean Up log file",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Set Message Params for Error Report",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Clean Up log file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Run Log": {
+        "main": [
+          [
+            {
+              "node": "Unzip Log",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Unzip Log": {
+        "main": [
+          [
+            {
+              "node": "Store Log",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Store Log": {
+        "main": [
+          [
+            {
+              "node": "Check for Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check for Error": {
+        "main": [
+          [
+            {
+              "node": "IF",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Run Completed?": {
+        "main": [
+          [
+            {
+              "node": "Get Run Log",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Wait 20 Secs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Clean Up log file": {
+        "main": [
+          [
+            {
+              "node": "NoOp",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Workflows Runs": {
+        "main": [
+          [
+            {
+              "node": "Has Run Completed?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait 20 Secs": {
+        "main": [
+          [
+            {
+              "node": "Get Workflows Runs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Report Error": {
+        "main": [
+          [
+            {
+              "node": "Stop and Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Message Params for Error Report": {
+        "main": [
+          [
+            {
+              "node": "Report Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "0c2fcac2-0ac7-4c3d-99a4-d0de00e27e01",
   "connections": {
     "Move Binary Data": {
       "main": [
