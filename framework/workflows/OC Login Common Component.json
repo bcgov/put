@@ -1,5 +1,118 @@
 {
-  "active": false,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-23T22:20:38.124Z",
+    "createdAt": "2025-12-23T22:20:38.124Z",
+    "versionId": "d45966ca-4b0b-4921-9767-c0427b0b4b26",
+    "workflowId": "28",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## Build OC Login Command\n\nThis workflow gets called while providing the **tokenName** in the calling workflow. \n\nThe workflow will find the token from the credential and will build the `oc login` statement that you can use.\n\n### Do not change this workflow as it is a common component used by other workflows.",
+          "height": 217,
+          "width": 717
+        },
+        "id": "9b977dfc-7a59-4569-a5b2-66eb0623ae9e",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -40,
+          -140
+        ]
+      },
+      {
+        "parameters": {
+          "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]'|jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.value' | tr -d '\\n'"
+        },
+        "id": "d98086d9-16a7-4567-8ff0-58047735bf4a",
+        "name": "Get Token",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          200,
+          100
+        ]
+      },
+      {
+        "parameters": {
+          "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]' | jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.name' | sed \"s/<token>/{{ $json.stdout }}/g\" "
+        },
+        "id": "7ebaa3c3-1535-4724-8b6e-75aa8c8ffe2a",
+        "name": "Build Login",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          340,
+          100
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "217c912d-0c76-4735-9c34-dec96eb4920b",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          100
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{ \"ocLogin\": $('Build Login').item.json.stdout }];"
+        },
+        "id": "e2b00ace-fca3-4bc9-b522-49588b5fef29",
+        "name": "Code",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 1,
+        "position": [
+          500,
+          100
+        ]
+      }
+    ],
+    "connections": {
+      "Get Token": {
+        "main": [
+          [
+            {
+              "node": "Build Login",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get Token",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Login": {
+        "main": [
+          [
+            {
+              "node": "Code",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "d45966ca-4b0b-4921-9767-c0427b0b4b26",
   "connections": {
     "Get Token": {
       "main": [
