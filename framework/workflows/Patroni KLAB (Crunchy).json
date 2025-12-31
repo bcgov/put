@@ -1,5 +1,472 @@
 {
-  "active": false,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-23T22:20:38.183Z",
+    "createdAt": "2025-12-23T22:20:38.183Z",
+    "versionId": "82dc8cce-d456-4c59-9b70-a35ea669f635",
+    "workflowId": "73",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "e8580138-c195-4159-99ea-663f7ed54106",
+        "name": "When clicking \"Execute Workflow\"",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -960,
+          -180
+        ],
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "command": "=nohup oc port-forward svc/crunchy-postgres-pgbouncer 15437:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
+        },
+        "id": "38d6ffe8-ece8-49f9-9f25-321e51d8b113",
+        "name": "Set Port Forward Patroni",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          60,
+          0
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "c187aef2-d58c-4879-a4e7-e37638a37c9f",
+        "name": "No Operation, do nothing",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1640,
+          -340
+        ]
+      },
+      {
+        "parameters": {
+          "command": "kill %1\noc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh"
+        },
+        "id": "5e54bc9b-15d8-4d0e-b815-a9848b6f8f43",
+        "name": "OC Logout",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1400,
+          -340
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "17"
+        },
+        "id": "54daf5b8-5033-442d-b833-808dae62e861",
+        "name": "Report Error",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          1020,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "tokenName",
+                "value": "KLAB_Token"
+              },
+              {
+                "name": "nameSpace",
+                "value": "d8d909-test"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "8d3a5ade-dfb2-4626-b3e5-25b36abc2e69",
+        "name": "Set Token Name",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          -740,
+          -80
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "28"
+        },
+        "id": "e8b0ee10-c9c5-4e4a-aae6-b9b52926c0a3",
+        "name": "Build Login Command",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          -580,
+          -80
+        ],
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "command": "=top -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name\"].json.nameSpace }}"
+        },
+        "id": "f7304886-469e-4e82-afb1-e9ca68c369bd",
+        "name": "OC Login",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          -420,
+          -80
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "66567190-a16f-4f99-b608-5a5cc7f31fc8",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          -960,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Login to OpenShift\n\nSee [here](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/workflow/29) for instructions.",
+          "height": 336.5625,
+          "width": 471.25
+        },
+        "id": "adbffe72-7ee9-464b-bbae-742551255ff9",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -780,
+          -186.85356782652548
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Forward the DB port to localhost",
+          "height": 336.5625,
+          "width": 252.5
+        },
+        "id": "6aa62d47-df8a-4857-a70f-df10027f23ef",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -20,
+          -100
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Run the Test Script",
+          "height": 331.875,
+          "width": 252.5
+        },
+        "id": "4b7ac6a1-fe0d-4228-845c-3d0bfa0fa52d",
+        "name": "Sticky Note2",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          240,
+          -94
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Check the result",
+          "height": 331.875,
+          "width": 233.75
+        },
+        "id": "90578dde-a37f-4100-9938-87c655529ac6",
+        "name": "Sticky Note3",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          500,
+          -94
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "CREATE TEMP TABLE lat_longs (\n  c1 BIGSERIAL,\n  c2 DOUBLE PRECISION\n);\n\nINSERT INTO lat_longs (c2)\nSELECT random() * 100 FROM generate_series(1, 10000) AS g(id);\n\nSELECT count(*) FROM lat_longs;",
+          "additionalFields": {}
+        },
+        "id": "cbfda6bd-f8c2-4d33-a752-1d48721a4a8f",
+        "name": "Postgres Test",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 1,
+        "position": [
+          320,
+          0
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "38",
+            "name": "Postgres Crunch KLAB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## Close the Workflow",
+          "height": 527.5937657589516,
+          "width": 418.125
+        },
+        "id": "025aebea-5d67-4ebc-a0ce-97c591d1f2a3",
+        "name": "Sticky Note4",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1300,
+          -440
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Report the Error",
+          "height": 217.8125,
+          "width": 418.125
+        },
+        "id": "c48024b6-bac1-4218-8b39-f33a2a4d466a",
+        "name": "Sticky Note5",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          760,
+          -20
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "string": [
+              {
+                "value1": "={{ $json.count }}",
+                "value2": "10000"
+              }
+            ]
+          }
+        },
+        "id": "e10ac140-1101-473c-8e97-dff7c57d8949",
+        "name": "Check",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          560,
+          6
+        ]
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "rcChannel",
+                "value": "={{ $vars.rc_group }}"
+              },
+              {
+                "name": "rcMessage",
+                "value": "KLAB Crunchy Failed Post Update Test"
+              },
+              {
+                "name": "fromAddress",
+                "value": "no-reply@gov.bc.ca"
+              },
+              {
+                "name": "toAddress",
+                "value": "={{ $vars.crunchy_Notify }}"
+              },
+              {
+                "name": "textMessage",
+                "value": "Test 2"
+              },
+              {
+                "name": "htmlMessage"
+              },
+              {
+                "name": "ccAddress"
+              },
+              {
+                "name": "bccAddress"
+              },
+              {
+                "name": "subJect",
+                "value": "=KLAB Crunchy Failed Post Update Test"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f18398b6-87b8-43c4-b309-0b4e4d36af1b",
+        "name": "Set Message Params for Error Report",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          840,
+          26
+        ]
+      },
+      {
+        "parameters": {
+          "errorMessage": "=Error in {{ $workflow.name }}"
+        },
+        "id": "28033715-9d3f-493f-a2aa-c9fef67a6e68",
+        "name": "Stop and Error",
+        "type": "n8n-nodes-base.stopAndError",
+        "typeVersion": 1,
+        "position": [
+          1480,
+          -100
+        ]
+      }
+    ],
+    "connections": {
+      "When clicking \"Execute Workflow\"": {
+        "main": [
+          [
+            {
+              "node": "Set Token Name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Port Forward Patroni": {
+        "main": [
+          [
+            {
+              "node": "Postgres Test",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OC Logout": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Report Error": {
+        "main": [
+          [
+            {
+              "node": "Stop and Error",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "OC Logout",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Token Name": {
+        "main": [
+          [
+            {
+              "node": "Build Login Command",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Login Command": {
+        "main": [
+          [
+            {
+              "node": "OC Login",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set Token Name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Postgres Test": {
+        "main": [
+          [
+            {
+              "node": "Check",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check": {
+        "main": [
+          [
+            {
+              "node": "OC Logout",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Set Message Params for Error Report",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Message Params for Error Report": {
+        "main": [
+          [
+            {
+              "node": "Report Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OC Login": {
+        "main": [
+          [
+            {
+              "node": "Set Port Forward Patroni",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "82dc8cce-d456-4c59-9b70-a35ea669f635",
   "connections": {
     "When clicking \"Execute Workflow\"": {
       "main": [
@@ -149,19 +616,20 @@
       "typeVersion": 1,
       "position": [
         -960,
-        -180
-      ]
+        -176
+      ],
+      "disabled": true
     },
     {
       "parameters": {
-        "command": "=nohup oc port-forward svc/crunchy-postgres-pgbouncer 15437:5432 > /dev/null 2>&1 & \nsleep 10\njobs\n"
+        "command": "=#!/usr/bin/env bash\nset -euo pipefail\n\nNAMESPACE=\"{{ $node[\"Set Token Name\"].json.nameSpace }}\"\n\n# Start port-forward in background\noc -n \"$NAMESPACE\" port-forward svc/put-test-patroni-master 15433:5432 \\\n  > /tmp/patroni-portforward.log 2>&1 &\n\nPFPID=$!\n\n# Save PID for later cleanup\necho \"$PFPID\" > /tmp/patroni-portforward.pid\n\n# Give it time to come up\nsleep 10\n\n# Sanity check\nif ! ps -p \"$PFPID\" >/dev/null; then\n  echo \"Port-forward process died early\"\n  exit 1\nfi\n\necho \"Port-forward running with PID $PFPID\"\n"
       },
       "id": "38d6ffe8-ece8-49f9-9f25-321e51d8b113",
       "name": "Set Port Forward Patroni",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        60,
+        64,
         0
       ]
     },
@@ -172,33 +640,34 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1640,
-        -340
+        1648,
+        -336
       ]
     },
     {
       "parameters": {
-        "command": "kill %1\noc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh"
+        "command": "#!/usr/bin/env bash\nset -euo pipefail\n\nPID_FILE=\"/tmp/patroni-portforward.pid\"\n\n# Kill port-forward if it exists\nif [[ -f \"$PID_FILE\" ]]; then\n  PFPID=$(cat \"$PID_FILE\")\n\n  if ps -p \"$PFPID\" >/dev/null 2>&1; then\n    echo \"Killing port-forward PID $PFPID\"\n    kill \"$PFPID\"\n\n    # Wait briefly, then force kill if needed\n    sleep 2\n    if ps -p \"$PFPID\" >/dev/null 2>&1; then\n      echo \"Force killing port-forward PID $PFPID\"\n      kill -9 \"$PFPID\"\n    fi\n  else\n    echo \"Port-forward PID $PFPID not running\"\n  fi\n\n  rm -f \"$PID_FILE\"\nelse\n  echo \"No port-forward PID file found\"\nfi\n\n# Logout cleanly\noc logout || true\n"
       },
       "id": "5e54bc9b-15d8-4d0e-b815-a9848b6f8f43",
       "name": "OC Logout",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1400,
-        -340
+        1408,
+        -336
       ]
     },
     {
       "parameters": {
-        "workflowId": "17"
+        "workflowId": "17",
+        "options": {}
       },
       "id": "54daf5b8-5033-442d-b833-808dae62e861",
       "name": "Report Error",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1020,
+        1024,
         0
       ]
     },
@@ -223,20 +692,21 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        -740,
+        -736,
         -80
       ]
     },
     {
       "parameters": {
-        "workflowId": "28"
+        "workflowId": "28",
+        "options": {}
       },
       "id": "e8b0ee10-c9c5-4e4a-aae6-b9b52926c0a3",
       "name": "Build Login Command",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -580,
+        -576,
         -80
       ],
       "alwaysOutputData": true
@@ -250,7 +720,7 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -420,
+        -416,
         -80
       ]
     },
@@ -276,8 +746,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -780,
-        -186.85356782652548
+        -784,
+        -192
       ]
     },
     {
@@ -291,8 +761,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -20,
-        -100
+        -16,
+        -96
       ]
     },
     {
@@ -307,7 +777,7 @@
       "typeVersion": 1,
       "position": [
         240,
-        -94
+        -96
       ]
     },
     {
@@ -321,8 +791,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        500,
-        -94
+        512,
+        -96
       ]
     },
     {
@@ -357,8 +827,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1300,
-        -440
+        1312,
+        -448
       ]
     },
     {
@@ -372,8 +842,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        760,
-        -20
+        768,
+        -16
       ]
     },
     {
@@ -393,7 +863,7 @@
       "typeVersion": 1,
       "position": [
         560,
-        6
+        16
       ]
     },
     {
@@ -442,8 +912,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        840,
-        26
+        848,
+        32
       ]
     },
     {
@@ -455,8 +925,8 @@
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        1480,
-        -100
+        1488,
+        -96
       ]
     }
   ],
@@ -491,6 +961,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2025-10-29T20:24:54.085Z",
-  "versionId": "7a4ef585-daf5-4387-9322-30f818392452"
+  "updatedAt": "2025-12-24T02:12:16.394Z",
+  "versionId": "9a40cc4c-e813-45c3-a1e8-163f87c5c926"
 }
