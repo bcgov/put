@@ -1,5 +1,487 @@
 {
-  "active": false,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-23T22:20:38.186Z",
+    "createdAt": "2025-12-23T22:20:38.186Z",
+    "versionId": "c30dccc1-358e-456e-94e9-fbaa2171c81f",
+    "workflowId": "32",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "b75db2dc-04a2-4962-9b0f-d6b4a921b3f6",
+        "name": "When clicking \"Execute Workflow\"",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -1000,
+          -180
+        ],
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "command": "=PODNAME=$(oc get pods --namespace {{ $node[\"Set Token Name\"].json.nameSpace }} -l \"app.kubernetes.io/name=patroni,app.kubernetes.io/instance=helm-patroni-instance,role=master\" -o jsonpath=\"{.items[0].metadata.name}\") \n\nCONTAINERPORT=$(oc get pod --namespace {{ $node[\"Set Token Name\"].json.nameSpace }} $PODNAME -o jsonpath=\"{.spec.containers[0].ports[0].containerPort}\")  \n\necho $PODNAME\necho $CONTAINERPORT\n\nnohup oc --namespace {{ $node[\"Set Token Name\"].parameter[\"values\"][\"string\"][1][\"value\"] }} port-forward $PODNAME 8432:$CONTAINER_PORT > /dev/null 2>&1 & \nsleep 10\njobs"
+        },
+        "id": "1d49c21a-8b8e-41dc-9728-7823af68430c",
+        "name": "Set Port Forward Patroni",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          -220,
+          -80
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "4a93771e-d445-45ba-acd7-429a0514d31d",
+        "name": "No Operation, do nothing",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1180,
+          -360
+        ]
+      },
+      {
+        "parameters": {
+          "command": "kill %1\noc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh"
+        },
+        "id": "81ebbf04-60e1-494d-bc32-01e97f75dfc8",
+        "name": "OC Logout",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1000,
+          -360
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "17"
+        },
+        "id": "49b885d1-7039-41a9-b926-b05cb761e5fa",
+        "name": "Report Error",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          740,
+          -60
+        ]
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "tokenName",
+                "value": "CLAB_Token"
+              },
+              {
+                "name": "nameSpace",
+                "value": "e31b6b-dev"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "e1ee6e80-e4f0-40ad-99dd-6f42706adf3b",
+        "name": "Set Token Name",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          -800,
+          -73
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "28"
+        },
+        "id": "a057caa3-1ba4-4571-9242-9ae9b81211eb",
+        "name": "Build Login Command",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          -640,
+          -73
+        ],
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}"
+        },
+        "id": "c3e3facd-b776-4181-9a41-0cd73da16071",
+        "name": "OC Login",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          -480,
+          -73
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "fa3258ca-d57c-4e05-ba29-0f2018d751c7",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          -1000,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Login to OpenShift\n\nSee [here](https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca/workflow/29) for instructions.",
+          "height": 336.5625,
+          "width": 471.25
+        },
+        "id": "e0f48790-90f9-48bc-9452-9e4999f0679d",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -840,
+          -180
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Forward the DB port to localhost",
+          "height": 336.5625,
+          "width": 252.5
+        },
+        "id": "3a9adda7-1775-4cef-952c-c0f5bb87ddfa",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -300,
+          -180
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Run the Test Script",
+          "height": 331.875,
+          "width": 252.5
+        },
+        "id": "186fea85-af61-45e8-b809-cdd5577b843a",
+        "name": "Sticky Note2",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -40,
+          -180
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Check the result",
+          "height": 331.875,
+          "width": 233.75
+        },
+        "id": "6bbee1fa-9ccf-4cb8-beb1-fea8ce650996",
+        "name": "Sticky Note3",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          220,
+          -180
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  commit;  \n\nselect count(*) from lat_longs;\n\ndrop table lat_longs;",
+          "additionalFields": {}
+        },
+        "id": "10cd21ed-2af4-4b22-88fe-eba506704fff",
+        "name": "Postgres Test",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 1,
+        "position": [
+          40,
+          -80
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "12",
+            "name": "Patroni (HELM)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## Close the Workflow",
+          "height": 513.4527191558439,
+          "width": 376.94128787878833
+        },
+        "id": "a25e2d82-e3c5-458a-94ab-d75913183dfe",
+        "name": "Sticky Note4",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          980,
+          -420
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Report the Error",
+          "height": 217.8125,
+          "width": 418.125
+        },
+        "id": "c0f0b3f7-554d-4435-ae21-fc7035e29e5f",
+        "name": "Sticky Note5",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          520,
+          -120
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "string": [
+              {
+                "value1": "={{ $json.count }}",
+                "value2": "10000"
+              }
+            ]
+          }
+        },
+        "id": "c2349da6-25ef-43ac-972c-deada65f9c0e",
+        "name": "Check",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          280,
+          -80
+        ]
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "rcChannel",
+                "value": "={{ $vars.rc_group }}"
+              },
+              {
+                "name": "rcMessage",
+                "value": "Patroni (HELM) Failed Post Update Test"
+              },
+              {
+                "name": "fromAddress",
+                "value": "no-reply@gov.bc.ca"
+              },
+              {
+                "name": "toAddress",
+                "value": "={{ $vars.crunchy_Notify }}"
+              },
+              {
+                "name": "textMessage",
+                "value": "Test 2"
+              },
+              {
+                "name": "htmlMessage"
+              },
+              {
+                "name": "ccAddress"
+              },
+              {
+                "name": "bccAddress"
+              },
+              {
+                "name": "subJect",
+                "value": "=Patroni (HELM) Failed Post Update Test"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "ad793bef-fb8c-44af-84cb-fbe5a5b0ebed",
+        "name": "Set Message Params for Error Report1",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          560,
+          -60
+        ]
+      },
+      {
+        "parameters": {
+          "errorMessage": "=Error in {{ $workflow.name }}"
+        },
+        "id": "08584b9c-834c-47ec-a040-d87d19c247a3",
+        "name": "Stop and Error",
+        "type": "n8n-nodes-base.stopAndError",
+        "typeVersion": 1,
+        "position": [
+          1000,
+          -60
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## This is the test for the HELM Patroni installed in CLAB\n\nFrom https://github.com/bcgov/nr-patroni-chart\n",
+          "height": 146.76237824675292,
+          "width": 863.6390692640689
+        },
+        "id": "cb3a9723-dcef-4801-836d-5208513d8ee1",
+        "name": "Sticky Note7",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -440,
+          -540
+        ]
+      }
+    ],
+    "connections": {
+      "When clicking \"Execute Workflow\"": {
+        "main": [
+          [
+            {
+              "node": "Set Token Name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Port Forward Patroni": {
+        "main": [
+          [
+            {
+              "node": "Postgres Test",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OC Logout": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Report Error": {
+        "main": [
+          [
+            {
+              "node": "Stop and Error",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "OC Logout",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Token Name": {
+        "main": [
+          [
+            {
+              "node": "Build Login Command",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Login Command": {
+        "main": [
+          [
+            {
+              "node": "OC Login",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OC Login": {
+        "main": [
+          [
+            {
+              "node": "Set Port Forward Patroni",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set Token Name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Postgres Test": {
+        "main": [
+          [
+            {
+              "node": "Check",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check": {
+        "main": [
+          [
+            {
+              "node": "OC Logout",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Set Message Params for Error Report1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Message Params for Error Report1": {
+        "main": [
+          [
+            {
+              "node": "Report Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "c30dccc1-358e-456e-94e9-fbaa2171c81f",
   "connections": {
     "When clicking \"Execute Workflow\"": {
       "main": [
@@ -150,7 +632,8 @@
       "position": [
         -1000,
         -180
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -507,5 +990,5 @@
   ],
   "triggerCount": 0,
   "updatedAt": "2023-05-26T21:25:17.550Z",
-  "versionId": "f4f68551-160f-46bc-a4e7-f43bcb372e63"
+  "versionId": "c30dccc1-358e-456e-94e9-fbaa2171c81f"
 }
