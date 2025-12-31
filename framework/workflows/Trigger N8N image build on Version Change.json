@@ -1,5 +1,281 @@
 {
   "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-23T22:20:38.124Z",
+    "createdAt": "2025-12-23T22:20:38.124Z",
+    "versionId": "b345fbea-e847-4d94-b467-26a63143bd85",
+    "workflowId": "27",
+    "nodes": [
+      {
+        "parameters": {
+          "command": "n8n --version | grep -o \"[0-9][\\.][0-9][0-9][0-9][\\.][0-9]\""
+        },
+        "id": "cd42b331-ce17-4456-8201-55eae4158bd7",
+        "name": "Get Version",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          -816,
+          -144
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "f5d3df30-e18e-493c-b3f0-c1eb0269de74",
+        "name": "No Operation, do nothing",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          -64,
+          -160
+        ]
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 22
+              }
+            ]
+          }
+        },
+        "id": "b5d0ed7a-d023-4dff-911e-cb0ca01a06ce",
+        "name": "Schedule Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1,
+        "position": [
+          -1136,
+          -144
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Get Current and Latest Version\nAfter the rebuild of the image, all deployments will refresh to use the new version.",
+          "height": 539.7660779912698,
+          "width": 1389.622793746848
+        },
+        "id": "80418f4c-3946-485e-8f6b-16cdf093614d",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -1200,
+          -288
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://registry.npmjs.org/n8n/latest",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "9f9c2a62-9bb4-4040-9ecf-66b232aa26a1",
+        "name": "Get Latest N8N Version",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 3,
+        "position": [
+          -976,
+          -144
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "28",
+          "options": {}
+        },
+        "id": "5ac20052-3d3f-4e34-835a-136e936cf31d",
+        "name": "Build Login Command",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          -368,
+          32
+        ],
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "tokenName",
+                "value": "GOLD_Token"
+              },
+              {
+                "name": "nameSpace",
+                "value": "bf5ef6-tools"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "9a241e78-c19f-4a1d-b60d-69f7e77220df",
+        "name": "Set Token Name1",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          -528,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "command": "={{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name1\"].json.nameSpace }}\noc start-build bc/n8n\noc logout\n"
+        },
+        "id": "968bd756-1af4-4786-b440-069a8a83f336",
+        "name": "Build New Version",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          -208,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "string": [
+              {
+                "value1": "={{ $json.stdout }}",
+                "operation": "contains",
+                "value2": "={{ $node[\"Get Latest N8N Version\"].json.version }}"
+              }
+            ]
+          }
+        },
+        "id": "ee5622b1-1076-42b4-b871-76b2ffdd9fbe",
+        "name": "IF Versions are identical",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          -656,
+          -144
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "60b32b00-591e-4ac7-938d-687b0becb0ac",
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          -1136,
+          64
+        ]
+      }
+    ],
+    "connections": {
+      "Get Version": {
+        "main": [
+          [
+            {
+              "node": "IF Versions are identical",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Latest N8N Version": {
+        "main": [
+          [
+            {
+              "node": "Get Version",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get Latest N8N Version",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Login Command": {
+        "main": [
+          [
+            {
+              "node": "Build New Version",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Token Name1": {
+        "main": [
+          [
+            {
+              "node": "Build Login Command",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build New Version": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF Versions are identical": {
+        "main": [
+          [
+            {
+              "node": "No Operation, do nothing",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Set Token Name1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get Latest N8N Version",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "b345fbea-e847-4d94-b467-26a63143bd85",
   "connections": {
     "Get Version": {
       "main": [
@@ -144,7 +420,8 @@
       "position": [
         -1136,
         -144
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -306,6 +583,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2025-11-18T20:48:44.109Z",
-  "versionId": "b345fbea-e847-4d94-b467-26a63143bd85"
+  "updatedAt": "2025-12-30T18:08:28.816Z",
+  "versionId": "bae8d3d7-b8e3-4cf9-9d82-2e2a5d37097f"
 }
