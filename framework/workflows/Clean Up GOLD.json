@@ -1,5 +1,160 @@
 {
   "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-23T22:20:38.124Z",
+    "createdAt": "2025-12-23T22:20:38.124Z",
+    "versionId": "9f779785-0edf-40b0-adc9-8adf5c228dc9",
+    "workflowId": "37",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowId": "28"
+        },
+        "id": "14b25078-e9c8-45fe-bda1-236856d63e02",
+        "name": "Build Login Command",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          1520,
+          340
+        ],
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {},
+        "id": "a150ed99-4df0-41e7-8bf1-1154a13f0d8b",
+        "name": "When clicking \"Execute Workflow\"",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          1180,
+          340
+        ]
+      },
+      {
+        "parameters": {
+          "command": "=# Make sure there are no remaining sessions\noc logout\n# Kill all hanging oc processes\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n# login\n{{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name\"].json.nameSpace }}\n# Clean out stopped pods and RCs\noc delete pods --field-selector=status.phase!=Running\noc delete ReplicationController --field-selector=status.replicas=0\n# Logout\noc logout\n# Kill all hanging oc processes\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n"
+        },
+        "id": "feda7f71-01d4-4ed9-812a-743a7bfb2373",
+        "name": "OC Login & Clean",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1680,
+          340
+        ]
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 7
+              }
+            ]
+          }
+        },
+        "id": "c9ee2813-d32c-4ccc-b7c9-de5dd285079a",
+        "name": "Schedule Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1,
+        "position": [
+          1180,
+          200
+        ]
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "tokenName",
+                "value": "GOLD_Token"
+              },
+              {
+                "name": "nameSpace",
+                "value": "bf5ef6-prod"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "162da2cf-3377-4381-85b9-cf645c74df32",
+        "name": "Set Token Name",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          1360,
+          340
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Cleans closed and errored PODS in Gold\n\nThis is a utility workflow that keep our environment clean.",
+          "width": 716
+        },
+        "id": "bba6e2f5-3ab2-4ea0-aefb-bb96b5e5c4a6",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1340,
+          80
+        ]
+      }
+    ],
+    "connections": {
+      "Build Login Command": {
+        "main": [
+          [
+            {
+              "node": "OC Login & Clean",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking \"Execute Workflow\"": {
+        "main": [
+          [
+            {
+              "node": "Set Token Name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set Token Name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Token Name": {
+        "main": [
+          [
+            {
+              "node": "Build Login Command",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "9f779785-0edf-40b0-adc9-8adf5c228dc9",
   "connections": {
     "Build Login Command": {
       "main": [
