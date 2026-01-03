@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2025-12-23T22:20:38.124Z",
-    "createdAt": "2025-12-23T22:20:38.124Z",
-    "versionId": "b345fbea-e847-4d94-b467-26a63143bd85",
+    "updatedAt": "2026-01-02T21:58:50.283Z",
+    "createdAt": "2026-01-02T21:58:48.449Z",
+    "versionId": "49142ebc-e572-45d1-92ef-d1fb81cd5b7e",
     "workflowId": "27",
     "nodes": [
       {
@@ -35,6 +35,7 @@
           "rule": {
             "interval": [
               {
+                "daysInterval": 30,
                 "triggerAtHour": 22
               }
             ]
@@ -47,7 +48,8 @@
         "position": [
           -1136,
           -144
-        ]
+        ],
+        "disabled": true
       },
       {
         "parameters": {
@@ -270,12 +272,12 @@
         ]
       }
     },
-    "authors": "system migration",
-    "name": null,
-    "description": null,
+    "authors": "Billy li",
+    "name": "Version 49142ebc",
+    "description": "",
     "autosaved": false
   },
-  "activeVersionId": "b345fbea-e847-4d94-b467-26a63143bd85",
+  "activeVersionId": "49142ebc-e572-45d1-92ef-d1fb81cd5b7e",
   "connections": {
     "Get Version": {
       "main": [
@@ -408,6 +410,7 @@
         "rule": {
           "interval": [
             {
+              "daysInterval": 30,
               "triggerAtHour": 22
             }
           ]
@@ -582,7 +585,7 @@
       "name": "Utility"
     }
   ],
-  "triggerCount": 1,
-  "updatedAt": "2025-12-30T18:08:28.816Z",
-  "versionId": "bae8d3d7-b8e3-4cf9-9d82-2e2a5d37097f"
+  "triggerCount": 0,
+  "updatedAt": "2026-01-02T21:58:48.447Z",
+  "versionId": "49142ebc-e572-45d1-92ef-d1fb81cd5b7e"
 }
