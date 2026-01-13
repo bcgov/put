@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2025-12-24T06:22:22.056Z",
-    "createdAt": "2025-12-24T06:22:20.041Z",
-    "versionId": "bc711ca8-e609-4b85-a3ad-0a5e2b638916",
+    "updatedAt": "2026-01-12T23:30:41.163Z",
+    "createdAt": "2026-01-12T23:30:39.493Z",
+    "versionId": "9c4564a9-d9be-4da7-ad3f-d3bdae88a759",
     "workflowId": "7",
     "nodes": [
       {
@@ -38,7 +38,7 @@
             "interval": [
               {
                 "field": "hours",
-                "triggerAtMinute": 9
+                "triggerAtMinute": 32
               }
             ]
           }
@@ -291,11 +291,11 @@
       }
     },
     "authors": "Billy li",
-    "name": "Version bc711ca8",
+    "name": "Version 9c4564a9",
     "description": "",
     "autosaved": false
   },
-  "activeVersionId": "bc711ca8-e609-4b85-a3ad-0a5e2b638916",
+  "activeVersionId": "9c4564a9-d9be-4da7-ad3f-d3bdae88a759",
   "connections": {
     "Schedule Trigger1": {
       "main": [
@@ -413,7 +413,7 @@
           "interval": [
             {
               "field": "hours",
-              "triggerAtMinute": 9
+              "triggerAtMinute": 32
             }
           ]
         }
@@ -621,6 +621,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2025-12-24T06:22:20.037Z",
-  "versionId": "bc711ca8-e609-4b85-a3ad-0a5e2b638916"
+  "updatedAt": "2026-01-12T23:30:39.489Z",
+  "versionId": "9c4564a9-d9be-4da7-ad3f-d3bdae88a759"
 }
