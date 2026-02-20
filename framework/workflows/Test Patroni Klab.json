@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2025-12-24T02:11:01.892Z",
-    "createdAt": "2025-12-24T02:10:59.289Z",
-    "versionId": "082e6e7a-4d56-4524-9d79-5829a36d69f6",
+    "updatedAt": "2026-02-19T20:47:39.020Z",
+    "createdAt": "2026-02-19T20:47:32.116Z",
+    "versionId": "667420eb-a827-4df0-8fb6-2cd19883e200",
     "workflowId": "77",
     "nodes": [
       {
@@ -200,7 +200,7 @@
       {
         "parameters": {
           "operation": "executeQuery",
-          "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  commit;  \n\nselect count(*) from lat_longs;\n\ndrop table lat_longs;",
+          "query": "CREATE TEMP TABLE lat_longs (\n  c1 bigint GENERATED ALWAYS AS IDENTITY,\n  c2 double precision\n) ON COMMIT DROP;\n\nINSERT INTO lat_longs(c2)\nSELECT random() * 100\nFROM generate_series(1, 10000);\n\nSELECT count(*) AS count FROM lat_longs;\n",
           "additionalFields": {}
         },
         "id": "7bc7d77b-4ba2-4b7d-b133-3ba5b3855034",
@@ -613,11 +613,11 @@
       }
     },
     "authors": "Billy li",
-    "name": "Version 082e6e7a",
+    "name": "Version 667420eb",
     "description": "",
     "autosaved": false
   },
-  "activeVersionId": "082e6e7a-4d56-4524-9d79-5829a36d69f6",
+  "activeVersionId": "667420eb-a827-4df0-8fb6-2cd19883e200",
   "connections": {
     "When clicking \"Execute Workflow\"": {
       "main": [
@@ -1004,7 +1004,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "create table IF NOT EXISTS lat_longs  (   c1 bigint generated always as identity,   c2 float );  \n\ninsert into lat_longs(c2) select random() * 100 from generate_series(1,10e3) as g(id);  commit;  \n\nselect count(*) from lat_longs;\n\ndrop table lat_longs;",
+        "query": "CREATE TEMP TABLE lat_longs (\n  c1 bigint GENERATED ALWAYS AS IDENTITY,\n  c2 double precision\n) ON COMMIT DROP;\n\nINSERT INTO lat_longs(c2)\nSELECT random() * 100\nFROM generate_series(1, 10000);\n\nSELECT count(*) AS count FROM lat_longs;\n",
         "additionalFields": {}
       },
       "id": "7bc7d77b-4ba2-4b7d-b133-3ba5b3855034",
@@ -1248,6 +1248,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2025-12-24T02:10:59.287Z",
-  "versionId": "082e6e7a-4d56-4524-9d79-5829a36d69f6"
+  "updatedAt": "2026-02-19T20:47:32.114Z",
+  "versionId": "667420eb-a827-4df0-8fb6-2cd19883e200"
 }
