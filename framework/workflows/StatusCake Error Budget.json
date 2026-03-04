@@ -1,0 +1,518 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-03-03T22:37:15.881Z",
+    "createdAt": "2026-03-03T22:37:14.234Z",
+    "versionId": "5760fe62-6c91-4696-8dbc-bcf381fbd775",
+    "workflowId": "bWQtIKtPc4qve6cX",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "statuscake/error-budget",
+          "responseMode": "responseNode",
+          "options": {
+            "responseHeaders": {
+              "entries": [
+                {
+                  "name": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "id": "0755d03d-9c2c-4768-9c02-dea59043e321",
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1,
+        "position": [
+          7168,
+          2976
+        ],
+        "webhookId": "19f59d61-1f16-4246-9f57-a61a249ce320"
+      },
+      {
+        "parameters": {
+          "jsCode": "const query = $json.query || {};\n\nconst testId = query.test_id || '7719640';\nconst slo = Number(query.slo || '0.995');\nconst windowDays = Number(query.days || '30');\n\nconst now = Math.floor(Date.now() / 1000);\nconst cutoff = now - windowDays * 24 * 60 * 60;\n\nreturn [\n  {\n    json: {\n      testId,\n      slo,\n      windowDays,\n      now,\n      cutoff,\n      url: `https://api.statuscake.com/v1/uptime/${testId}/periods?limit=100`,\n      totalDownMs: 0\n    }\n  }\n];"
+        },
+        "id": "465929f6-bc72-4aae-8c47-04bee4e58b99",
+        "name": "Init",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          7392,
+          2976
+        ]
+      },
+      {
+        "parameters": {
+          "url": "={{ $json.url }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "options": {}
+        },
+        "id": "ad458f2b-76e8-426b-afe0-fb8c7115024d",
+        "name": "Fetch periods",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 3,
+        "position": [
+          7600,
+          2976
+        ],
+        "credentials": {
+          "actionNetworkApi": {
+            "id": "KSxGLGUMo1cqPMXD",
+            "name": "Action Network account"
+          },
+          "httpBearerAuth": {
+            "id": "iAM8OHBHv2ufqIfF",
+            "name": "Statuscake Token"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "function toEpoch(s) {\n  return Math.floor(new Date(s).getTime() / 1000);\n}\n\nfunction clamp(x, lo, hi) {\n  return Math.max(lo, Math.min(hi, x));\n}\n\nconst previousState =\n  $runIndex > 0\n    ? $items('Accumulate + Next', 0, $runIndex - 1)[0].json\n    : $items('Init')[0].json;\n\nconst state = {\n  ...previousState,\n  totalDownMs: Number(previousState.totalDownMs || 0)\n};\n\nconst resp = $json;\nconst data = resp.data || [];\nlet addMs = 0;\n\nfor (const p of data) {\n  if (p.status !== 'down') continue;\n  if (!p.created_at || !p.ended_at) continue;\n\n  const s = toEpoch(p.created_at);\n  const e = toEpoch(p.ended_at);\n\n  const os = clamp(s, state.cutoff, state.now);\n  const oe = clamp(e, state.cutoff, state.now);\n  const overlap = oe - os;\n\n  if (overlap > 0) addMs += overlap * 1000;\n}\n\nstate.totalDownMs += addMs;\n\nlet oldest = state.now;\nfor (const p of data) {\n  if (p.created_at) oldest = Math.min(oldest, toEpoch(p.created_at));\n}\n\nconst nextUrl = resp.links?.next || null;\nconst done = (!nextUrl) || (oldest < state.cutoff);\n\nreturn [\n  {\n    json: {\n      ...state,\n      url: nextUrl,\n      done\n    }\n  }\n];"
+        },
+        "id": "8ae2d36d-6a13-499a-a350-2d98af1417d7",
+        "name": "Accumulate + Next",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          7840,
+          2976
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "string": [
+              {
+                "value1": "={{ ($json.done || !$json.url) ? 'true' : 'false' }}",
+                "value2": "true"
+              }
+            ]
+          }
+        },
+        "id": "210d5e96-f4db-46de-af60-80c08e1be7e2",
+        "name": "Done?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          8064,
+          2976
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const { slo, windowDays, totalDownMs } = $json;\nconst windowSeconds = windowDays * 24 * 60 * 60;\n\nconst allowedSeconds = Math.floor(windowSeconds * (1 - slo));\nconst usedSeconds = Math.floor(totalDownMs / 1000);\nconst remainingSeconds = Math.max(0, allowedSeconds - usedSeconds);\n\nreturn [\n  {\n    json: {\n      windowDays,\n      slo,\n      allowedSeconds,\n      usedSeconds,\n      remainingSeconds,\n      downtimeUsedMs: totalDownMs\n    }\n  }\n];"
+        },
+        "id": "36de7785-18f8-41a2-9bd8-291339e4866a",
+        "name": "Compute budgets",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          8288,
+          2896
+        ]
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ { \"data\": [ { \"timestamp\": Math.floor(Date.now() / 1000), \"value\": Number($json.remainingSeconds) } ] } }}",
+          "options": {}
+        },
+        "id": "604c0b04-5790-4e8e-bceb-36a1fe0ea9ae",
+        "name": "Respond to Webhook",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          8528,
+          2896
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## StatusCake Error Budget (Webhook + Custom Metric)\n\nQuery parameters:\n- `test_id` (default: `7719640`)\n- `slo` (default: `0.995` for 99.5%)\n- `days` (default: `30`)\n\nExample URL:\n`/webhook/statuscake/error-budget?test_id=7719640&slo=0.995&days=30`\n\nSet `STATUSCAKE_API_TOKEN` in n8n env/credentials. Do not hardcode API tokens in node parameters.",
+          "height": 260,
+          "width": 1060
+        },
+        "id": "9e94ed71-e677-4ef0-be23-1124e081ce3c",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          7120,
+          2688
+        ]
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          7136,
+          3168
+        ],
+        "id": "aadee2f5-3ae8-4fcc-a781-52b8a667ea3f",
+        "name": "When clicking ‘Execute workflow’"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Init",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Init": {
+        "main": [
+          [
+            {
+              "node": "Fetch periods",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch periods": {
+        "main": [
+          [
+            {
+              "node": "Accumulate + Next",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Accumulate + Next": {
+        "main": [
+          [
+            {
+              "node": "Done?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Done?": {
+        "main": [
+          [
+            {
+              "node": "Compute budgets",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Fetch periods",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Compute budgets": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking ‘Execute workflow’": {
+        "main": [
+          [
+            {
+              "node": "Init",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Billy li",
+    "name": "Version 5760fe62",
+    "description": "",
+    "autosaved": false
+  },
+  "activeVersionId": "5760fe62-6c91-4696-8dbc-bcf381fbd775",
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Init",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init": {
+      "main": [
+        [
+          {
+            "node": "Fetch periods",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch periods": {
+      "main": [
+        [
+          {
+            "node": "Accumulate + Next",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accumulate + Next": {
+      "main": [
+        [
+          {
+            "node": "Done?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done?": {
+      "main": [
+        [
+          {
+            "node": "Compute budgets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch periods",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute budgets": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Init",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-03T21:35:43.771Z",
+  "id": "bWQtIKtPc4qve6cX",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "StatusCake Error Budget",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "statuscake/error-budget",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "0755d03d-9c2c-4768-9c02-dea59043e321",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        7168,
+        2976
+      ],
+      "webhookId": "19f59d61-1f16-4246-9f57-a61a249ce320"
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $json.query || {};\n\nconst testId = query.test_id || '7719640';\nconst slo = Number(query.slo || '0.995');\nconst windowDays = Number(query.days || '30');\n\nconst now = Math.floor(Date.now() / 1000);\nconst cutoff = now - windowDays * 24 * 60 * 60;\n\nreturn [\n  {\n    json: {\n      testId,\n      slo,\n      windowDays,\n      now,\n      cutoff,\n      url: `https://api.statuscake.com/v1/uptime/${testId}/periods?limit=100`,\n      totalDownMs: 0\n    }\n  }\n];"
+      },
+      "id": "465929f6-bc72-4aae-8c47-04bee4e58b99",
+      "name": "Init",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7392,
+        2976
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "id": "ad458f2b-76e8-426b-afe0-fb8c7115024d",
+      "name": "Fetch periods",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        7600,
+        2976
+      ],
+      "credentials": {
+        "actionNetworkApi": {
+          "id": "KSxGLGUMo1cqPMXD",
+          "name": "Action Network account"
+        },
+        "httpBearerAuth": {
+          "id": "iAM8OHBHv2ufqIfF",
+          "name": "Statuscake Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function toEpoch(s) {\n  return Math.floor(new Date(s).getTime() / 1000);\n}\n\nfunction clamp(x, lo, hi) {\n  return Math.max(lo, Math.min(hi, x));\n}\n\nconst previousState =\n  $runIndex > 0\n    ? $items('Accumulate + Next', 0, $runIndex - 1)[0].json\n    : $items('Init')[0].json;\n\nconst state = {\n  ...previousState,\n  totalDownMs: Number(previousState.totalDownMs || 0)\n};\n\nconst resp = $json;\nconst data = resp.data || [];\nlet addMs = 0;\n\nfor (const p of data) {\n  if (p.status !== 'down') continue;\n  if (!p.created_at || !p.ended_at) continue;\n\n  const s = toEpoch(p.created_at);\n  const e = toEpoch(p.ended_at);\n\n  const os = clamp(s, state.cutoff, state.now);\n  const oe = clamp(e, state.cutoff, state.now);\n  const overlap = oe - os;\n\n  if (overlap > 0) addMs += overlap * 1000;\n}\n\nstate.totalDownMs += addMs;\n\nlet oldest = state.now;\nfor (const p of data) {\n  if (p.created_at) oldest = Math.min(oldest, toEpoch(p.created_at));\n}\n\nconst nextUrl = resp.links?.next || null;\nconst done = (!nextUrl) || (oldest < state.cutoff);\n\nreturn [\n  {\n    json: {\n      ...state,\n      url: nextUrl,\n      done\n    }\n  }\n];"
+      },
+      "id": "8ae2d36d-6a13-499a-a350-2d98af1417d7",
+      "name": "Accumulate + Next",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7840,
+        2976
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ ($json.done || !$json.url) ? 'true' : 'false' }}",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "id": "210d5e96-f4db-46de-af60-80c08e1be7e2",
+      "name": "Done?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        8064,
+        2976
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { slo, windowDays, totalDownMs } = $json;\nconst windowSeconds = windowDays * 24 * 60 * 60;\n\nconst allowedSeconds = Math.floor(windowSeconds * (1 - slo));\nconst usedSeconds = Math.floor(totalDownMs / 1000);\nconst remainingSeconds = Math.max(0, allowedSeconds - usedSeconds);\n\nreturn [\n  {\n    json: {\n      windowDays,\n      slo,\n      allowedSeconds,\n      usedSeconds,\n      remainingSeconds,\n      downtimeUsedMs: totalDownMs\n    }\n  }\n];"
+      },
+      "id": "36de7785-18f8-41a2-9bd8-291339e4866a",
+      "name": "Compute budgets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8288,
+        2896
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"data\": [ { \"timestamp\": Math.floor(Date.now() / 1000), \"value\": Number($json.remainingSeconds) } ] } }}",
+        "options": {}
+      },
+      "id": "604c0b04-5790-4e8e-bceb-36a1fe0ea9ae",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        8528,
+        2896
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## StatusCake Error Budget (Webhook + Custom Metric)\n\nQuery parameters:\n- `test_id` (default: `7719640`)\n- `slo` (default: `0.995` for 99.5%)\n- `days` (default: `30`)\n\nExample URL:\n`/webhook/statuscake/error-budget?test_id=7719640&slo=0.995&days=30`\n\nSet `STATUSCAKE_API_TOKEN` in n8n env/credentials. Do not hardcode API tokens in node parameters.",
+        "height": 260,
+        "width": 1060
+      },
+      "id": "9e94ed71-e677-4ef0-be23-1124e081ce3c",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7120,
+        2688
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        7136,
+        3168
+      ],
+      "id": "aadee2f5-3ae8-4fcc-a781-52b8a667ea3f",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-03T21:35:43.771Z",
+      "createdAt": "2026-03-03T21:35:43.771Z",
+      "role": "workflow:owner",
+      "workflowId": "bWQtIKtPc4qve6cX",
+      "projectId": "8TL7f7Zh5T94reb3"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-03T22:37:14.234Z",
+  "versionId": "5760fe62-6c91-4696-8dbc-bcf381fbd775"
+}
