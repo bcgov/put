@@ -575,14 +575,14 @@
     {
       "updatedAt": "2023-04-29T00:07:24.473Z",
       "createdAt": "2023-04-29T00:07:24.473Z",
-      "id": "10",
-      "name": "Utility"
+      "id": "9",
+      "name": "Platform"
     },
     {
       "updatedAt": "2023-04-29T00:07:24.473Z",
       "createdAt": "2023-04-29T00:07:24.473Z",
-      "id": "9",
-      "name": "Platform"
+      "id": "10",
+      "name": "Utility"
     }
   ],
   "triggerCount": 0,
