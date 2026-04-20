@@ -15,6 +15,7 @@ containers/workflow/openshift/
 │   ├── postgresql-statefulset.yaml    # PostgreSQL StatefulSet
 │   ├── n8n-deployment.yaml            # N8N main deployment
 │   ├── n8n-worker-deployment.yaml     # N8N worker deployment
+│   ├── n8n-worker-restart-cronjob.yaml # Weekly worker restart CronJob + RBAC
 │   ├── n8n-webhook-deployment.yaml    # N8N webhook deployment
 │   ├── hpa.yaml                        # HorizontalPodAutoscalers
 │   ├── pdb.yaml                        # PodDisruptionBudgets
@@ -74,16 +75,19 @@ oc process -f templates/n8n-deployment.yaml --param-file=${ENV_FILE} | oc apply 
 # 8. Deploy n8n worker
 oc process -f templates/n8n-worker-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
 
-# 9. Deploy n8n webhook
+# 9. Deploy worker weekly restart CronJob + RBAC
+oc process -f templates/n8n-worker-restart-cronjob.yaml --param-file=${ENV_FILE} | oc apply -f -
+
+# 10. Deploy n8n webhook
 oc process -f templates/n8n-webhook-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
 
-# 10. Create HorizontalPodAutoscalers
+# 11. Create HorizontalPodAutoscalers
 oc process -f templates/hpa.yaml --param-file=${ENV_FILE} | oc apply -f -
 
-# 11. Create PodDisruptionBudgets
+# 12. Create PodDisruptionBudgets
 oc process -f templates/pdb.yaml --param-file=${ENV_FILE} | oc apply -f -
 
-# 12. Create NetworkPolicy
+# 13. Create NetworkPolicy
 oc process -f templates/networkpolicy.yaml --param-file=${ENV_FILE} | oc apply -f -
 ```
 
@@ -97,6 +101,7 @@ ENV_FILE="values-prod.env"
 # Update only n8n deployments (after new image build)
 oc process -f templates/n8n-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/n8n-worker-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
+oc process -f templates/n8n-worker-restart-cronjob.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/n8n-webhook-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
 
 # Update only configuration (secrets) - ONLY if you have provided password values in env file
@@ -146,6 +151,7 @@ REDIS_DATABASE_PASSWORD=<redis-password>
 - **New installations**: Leave password fields commented out - they will auto-generate
 - **Existing installations**: MUST provide all passwords to maintain data access
 - **Production encryption key**: NEVER change for existing installations - will break all encrypted data
+- Worker restart schedule defaults to Sunday at 12:00 PM (`America/Vancouver`) via `n8n-worker-restart-cronjob.yaml`
 - Keep env files secure and never commit actual passwords to git
 
 ## Using Existing PVCs
@@ -174,6 +180,7 @@ ENV_FILE="values-prod.env"
 oc process -f templates/networkpolicy.yaml --param-file=${ENV_FILE} | oc delete -f -
 oc process -f templates/pdb.yaml --param-file=${ENV_FILE} | oc delete -f -
 oc process -f templates/hpa.yaml --param-file=${ENV_FILE} | oc delete -f -
+oc process -f templates/n8n-worker-restart-cronjob.yaml --param-file=${ENV_FILE} | oc delete -f -
 oc process -f templates/n8n-webhook-deployment.yaml --param-file=${ENV_FILE} | oc delete -f -
 oc process -f templates/n8n-worker-deployment.yaml --param-file=${ENV_FILE} | oc delete -f -
 oc process -f templates/n8n-deployment.yaml --param-file=${ENV_FILE} | oc delete -f -
@@ -207,6 +214,7 @@ oc process -f templates/postgresql-statefulset.yaml --param-file=${ENV_FILE} | o
 oc process -f templates/redis-statefulset.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/n8n-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/n8n-worker-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
+oc process -f templates/n8n-worker-restart-cronjob.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/n8n-webhook-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/hpa.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/pdb.yaml --param-file=${ENV_FILE} | oc apply -f -
@@ -234,6 +242,7 @@ oc process -f templates/postgresql-statefulset.yaml --param-file=${ENV_FILE} | o
 oc process -f templates/redis-statefulset.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/n8n-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/n8n-worker-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
+oc process -f templates/n8n-worker-restart-cronjob.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/n8n-webhook-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/hpa.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/pdb.yaml --param-file=${ENV_FILE} | oc apply -f -
@@ -252,6 +261,7 @@ echo "Encryption Key: $(oc get secret n8n -o jsonpath='{.data.encryption-key}' |
 export ENV_FILE="values-prod.env"
 oc process -f templates/n8n-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/n8n-worker-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
+oc process -f templates/n8n-worker-restart-cronjob.yaml --param-file=${ENV_FILE} | oc apply -f -
 oc process -f templates/n8n-webhook-deployment.yaml --param-file=${ENV_FILE} | oc apply -f -
 
 # Force new rollout to pull latest image
@@ -272,10 +282,10 @@ oc process -f templates/redis-statefulset.yaml --param-file=${ENV_FILE} | oc app
 ### Full Deployment (New Installation)
 ```bash
 # Production
-oc process -f templates/secrets.yaml --param-file=values-prod.env | oc create -f - && for template in services routes postgresql-statefulset redis-statefulset n8n-deployment n8n-worker-deployment n8n-webhook-deployment hpa pdb networkpolicy; do oc process -f templates/${template}.yaml --param-file=values-prod.env | oc apply -f -; done
+oc process -f templates/secrets.yaml --param-file=values-prod.env | oc create -f - && for template in services routes postgresql-statefulset redis-statefulset n8n-deployment n8n-worker-deployment n8n-worker-restart-cronjob n8n-webhook-deployment hpa pdb networkpolicy; do oc process -f templates/${template}.yaml --param-file=values-prod.env | oc apply -f -; done
 
 # Development
-oc process -f templates/secrets.yaml --param-file=values-dev.env | oc create -f - && for template in services routes postgresql-statefulset redis-statefulset n8n-deployment n8n-worker-deployment n8n-webhook-deployment hpa pdb networkpolicy; do oc process -f templates/${template}.yaml --param-file=values-dev.env | oc apply -f -; done
+oc process -f templates/secrets.yaml --param-file=values-dev.env | oc create -f - && for template in services routes postgresql-statefulset redis-statefulset n8n-deployment n8n-worker-deployment n8n-worker-restart-cronjob n8n-webhook-deployment hpa pdb networkpolicy; do oc process -f templates/${template}.yaml --param-file=values-dev.env | oc apply -f -; done
 ```
 
 **Note:** Use `oc create` for secrets on first deployment to auto-generate passwords. Use `oc apply` for updates (but ensure you have password values set in env file).
@@ -283,9 +293,8 @@ oc process -f templates/secrets.yaml --param-file=values-dev.env | oc create -f 
 ### Update Only Application Deployments
 ```bash
 # Production
-for template in n8n-deployment n8n-worker-deployment n8n-webhook-deployment; do oc process -f templates/${template}.yaml --param-file=values-prod.env | oc apply -f -; done
+for template in n8n-deployment n8n-worker-deployment n8n-worker-restart-cronjob n8n-webhook-deployment; do oc process -f templates/${template}.yaml --param-file=values-prod.env | oc apply -f -; done
 
 # Development
-for template in n8n-deployment n8n-worker-deployment n8n-webhook-deployment; do oc process -f templates/${template}.yaml --param-file=values-dev.env | oc apply -f -; done
+for template in n8n-deployment n8n-worker-deployment n8n-worker-restart-cronjob n8n-webhook-deployment; do oc process -f templates/${template}.yaml --param-file=values-dev.env | oc apply -f -; done
 ```
-

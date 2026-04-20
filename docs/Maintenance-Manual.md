@@ -18,7 +18,9 @@ It is advisable to review actual usage over the longer term and adjust resource 
 The N8N OpenSource version does not allow for credentials and workflow sharing between users. To get around this, we need to assign new users as the owner of all workflows and credentials. To make a user the owner of all workflows and credentials, you need to run the following SQL query:
 
 ```sql
-update "user" set "globalRoleId"=1 where "id"=1;
+UPDATE "user"
+SET "roleSlug" = 'global:owner'
+WHERE "email" = '<email_you_want_to_add>';
 ```
 
 This query needs to be run on the n8n database pod by running the following statements in terminal:
@@ -28,7 +30,9 @@ psql
 \c n8n # This will connect you to the n8n database
 \dt # This will list all the tables in the database making sure you are in the right database
 select * from "user"; # Find the id of the user you want to make the owner
-update "user" set "globalRoleId"=1 where "id"=<id of user>;
+UPDATE "user"
+SET "roleSlug" = 'global:owner'
+WHERE "email" = '<email_you_want_to_add>';
 ```
 
 ## Insert global variables
