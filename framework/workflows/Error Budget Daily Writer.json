@@ -1,0 +1,518 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Error Budget Daily Writer\nRuns hourly and UPSERTs daily remaining error budget minutes into `error_budget_daily` for silver, emerald, gold, golddr, and gold-ha.\\\n\nUses Postgres credential: `N8N database access`.",
+        "height": 220,
+        "width": 980
+      },
+      "id": "faaf2a8f-3de4-49ca-ab58-ff6220a7558b",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4336,
+        1360
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 10
+            }
+          ]
+        }
+      },
+      "id": "db1407b0-3d6a-4f12-ace6-1c173faf047a",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        4384,
+        1848
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "4890539e-3c0b-4bd8-a4d5-0d0b33181ee3",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        4384,
+        2040
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS public.error_budget_daily (\n  cluster TEXT NOT NULL,\n  day DATE NOT NULL,\n  value_minutes NUMERIC NOT NULL,\n  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  PRIMARY KEY (cluster, day)\n);\nSELECT 1 AS ready;",
+        "additionalFields": {}
+      },
+      "id": "74475760-53ef-4643-ac19-60da4a99158e",
+      "name": "Ensure Table",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        4608,
+        1944
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "21",
+          "name": "N8N database access"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const windowDays = 30;\nconst now = Math.floor(Date.now() / 1000);\nconst cutoff = now - windowDays * 24 * 60 * 60;\nconst utcDay = new Date().toISOString().slice(0, 10);\n\nconst clusters = [\n  { cluster: 'silver', mode: 'single', testId: '7719640', slo: 0.995 },\n  { cluster: 'emerald', mode: 'single', testId: '7719620', slo: 0.995 },\n  { cluster: 'gold', mode: 'single', testId: '7719621', slo: 0.9995 },\n  { cluster: 'golddr', mode: 'single', testId: '7719622', slo: 0.9995 },\n  { cluster: 'gold-ha', mode: 'pair', primaryId: '7719621', secondaryId: '7719622', slo: 0.9995 },\n];\n\nreturn clusters.map((c) => {\n  if (c.mode === 'pair') {\n    return {\n      json: {\n        cluster: c.cluster,\n        mode: c.mode,\n        primaryId: c.primaryId,\n        secondaryId: c.secondaryId,\n        slo: c.slo,\n        windowDays,\n        now,\n        cutoff,\n        day: utcDay,\n        debug: false,\n      }\n    };\n  }\n\n  return {\n    json: {\n      cluster: c.cluster,\n      mode: c.mode,\n      testId: c.testId,\n      slo: c.slo,\n      windowDays,\n      now,\n      cutoff,\n      day: utcDay,\n      url: 'https://api.statuscake.com/v1/uptime/' + c.testId + '/periods?limit=100',\n      totalDownMs: 0,\n      debug: false,\n    }\n  };\n});"
+      },
+      "id": "22316059-a0ee-44b7-9ba1-797b8ff7afb9",
+      "name": "Build Cluster Jobs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4832,
+        1944
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "55d6c3b2-47e7-4a40-b85f-ae3097256d2a",
+      "name": "Split Clusters",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        5056,
+        1944
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.mode}}",
+              "value2": "single"
+            }
+          ]
+        }
+      },
+      "id": "bc4dda43-2f61-4f02-8d61-3012c612c509",
+      "name": "Mode?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        5280,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "id": "4ab416f4-eb35-43e6-8f1b-9e2f8f3ecf00",
+      "name": "Fetch periods1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        5952,
+        1704
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "iAM8OHBHv2ufqIfF",
+          "name": "Statuscake Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function toEpoch(s) {\n  return Math.floor(new Date(s).getTime() / 1000);\n}\n\nfunction clamp(x, lo, hi) {\n  return Math.max(lo, Math.min(hi, x));\n}\n\nconst previousState =\n  $runIndex > 0\n    ? $items('Accumulate + Next1', 0, $runIndex - 1)[0].json\n    : $items('Split Clusters')[0].json;\n\nconst state = {\n  ...previousState,\n  totalDownMs: Number(previousState.totalDownMs || 0)\n};\n\nconst resp = $json;\nconst data = resp.data || [];\nlet addMs = 0;\n\nfor (const p of data) {\n  if (p.status !== 'down') continue;\n  if (!p.created_at || !p.ended_at) continue;\n\n  const s = toEpoch(p.created_at);\n  const e = toEpoch(p.ended_at);\n  const os = clamp(s, state.cutoff, state.now);\n  const oe = clamp(e, state.cutoff, state.now);\n  const overlap = oe - os;\n\n  if (overlap > 0) addMs += overlap * 1000;\n}\n\nstate.totalDownMs += addMs;\n\nlet oldest = state.now;\nfor (const p of data) {\n  if (p.created_at) oldest = Math.min(oldest, toEpoch(p.created_at));\n}\n\nconst nextUrl = resp.links?.next || null;\nconst done = (!nextUrl) || (oldest < state.cutoff);\n\nreturn [{ json: { ...state, url: nextUrl, done } }];"
+      },
+      "id": "5af4f50c-5498-44cc-a1d1-5607c2fa2631",
+      "name": "Accumulate + Next1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6176,
+        1632
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ ($json.done || !$json.url) ? \"true\" : \"false\" }}",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "id": "7bf51c04-4e73-4fc4-9742-956b000f1c0b",
+      "name": "Done?1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        6400,
+        1704
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { primaryId, secondaryId, slo, windowDays, now, cutoff, debug, cluster, day } = $json;\n\nreturn [{\n  json: {\n    cluster,\n    day,\n    mode: 'pair',\n    primaryId,\n    secondaryId,\n    slo: Number(slo),\n    windowDays: Number(windowDays),\n    now: Number(now),\n    cutoff: Number(cutoff),\n    debug: Boolean(debug),\n    phase: 'primary',\n    url: 'https://api.statuscake.com/v1/uptime/' + primaryId + '/periods?limit=100',\n    primaryIntervals: [],\n    secondaryIntervals: [],\n    done: false,\n  }\n}];"
+      },
+      "id": "9135a7c6-15db-4c09-baa3-3c1b373e2dd7",
+      "name": "Init Pair State",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5504,
+        2016
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "id": "e8bdd544-8505-4eeb-bb95-0df6e078afa5",
+      "name": "Fetch periods (pair)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        5728,
+        2016
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "iAM8OHBHv2ufqIfF",
+          "name": "Statuscake Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function toEpoch(s) {\n  return Math.floor(new Date(s).getTime() / 1000);\n}\n\nfunction clamp(x, lo, hi) {\n  return Math.max(lo, Math.min(hi, x));\n}\n\nconst previousState =\n  $runIndex > 0\n    ? $items('Collect Pair + Next', 0, $runIndex - 1)[0].json\n    : $items('Init Pair State')[0].json;\n\nconst state = {\n  ...previousState,\n  primaryIntervals: Array.isArray(previousState.primaryIntervals) ? [...previousState.primaryIntervals] : [],\n  secondaryIntervals: Array.isArray(previousState.secondaryIntervals) ? [...previousState.secondaryIntervals] : [],\n};\n\nconst resp = $json;\nconst data = resp.data || [];\nconst target = state.phase === 'primary' ? state.primaryIntervals : state.secondaryIntervals;\n\nfor (const p of data) {\n  if (p.status !== 'down') continue;\n  if (!p.created_at || !p.ended_at) continue;\n\n  const s = toEpoch(p.created_at);\n  const e = toEpoch(p.ended_at);\n  const os = clamp(s, state.cutoff, state.now);\n  const oe = clamp(e, state.cutoff, state.now);\n\n  if (oe > os) target.push({ start: os, end: oe });\n}\n\nlet oldest = state.now;\nfor (const p of data) {\n  if (p.created_at) oldest = Math.min(oldest, toEpoch(p.created_at));\n}\n\nconst nextUrl = resp.links?.next || null;\nconst phaseDone = (!nextUrl) || (oldest < state.cutoff);\n\nif (!phaseDone) {\n  state.url = nextUrl;\n  state.done = false;\n} else if (state.phase === 'primary') {\n  state.phase = 'secondary';\n  state.url = 'https://api.statuscake.com/v1/uptime/' + state.secondaryId + '/periods?limit=100';\n  state.done = false;\n} else {\n  state.phase = 'complete';\n  state.url = null;\n  state.done = true;\n}\n\nreturn [{ json: state }];"
+      },
+      "id": "ae64a972-1d68-4457-8899-95967a06be8e",
+      "name": "Collect Pair + Next",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5952,
+        1944
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ ($json.done || !$json.url) ? \"true\" : \"false\" }}",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "id": "9c75bec9-e877-4a95-89ca-9a3e53785d36",
+      "name": "Pair Done?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        6176,
+        2016
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function normalize(intervals) {\n  const sorted = [...intervals]\n    .filter(i => Number(i.end) > Number(i.start))\n    .map(i => ({ start: Number(i.start), end: Number(i.end) }))\n    .sort((a, b) => a.start - b.start || a.end - b.end);\n\n  const merged = [];\n  for (const cur of sorted) {\n    if (!merged.length || cur.start > merged[merged.length - 1].end) merged.push({ ...cur });\n    else merged[merged.length - 1].end = Math.max(merged[merged.length - 1].end, cur.end);\n  }\n  return merged;\n}\n\nconst primary = normalize($json.primaryIntervals || []);\nconst secondary = normalize($json.secondaryIntervals || []);\n\nlet i = 0;\nlet j = 0;\nlet overlapSeconds = 0;\n\nwhile (i < primary.length && j < secondary.length) {\n  const s = Math.max(primary[i].start, secondary[j].start);\n  const e = Math.min(primary[i].end, secondary[j].end);\n  if (e > s) overlapSeconds += e - s;\n  if (primary[i].end <= secondary[j].end) i += 1;\n  else j += 1;\n}\n\nreturn [{\n  json: {\n    cluster: $json.cluster,\n    day: $json.day,\n    slo: Number($json.slo),\n    windowDays: Number($json.windowDays),\n    totalDownMs: overlapSeconds * 1000,\n  }\n}];"
+      },
+      "id": "3fe57f4e-3415-48bc-a10b-0d532b3dbed1",
+      "name": "Compute Pair Overlap",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6400,
+        2016
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { slo, windowDays, totalDownMs } = $json;\nconst windowSeconds = windowDays * 24 * 60 * 60;\nconst allowedSeconds = Math.floor(windowSeconds * (1 - slo));\nconst usedSeconds = Math.floor(totalDownMs / 1000);\nconst remainingSeconds = Math.max(0, allowedSeconds - usedSeconds);\nconst remainingMinutes = +(remainingSeconds / 60).toFixed(2);\n\nreturn [{\n  json: {\n    cluster: $json.cluster,\n    day: $json.day,\n    windowDays,\n    slo,\n    allowedSeconds,\n    usedSeconds,\n    remainingSeconds,\n    remainingMinutes,\n    downtimeUsedMs: totalDownMs\n  }\n}];"
+      },
+      "id": "860c0e36-75ee-4a17-b511-b0be047143e2",
+      "name": "Compute budgets1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6624,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cluster = String($json.cluster || '').toLowerCase();\nconst dayRaw = $json.day ? String($json.day) : new Date().toISOString().slice(0, 10);\nconst day = dayRaw.slice(0, 10);\nconst valueMinutes = Number($json.remainingMinutes);\n\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst safeDay = day.replace(/'/g, \"''\");\nconst safeValue = Number.isFinite(valueMinutes) ? valueMinutes : 0;\n\nconst upsertSql = [\n  'INSERT INTO public.error_budget_daily (cluster, day, value_minutes)',\n  \"VALUES ('\" + safeCluster + \"', '\" + safeDay + \"'::date, \" + safeValue + ')',\n  'ON CONFLICT (cluster, day)',\n  'DO UPDATE SET value_minutes = EXCLUDED.value_minutes, updated_at = now()',\n  'RETURNING cluster, day, value_minutes, updated_at;'\n].join('\\n');\n\nreturn [{ json: { ...$json, upsertSql } }];"
+      },
+      "id": "41c5edc0-1aa5-4fbc-9ff7-87fb58bb2d8b",
+      "name": "Build Upsert SQL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6848,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.upsertSql }}",
+        "additionalFields": {}
+      },
+      "id": "9faeea1a-9021-4c51-97af-07799b54884e",
+      "name": "Upsert Daily Row",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        6800,
+        2352
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "21",
+          "name": "N8N database access"
+        }
+      },
+      "alwaysOutputData": true
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Ensure Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Ensure Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensure Table": {
+      "main": [
+        [
+          {
+            "node": "Build Cluster Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Cluster Jobs": {
+      "main": [
+        [
+          {
+            "node": "Split Clusters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Clusters": {
+      "main": [
+        [
+          {
+            "node": "Mode?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mode?": {
+      "main": [
+        [
+          {
+            "node": "Fetch periods1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Init Pair State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch periods1": {
+      "main": [
+        [
+          {
+            "node": "Accumulate + Next1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accumulate + Next1": {
+      "main": [
+        [
+          {
+            "node": "Done?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done?1": {
+      "main": [
+        [
+          {
+            "node": "Compute budgets1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch periods1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init Pair State": {
+      "main": [
+        [
+          {
+            "node": "Fetch periods (pair)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch periods (pair)": {
+      "main": [
+        [
+          {
+            "node": "Collect Pair + Next",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Pair + Next": {
+      "main": [
+        [
+          {
+            "node": "Pair Done?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pair Done?": {
+      "main": [
+        [
+          {
+            "node": "Compute Pair Overlap",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch periods (pair)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Pair Overlap": {
+      "main": [
+        [
+          {
+            "node": "Compute budgets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute budgets1": {
+      "main": [
+        [
+          {
+            "node": "Build Upsert SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Upsert SQL": {
+      "main": [
+        [
+          {
+            "node": "Upsert Daily Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Daily Row": {
+      "main": [
+        [
+          {
+            "node": "Split Clusters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c2a9f7d67da59ff35a95e297fb86c74cce47a81a86b2e53fd994d5c3a75af39c"
+  }
+}
