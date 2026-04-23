@@ -1,129 +1,24 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2026-04-01T00:25:34.944Z",
-    "createdAt": "2026-04-01T00:25:33.092Z",
-    "versionId": "bf2f3716-f834-4349-a481-f205b0e0e4f2",
+    "updatedAt": "2026-04-22T20:45:52.861Z",
+    "createdAt": "2026-04-22T20:45:50.639Z",
+    "versionId": "8e141589-3d70-4452-ad5b-1d23fe123bc5",
     "workflowId": "bWQtIKtPc4qve6cX",
     "nodes": [
       {
         "parameters": {
-          "content": "## StatusCake Error Budget (Webhook + Custom Metric)\n\nQuery parameters:\n- `test_id` (default: `7719640`)\n- `slo` (default: `0.995` for 99.5%)\n- `days` (default: `30`)\n\nExample URL:\n`/webhook/statuscake/error-budget?test_id=7719640&slo=0.995&days=30`\n\nSet `STATUSCAKE_API_TOKEN` in n8n env/credentials. Do not hardcode API tokens in node parameters.",
-          "height": 260,
+          "content": "## StatusCake Error Budget (DB-backed Webhook)\n\nReads precomputed daily points from Postgres table `public.error_budget_daily`.\n\nQuery parameters:\n- `cluster` (supported: `silver`, `emerald`, `gold`, `golddr`, `gold-ha`; default `silver`)\n- `days` (default `30`)\n- `slo` optional override (otherwise mapped by cluster)\n- `test_id` optional legacy mapping to cluster (7719640/7719620/7719621/7719622)\n\nExample URL:\n`/webhook/statuscake/error-budget?cluster=silver&days=30`",
+          "height": 300,
           "width": 1060
         },
-        "id": "9e94ed71-e677-4ef0-be23-1124e081ce3c",
+        "id": "af79aec1-0a43-4c06-b46d-11f49a70bd65",
         "name": "Sticky Note",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          7984,
-          3088
-        ]
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "string": [
-              {
-                "value1": "={{$json.mode}}",
-                "value2": "single"
-              }
-            ]
-          }
-        },
-        "id": "2d547e08-b392-4f91-b166-91b78b0a5791",
-        "name": "Mode?",
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 1,
-        "position": [
-          8048,
-          3728
-        ]
-      },
-      {
-        "parameters": {
-          "jsCode": "// New: carry debug flag through pair-mode flow.\nconst { primaryId, secondaryId, slo, windowDays, now, cutoff, debug } = $json;\n\nreturn [{\n  json: {\n    mode: 'pair',\n    primaryId,\n    secondaryId,\n    slo: Number(slo),\n    windowDays: Number(windowDays),\n    now: Number(now),\n    cutoff: Number(cutoff),\n    debug: Boolean(debug),\n    phase: 'primary',\n    url: `https://api.statuscake.com/v1/uptime/${primaryId}/periods?limit=100`,\n    primaryIntervals: [],\n    secondaryIntervals: [],\n    done: false,\n  }\n}];\n"
-        },
-        "id": "90ad54bc-4b50-43bb-a824-ed497f8ba387",
-        "name": "Init Pair State",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          8272,
-          3872
-        ]
-      },
-      {
-        "parameters": {
-          "url": "={{ $json.url }}",
-          "authentication": "genericCredentialType",
-          "genericAuthType": "httpBearerAuth",
-          "options": {}
-        },
-        "id": "e14b6f7b-4c27-42f6-ba2d-6b6b2d0eeb19",
-        "name": "Fetch periods (pair)",
-        "type": "n8n-nodes-base.httpRequest",
-        "typeVersion": 3,
-        "position": [
-          8496,
-          3872
-        ],
-        "credentials": {
-          "actionNetworkApi": {
-            "id": "KSxGLGUMo1cqPMXD",
-            "name": "Action Network account"
-          },
-          "httpBearerAuth": {
-            "id": "iAM8OHBHv2ufqIfF",
-            "name": "Statuscake Token"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "jsCode": "function toEpoch(s) {\n  return Math.floor(new Date(s).getTime() / 1000);\n}\n\nfunction clamp(x, lo, hi) {\n  return Math.max(lo, Math.min(hi, x));\n}\n\n// New logic: collect clamped DOWN intervals for primary/secondary test streams.\nconst previousState =\n  $runIndex > 0\n    ? $items('Collect Pair + Next', 0, $runIndex - 1)[0].json\n    : $items('Init Pair State')[0].json;\n\nconst state = {\n  ...previousState,\n  primaryIntervals: Array.isArray(previousState.primaryIntervals) ? [...previousState.primaryIntervals] : [],\n  secondaryIntervals: Array.isArray(previousState.secondaryIntervals) ? [...previousState.secondaryIntervals] : [],\n};\n\nconst resp = $json;\nconst data = resp.data || [];\nconst target = state.phase === 'primary' ? state.primaryIntervals : state.secondaryIntervals;\n\nfor (const p of data) {\n  if (p.status !== 'down') continue;\n  if (!p.created_at || !p.ended_at) continue;\n\n  const s = toEpoch(p.created_at);\n  const e = toEpoch(p.ended_at);\n  const os = clamp(s, state.cutoff, state.now);\n  const oe = clamp(e, state.cutoff, state.now);\n\n  if (oe > os) {\n    target.push({ start: os, end: oe });\n  }\n}\n\nlet oldest = state.now;\nfor (const p of data) {\n  if (p.created_at) oldest = Math.min(oldest, toEpoch(p.created_at));\n}\n\nconst nextUrl = resp.links?.next || null;\nconst phaseDone = (!nextUrl) || (oldest < state.cutoff);\n\nif (!phaseDone) {\n  state.url = nextUrl;\n  state.done = false;\n} else if (state.phase === 'primary') {\n  state.phase = 'secondary';\n  state.url = `https://api.statuscake.com/v1/uptime/${state.secondaryId}/periods?limit=100`;\n  state.done = false;\n} else {\n  state.phase = 'complete';\n  state.url = null;\n  state.done = true;\n}\n\nreturn [{ json: state }];"
-        },
-        "id": "a8ac4cbe-916f-4bd3-9572-4f5bcf080312",
-        "name": "Collect Pair + Next",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          8720,
-          3808
-        ]
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "string": [
-              {
-                "value1": "={{ ($json.done || !$json.url) ? 'true' : 'false' }}",
-                "value2": "true"
-              }
-            ]
-          }
-        },
-        "id": "90ff33b5-6934-43e7-8552-74d72d37db44",
-        "name": "Pair Done?",
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 1,
-        "position": [
-          8944,
-          3872
-        ]
-      },
-      {
-        "parameters": {
-          "jsCode": "// New: compute overlap and optionally emit overlap windows for debugging.\nfunction normalize(intervals) {\n  const sorted = [...intervals]\n    .filter(i => Number(i.end) > Number(i.start))\n    .map(i => ({ start: Number(i.start), end: Number(i.end) }))\n    .sort((a, b) => a.start - b.start || a.end - b.end);\n\n  const merged = [];\n  for (const cur of sorted) {\n    if (!merged.length || cur.start > merged[merged.length - 1].end) {\n      merged.push({ ...cur });\n    } else {\n      merged[merged.length - 1].end = Math.max(merged[merged.length - 1].end, cur.end);\n    }\n  }\n  return merged;\n}\n\nfunction toIso(sec) {\n  return new Date(sec * 1000).toISOString();\n}\n\nconst primary = normalize($json.primaryIntervals || []);\nconst secondary = normalize($json.secondaryIntervals || []);\n\nlet i = 0;\nlet j = 0;\nlet overlapSeconds = 0;\nconst overlapWindows = [];\n\nwhile (i < primary.length && j < secondary.length) {\n  const s = Math.max(primary[i].start, secondary[j].start);\n  const e = Math.min(primary[i].end, secondary[j].end);\n\n  if (e > s) {\n    const dur = e - s;\n    overlapSeconds += dur;\n\n    if ($json.debug && overlapWindows.length < 300) {\n      overlapWindows.push({\n        start: s,\n        end: e,\n        startIso: toIso(s),\n        endIso: toIso(e),\n        seconds: dur,\n      });\n    }\n  }\n\n  if (primary[i].end <= secondary[j].end) i += 1;\n  else j += 1;\n}\n\nconst out = {\n  slo: Number($json.slo),\n  windowDays: Number($json.windowDays),\n  totalDownMs: overlapSeconds * 1000,\n};\n\nif ($json.debug) {\n  out.debug = {\n    mode: \"gold-ha\",\n    primaryId: $json.primaryId,\n    secondaryId: $json.secondaryId,\n    primaryIntervalCount: primary.length,\n    secondaryIntervalCount: secondary.length,\n    overlapSecondsTotal: overlapSeconds,\n    overlapWindowCount: overlapWindows.length,\n    overlapWindows,\n    primarySample: primary.slice(0, 50).map(i => ({\n      start: i.start,\n      end: i.end,\n      startIso: toIso(i.start),\n      endIso: toIso(i.end),\n      seconds: i.end - i.start,\n    })),\n    secondarySample: secondary.slice(0, 50).map(i => ({\n      start: i.start,\n      end: i.end,\n      startIso: toIso(i.start),\n      endIso: toIso(i.end),\n      seconds: i.end - i.start,\n    })),\n  };\n}\n\nreturn [{ json: out }];\n"
-        },
-        "id": "17b8655e-8dce-434c-ade3-e26fbdecfc83",
-        "name": "Compute Pair Overlap",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          9168,
-          3872
+          7504,
+          3760
         ]
       },
       {
@@ -141,100 +36,15 @@
             }
           }
         },
-        "id": "8ea63156-8feb-4a90-bef9-a251daed2955",
+        "id": "33413875-af46-4a4e-b4b9-4f721db8de4a",
         "name": "Webhook1",
         "type": "n8n-nodes-base.webhook",
         "typeVersion": 1,
         "position": [
-          7600,
-          3632
+          7120,
+          4144
         ],
         "webhookId": "19f59d61-1f16-4246-9f57-a61a249ce320"
-      },
-      {
-        "parameters": {
-          "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  silver:  { testId: \"7719640\", slo: 0.995 },\n  emerald: { testId: \"7719620\", slo: 0.995 },\n  \"gold-ha\": { primary: \"7719621\", secondary: \"7719622\", slo: 0.9995 },\n};\n\nconst windowDays = Number(query.days || \"30\");\nconst now = Math.floor(Date.now() / 1000);\nconst cutoff = now - windowDays * 24 * 60 * 60;\nconst clusterKey = query.cluster ? String(query.cluster).toLowerCase() : null;\n\n// New: opt-in debug output for overlap inspection.\nconst debug = [\"1\", \"true\", \"yes\"].includes(String(query.debug || \"\").toLowerCase());\n\nif (clusterKey === \"gold-ha\") {\n  const c = clusters[\"gold-ha\"];\n  return [{\n    json: {\n      mode: \"pair\",\n      primaryId: c.primary,\n      secondaryId: c.secondary,\n      slo: Number(query.slo || c.slo),\n      windowDays,\n      now,\n      cutoff,\n      debug,\n    }\n  }];\n}\n\n// existing single-test behavior\nlet testId = query.test_id;\nlet slo = query.slo;\n\nif (clusterKey && clusters[clusterKey]?.testId) {\n  const c = clusters[clusterKey];\n  testId = testId || c.testId;\n  slo = slo || c.slo;\n}\n\ntestId = String(testId || \"7719640\");\nslo = Number(slo || \"0.995\");\n\nreturn [{\n  json: {\n    mode: \"single\",\n    testId,\n    slo,\n    windowDays,\n    now,\n    cutoff,\n    url: `https://api.statuscake.com/v1/uptime/${testId}/periods?limit=100`,\n    totalDownMs: 0,\n    debug,\n  }\n}];\n"
-        },
-        "id": "c1ce5f67-c43b-4d35-ba5e-640ad60da8cd",
-        "name": "Init1",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          7824,
-          3728
-        ]
-      },
-      {
-        "parameters": {
-          "url": "={{ $json.url }}",
-          "authentication": "genericCredentialType",
-          "genericAuthType": "httpBearerAuth",
-          "options": {}
-        },
-        "id": "0724e667-084c-4e12-9fdf-56c633f5ec25",
-        "name": "Fetch periods1",
-        "type": "n8n-nodes-base.httpRequest",
-        "typeVersion": 3,
-        "position": [
-          8720,
-          3568
-        ],
-        "credentials": {
-          "actionNetworkApi": {
-            "id": "KSxGLGUMo1cqPMXD",
-            "name": "Action Network account"
-          },
-          "httpBearerAuth": {
-            "id": "iAM8OHBHv2ufqIfF",
-            "name": "Statuscake Token"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "jsCode": "function toEpoch(s) {\n  return Math.floor(new Date(s).getTime() / 1000);\n}\n\nfunction clamp(x, lo, hi) {\n  return Math.max(lo, Math.min(hi, x));\n}\n\nconst previousState =\n  $runIndex > 0\n    ? $items('Accumulate + Next1', 0, $runIndex - 1)[0].json\n    : $items('Init1')[0].json;\n\nconst state = {\n  ...previousState,\n  totalDownMs: Number(previousState.totalDownMs || 0)\n};\n\nconst resp = $json;\nconst data = resp.data || [];\nlet addMs = 0;\n\nfor (const p of data) {\n  if (p.status !== 'down') continue;\n  if (!p.created_at || !p.ended_at) continue;\n\n  const s = toEpoch(p.created_at);\n  const e = toEpoch(p.ended_at);\n\n  const os = clamp(s, state.cutoff, state.now);\n  const oe = clamp(e, state.cutoff, state.now);\n  const overlap = oe - os;\n\n  if (overlap > 0) addMs += overlap * 1000;\n}\n\nstate.totalDownMs += addMs;\n\nlet oldest = state.now;\nfor (const p of data) {\n  if (p.created_at) oldest = Math.min(oldest, toEpoch(p.created_at));\n}\n\nconst nextUrl = resp.links?.next || null;\nconst done = (!nextUrl) || (oldest < state.cutoff);\n\nreturn [\n  {\n    json: {\n      ...state,\n      url: nextUrl,\n      done\n    }\n  }\n];"
-        },
-        "id": "af55feaf-bd68-48fb-99d7-a75f461aff8f",
-        "name": "Accumulate + Next1",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          8944,
-          3488
-        ]
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "string": [
-              {
-                "value1": "={{ ($json.done || !$json.url) ? 'true' : 'false' }}",
-                "value2": "true"
-              }
-            ]
-          }
-        },
-        "id": "d0b5d880-70ae-49a2-8d7c-697616a435c9",
-        "name": "Done?1",
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 1,
-        "position": [
-          9168,
-          3568
-        ]
-      },
-      {
-        "parameters": {
-          "jsCode": "const { slo, windowDays, totalDownMs } = $json;\nconst windowSeconds = windowDays * 24 * 60 * 60;\n\nconst allowedSeconds = Math.floor(windowSeconds * (1 - slo));\nconst usedSeconds = Math.floor(totalDownMs / 1000);\nconst remainingSeconds = Math.max(0, allowedSeconds - usedSeconds);\nconst remainingMinutes = +(remainingSeconds / 60).toFixed(2);\n\nconst out = {\n  windowDays,\n  slo,\n  allowedSeconds,\n  usedSeconds,\n  remainingSeconds,\n  remainingMinutes,\n  downtimeUsedMs: totalDownMs\n};\n\n// New: attach budget math into debug output.\nif ($json.debug) {\n  out.debug = {\n    ...$json.debug,\n    allowedSeconds,\n    usedSeconds,\n    remainingSeconds,\n    remainingMinutes,\n  };\n}\n\nreturn [{ json: out }];\n"
-        },
-        "id": "352be1df-39d9-4975-9d1a-29767c83d7d4",
-        "name": "Compute budgets1",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          9392,
-          3728
-        ]
       },
       {
         "parameters": {
@@ -242,195 +52,109 @@
           "responseBody": "={{$json}}",
           "options": {}
         },
-        "id": "18b61a5f-f6c5-4c0d-bd35-efcba8458dd2",
+        "id": "3e4966b3-57a4-495b-a16b-790f1e4bc109",
         "name": "Respond to Webhook1",
         "type": "n8n-nodes-base.respondToWebhook",
         "typeVersion": 1,
         "position": [
-          9840,
-          3728
+          8016,
+          4240
         ]
-      },
-      {
-        "parameters": {
-          "jsCode": "const response = {\n  data: [\n    {\n      timestamp: new Date().toISOString(),\n      value: Number($json.remainingMinutes),\n    },\n  ],\n};\n\n// New: only include debug block when explicitly requested.\nif ($json.debug) {\n  response.debug = $json.debug;\n}\n\nreturn [{ json: response }];\n"
-        },
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          9616,
-          3728
-        ],
-        "id": "b7650a99-4600-4989-a43b-fed3e9f145b7",
-        "name": "Build Response1"
       },
       {
         "parameters": {},
         "type": "n8n-nodes-base.manualTrigger",
         "typeVersion": 1,
         "position": [
-          7600,
-          3824
+          7120,
+          4336
         ],
-        "id": "aadee2f5-3ae8-4fcc-a781-52b8a667ea3f",
+        "id": "04e4d168-cbe7-40b1-9559-b275d85fde3b",
         "name": "When clicking ‘Execute workflow’"
+      },
+      {
+        "parameters": {
+          "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  silver:  { testId: '7719640', slo: 0.995 },\n  emerald: { testId: '7719620', slo: 0.995 },\n  gold:    { testId: '7719621', slo: 0.9995 },\n  golddr:  { testId: '7719622', slo: 0.9995 },\n  'gold-ha': { primary: '7719621', secondary: '7719622', slo: 0.9995 },\n};\n\nconst testIdToCluster = {\n  '7719640': 'silver',\n  '7719620': 'emerald',\n  '7719621': 'gold',\n  '7719622': 'golddr',\n};\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\nif (days > 3650) days = 3650;\n\nconst slo = (query.slo !== undefined && String(query.slo).trim() !== '')\n  ? Number(query.slo)\n  : Number(clusters[cluster].slo);\n\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst sql = [\n  'SELECT day, value_minutes',\n  'FROM public.error_budget_daily',\n  \"WHERE cluster = '\" + safeCluster + \"'\",\n  '  AND day >= (current_date - (' + days + '::int - 1))',\n  'ORDER BY day;'\n].join('\\n');\n\nreturn [{ json: { cluster, days, slo, sql } }];"
+        },
+        "id": "aa14e018-a4d3-409b-9b3d-44f2b20daa73",
+        "name": "Init DB Query",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          7344,
+          4240
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "={{ $json.sql }}",
+          "additionalFields": {}
+        },
+        "id": "12bfa3e8-f124-4eb3-b70c-d2fee04149b0",
+        "name": "Read Daily Series",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 1,
+        "position": [
+          7568,
+          4240
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "21",
+            "name": "N8N database access"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.day !== undefined);\n\nconst data = rows.map((item) => {\n  const rawDay = item.json.day;\n  const day = rawDay instanceof Date\n    ? rawDay.toISOString().slice(0, 10)\n    : String(rawDay).slice(0, 10);\n  return {\n    timestamp: day + 'T00:00:00.000Z',\n    value: Number(item.json.value_minutes),\n  };\n});\n\nreturn [{ json: { data } }];"
+        },
+        "id": "e12cb5c2-04d6-473f-a8f1-1357cf092a94",
+        "name": "Build DB Response",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          7792,
+          4240
+        ]
       }
     ],
     "connections": {
-      "Mode?": {
-        "main": [
-          [
-            {
-              "node": "Fetch periods1",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Init Pair State",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Init Pair State": {
-        "main": [
-          [
-            {
-              "node": "Fetch periods (pair)",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Fetch periods (pair)": {
-        "main": [
-          [
-            {
-              "node": "Collect Pair + Next",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Collect Pair + Next": {
-        "main": [
-          [
-            {
-              "node": "Pair Done?",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Pair Done?": {
-        "main": [
-          [
-            {
-              "node": "Compute Pair Overlap",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Fetch periods (pair)",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Compute Pair Overlap": {
-        "main": [
-          [
-            {
-              "node": "Compute budgets1",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
       "Webhook1": {
         "main": [
           [
             {
-              "node": "Init1",
+              "node": "Init DB Query",
               "type": "main",
               "index": 0
             }
           ]
         ]
       },
-      "Init1": {
+      "Init DB Query": {
         "main": [
           [
             {
-              "node": "Mode?",
+              "node": "Read Daily Series",
               "type": "main",
               "index": 0
             }
           ]
         ]
       },
-      "Fetch periods1": {
+      "Read Daily Series": {
         "main": [
           [
             {
-              "node": "Accumulate + Next1",
+              "node": "Build DB Response",
               "type": "main",
               "index": 0
             }
           ]
         ]
       },
-      "Accumulate + Next1": {
-        "main": [
-          [
-            {
-              "node": "Done?1",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Done?1": {
-        "main": [
-          [
-            {
-              "node": "Compute budgets1",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Fetch periods1",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Compute budgets1": {
-        "main": [
-          [
-            {
-              "node": "Build Response1",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Build Response1": {
+      "Build DB Response": {
         "main": [
           [
             {
@@ -445,7 +169,7 @@
         "main": [
           [
             {
-              "node": "Init1",
+              "node": "Init DB Query",
               "type": "main",
               "index": 0
             }
@@ -454,166 +178,46 @@
       }
     },
     "authors": "Billy li",
-    "name": "Version bf2f3716",
+    "name": "Version 8e141589",
     "description": "",
     "autosaved": false
   },
-  "activeVersionId": "bf2f3716-f834-4349-a481-f205b0e0e4f2",
+  "activeVersionId": "8e141589-3d70-4452-ad5b-1d23fe123bc5",
   "connections": {
-    "Mode?": {
-      "main": [
-        [
-          {
-            "node": "Fetch periods1",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Init Pair State",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Init Pair State": {
-      "main": [
-        [
-          {
-            "node": "Fetch periods (pair)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Fetch periods (pair)": {
-      "main": [
-        [
-          {
-            "node": "Collect Pair + Next",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Collect Pair + Next": {
-      "main": [
-        [
-          {
-            "node": "Pair Done?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Pair Done?": {
-      "main": [
-        [
-          {
-            "node": "Compute Pair Overlap",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Fetch periods (pair)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Compute Pair Overlap": {
-      "main": [
-        [
-          {
-            "node": "Compute budgets1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Webhook1": {
       "main": [
         [
           {
-            "node": "Init1",
+            "node": "Init DB Query",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Init1": {
+    "Init DB Query": {
       "main": [
         [
           {
-            "node": "Mode?",
+            "node": "Read Daily Series",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Fetch periods1": {
+    "Read Daily Series": {
       "main": [
         [
           {
-            "node": "Accumulate + Next1",
+            "node": "Build DB Response",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Accumulate + Next1": {
-      "main": [
-        [
-          {
-            "node": "Done?1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Done?1": {
-      "main": [
-        [
-          {
-            "node": "Compute budgets1",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Fetch periods1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Compute budgets1": {
-      "main": [
-        [
-          {
-            "node": "Build Response1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Build Response1": {
+    "Build DB Response": {
       "main": [
         [
           {
@@ -628,7 +232,7 @@
       "main": [
         [
           {
-            "node": "Init1",
+            "node": "Init DB Query",
             "type": "main",
             "index": 0
           }
@@ -646,122 +250,17 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## StatusCake Error Budget (Webhook + Custom Metric)\n\nQuery parameters:\n- `test_id` (default: `7719640`)\n- `slo` (default: `0.995` for 99.5%)\n- `days` (default: `30`)\n\nExample URL:\n`/webhook/statuscake/error-budget?test_id=7719640&slo=0.995&days=30`\n\nSet `STATUSCAKE_API_TOKEN` in n8n env/credentials. Do not hardcode API tokens in node parameters.",
-        "height": 260,
+        "content": "## StatusCake Error Budget (DB-backed Webhook)\n\nReads precomputed daily points from Postgres table `public.error_budget_daily`.\n\nQuery parameters:\n- `cluster` (supported: `silver`, `emerald`, `gold`, `golddr`, `gold-ha`; default `silver`)\n- `days` (default `30`)\n- `slo` optional override (otherwise mapped by cluster)\n- `test_id` optional legacy mapping to cluster (7719640/7719620/7719621/7719622)\n\nExample URL:\n`/webhook/statuscake/error-budget?cluster=silver&days=30`",
+        "height": 300,
         "width": 1060
       },
-      "id": "9e94ed71-e677-4ef0-be23-1124e081ce3c",
+      "id": "af79aec1-0a43-4c06-b46d-11f49a70bd65",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        7984,
-        3088
-      ]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{$json.mode}}",
-              "value2": "single"
-            }
-          ]
-        }
-      },
-      "id": "2d547e08-b392-4f91-b166-91b78b0a5791",
-      "name": "Mode?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "position": [
-        8048,
-        3728
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// New: carry debug flag through pair-mode flow.\nconst { primaryId, secondaryId, slo, windowDays, now, cutoff, debug } = $json;\n\nreturn [{\n  json: {\n    mode: 'pair',\n    primaryId,\n    secondaryId,\n    slo: Number(slo),\n    windowDays: Number(windowDays),\n    now: Number(now),\n    cutoff: Number(cutoff),\n    debug: Boolean(debug),\n    phase: 'primary',\n    url: `https://api.statuscake.com/v1/uptime/${primaryId}/periods?limit=100`,\n    primaryIntervals: [],\n    secondaryIntervals: [],\n    done: false,\n  }\n}];\n"
-      },
-      "id": "90ad54bc-4b50-43bb-a824-ed497f8ba387",
-      "name": "Init Pair State",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        8272,
-        3872
-      ]
-    },
-    {
-      "parameters": {
-        "url": "={{ $json.url }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "options": {}
-      },
-      "id": "e14b6f7b-4c27-42f6-ba2d-6b6b2d0eeb19",
-      "name": "Fetch periods (pair)",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 3,
-      "position": [
-        8496,
-        3872
-      ],
-      "credentials": {
-        "actionNetworkApi": {
-          "id": "KSxGLGUMo1cqPMXD",
-          "name": "Action Network account"
-        },
-        "httpBearerAuth": {
-          "id": "iAM8OHBHv2ufqIfF",
-          "name": "Statuscake Token"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "function toEpoch(s) {\n  return Math.floor(new Date(s).getTime() / 1000);\n}\n\nfunction clamp(x, lo, hi) {\n  return Math.max(lo, Math.min(hi, x));\n}\n\n// New logic: collect clamped DOWN intervals for primary/secondary test streams.\nconst previousState =\n  $runIndex > 0\n    ? $items('Collect Pair + Next', 0, $runIndex - 1)[0].json\n    : $items('Init Pair State')[0].json;\n\nconst state = {\n  ...previousState,\n  primaryIntervals: Array.isArray(previousState.primaryIntervals) ? [...previousState.primaryIntervals] : [],\n  secondaryIntervals: Array.isArray(previousState.secondaryIntervals) ? [...previousState.secondaryIntervals] : [],\n};\n\nconst resp = $json;\nconst data = resp.data || [];\nconst target = state.phase === 'primary' ? state.primaryIntervals : state.secondaryIntervals;\n\nfor (const p of data) {\n  if (p.status !== 'down') continue;\n  if (!p.created_at || !p.ended_at) continue;\n\n  const s = toEpoch(p.created_at);\n  const e = toEpoch(p.ended_at);\n  const os = clamp(s, state.cutoff, state.now);\n  const oe = clamp(e, state.cutoff, state.now);\n\n  if (oe > os) {\n    target.push({ start: os, end: oe });\n  }\n}\n\nlet oldest = state.now;\nfor (const p of data) {\n  if (p.created_at) oldest = Math.min(oldest, toEpoch(p.created_at));\n}\n\nconst nextUrl = resp.links?.next || null;\nconst phaseDone = (!nextUrl) || (oldest < state.cutoff);\n\nif (!phaseDone) {\n  state.url = nextUrl;\n  state.done = false;\n} else if (state.phase === 'primary') {\n  state.phase = 'secondary';\n  state.url = `https://api.statuscake.com/v1/uptime/${state.secondaryId}/periods?limit=100`;\n  state.done = false;\n} else {\n  state.phase = 'complete';\n  state.url = null;\n  state.done = true;\n}\n\nreturn [{ json: state }];"
-      },
-      "id": "a8ac4cbe-916f-4bd3-9572-4f5bcf080312",
-      "name": "Collect Pair + Next",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        8720,
-        3808
-      ]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{ ($json.done || !$json.url) ? 'true' : 'false' }}",
-              "value2": "true"
-            }
-          ]
-        }
-      },
-      "id": "90ff33b5-6934-43e7-8552-74d72d37db44",
-      "name": "Pair Done?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "position": [
-        8944,
-        3872
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// New: compute overlap and optionally emit overlap windows for debugging.\nfunction normalize(intervals) {\n  const sorted = [...intervals]\n    .filter(i => Number(i.end) > Number(i.start))\n    .map(i => ({ start: Number(i.start), end: Number(i.end) }))\n    .sort((a, b) => a.start - b.start || a.end - b.end);\n\n  const merged = [];\n  for (const cur of sorted) {\n    if (!merged.length || cur.start > merged[merged.length - 1].end) {\n      merged.push({ ...cur });\n    } else {\n      merged[merged.length - 1].end = Math.max(merged[merged.length - 1].end, cur.end);\n    }\n  }\n  return merged;\n}\n\nfunction toIso(sec) {\n  return new Date(sec * 1000).toISOString();\n}\n\nconst primary = normalize($json.primaryIntervals || []);\nconst secondary = normalize($json.secondaryIntervals || []);\n\nlet i = 0;\nlet j = 0;\nlet overlapSeconds = 0;\nconst overlapWindows = [];\n\nwhile (i < primary.length && j < secondary.length) {\n  const s = Math.max(primary[i].start, secondary[j].start);\n  const e = Math.min(primary[i].end, secondary[j].end);\n\n  if (e > s) {\n    const dur = e - s;\n    overlapSeconds += dur;\n\n    if ($json.debug && overlapWindows.length < 300) {\n      overlapWindows.push({\n        start: s,\n        end: e,\n        startIso: toIso(s),\n        endIso: toIso(e),\n        seconds: dur,\n      });\n    }\n  }\n\n  if (primary[i].end <= secondary[j].end) i += 1;\n  else j += 1;\n}\n\nconst out = {\n  slo: Number($json.slo),\n  windowDays: Number($json.windowDays),\n  totalDownMs: overlapSeconds * 1000,\n};\n\nif ($json.debug) {\n  out.debug = {\n    mode: \"gold-ha\",\n    primaryId: $json.primaryId,\n    secondaryId: $json.secondaryId,\n    primaryIntervalCount: primary.length,\n    secondaryIntervalCount: secondary.length,\n    overlapSecondsTotal: overlapSeconds,\n    overlapWindowCount: overlapWindows.length,\n    overlapWindows,\n    primarySample: primary.slice(0, 50).map(i => ({\n      start: i.start,\n      end: i.end,\n      startIso: toIso(i.start),\n      endIso: toIso(i.end),\n      seconds: i.end - i.start,\n    })),\n    secondarySample: secondary.slice(0, 50).map(i => ({\n      start: i.start,\n      end: i.end,\n      startIso: toIso(i.start),\n      endIso: toIso(i.end),\n      seconds: i.end - i.start,\n    })),\n  };\n}\n\nreturn [{ json: out }];\n"
-      },
-      "id": "17b8655e-8dce-434c-ade3-e26fbdecfc83",
-      "name": "Compute Pair Overlap",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        9168,
-        3872
+        7504,
+        3760
       ]
     },
     {
@@ -779,100 +278,15 @@
           }
         }
       },
-      "id": "8ea63156-8feb-4a90-bef9-a251daed2955",
+      "id": "33413875-af46-4a4e-b4b9-4f721db8de4a",
       "name": "Webhook1",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        7600,
-        3632
+        7120,
+        4144
       ],
       "webhookId": "19f59d61-1f16-4246-9f57-a61a249ce320"
-    },
-    {
-      "parameters": {
-        "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  silver:  { testId: \"7719640\", slo: 0.995 },\n  emerald: { testId: \"7719620\", slo: 0.995 },\n  \"gold-ha\": { primary: \"7719621\", secondary: \"7719622\", slo: 0.9995 },\n};\n\nconst windowDays = Number(query.days || \"30\");\nconst now = Math.floor(Date.now() / 1000);\nconst cutoff = now - windowDays * 24 * 60 * 60;\nconst clusterKey = query.cluster ? String(query.cluster).toLowerCase() : null;\n\n// New: opt-in debug output for overlap inspection.\nconst debug = [\"1\", \"true\", \"yes\"].includes(String(query.debug || \"\").toLowerCase());\n\nif (clusterKey === \"gold-ha\") {\n  const c = clusters[\"gold-ha\"];\n  return [{\n    json: {\n      mode: \"pair\",\n      primaryId: c.primary,\n      secondaryId: c.secondary,\n      slo: Number(query.slo || c.slo),\n      windowDays,\n      now,\n      cutoff,\n      debug,\n    }\n  }];\n}\n\n// existing single-test behavior\nlet testId = query.test_id;\nlet slo = query.slo;\n\nif (clusterKey && clusters[clusterKey]?.testId) {\n  const c = clusters[clusterKey];\n  testId = testId || c.testId;\n  slo = slo || c.slo;\n}\n\ntestId = String(testId || \"7719640\");\nslo = Number(slo || \"0.995\");\n\nreturn [{\n  json: {\n    mode: \"single\",\n    testId,\n    slo,\n    windowDays,\n    now,\n    cutoff,\n    url: `https://api.statuscake.com/v1/uptime/${testId}/periods?limit=100`,\n    totalDownMs: 0,\n    debug,\n  }\n}];\n"
-      },
-      "id": "c1ce5f67-c43b-4d35-ba5e-640ad60da8cd",
-      "name": "Init1",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        7824,
-        3728
-      ]
-    },
-    {
-      "parameters": {
-        "url": "={{ $json.url }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "options": {}
-      },
-      "id": "0724e667-084c-4e12-9fdf-56c633f5ec25",
-      "name": "Fetch periods1",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 3,
-      "position": [
-        8720,
-        3568
-      ],
-      "credentials": {
-        "actionNetworkApi": {
-          "id": "KSxGLGUMo1cqPMXD",
-          "name": "Action Network account"
-        },
-        "httpBearerAuth": {
-          "id": "iAM8OHBHv2ufqIfF",
-          "name": "Statuscake Token"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "function toEpoch(s) {\n  return Math.floor(new Date(s).getTime() / 1000);\n}\n\nfunction clamp(x, lo, hi) {\n  return Math.max(lo, Math.min(hi, x));\n}\n\nconst previousState =\n  $runIndex > 0\n    ? $items('Accumulate + Next1', 0, $runIndex - 1)[0].json\n    : $items('Init1')[0].json;\n\nconst state = {\n  ...previousState,\n  totalDownMs: Number(previousState.totalDownMs || 0)\n};\n\nconst resp = $json;\nconst data = resp.data || [];\nlet addMs = 0;\n\nfor (const p of data) {\n  if (p.status !== 'down') continue;\n  if (!p.created_at || !p.ended_at) continue;\n\n  const s = toEpoch(p.created_at);\n  const e = toEpoch(p.ended_at);\n\n  const os = clamp(s, state.cutoff, state.now);\n  const oe = clamp(e, state.cutoff, state.now);\n  const overlap = oe - os;\n\n  if (overlap > 0) addMs += overlap * 1000;\n}\n\nstate.totalDownMs += addMs;\n\nlet oldest = state.now;\nfor (const p of data) {\n  if (p.created_at) oldest = Math.min(oldest, toEpoch(p.created_at));\n}\n\nconst nextUrl = resp.links?.next || null;\nconst done = (!nextUrl) || (oldest < state.cutoff);\n\nreturn [\n  {\n    json: {\n      ...state,\n      url: nextUrl,\n      done\n    }\n  }\n];"
-      },
-      "id": "af55feaf-bd68-48fb-99d7-a75f461aff8f",
-      "name": "Accumulate + Next1",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        8944,
-        3488
-      ]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{ ($json.done || !$json.url) ? 'true' : 'false' }}",
-              "value2": "true"
-            }
-          ]
-        }
-      },
-      "id": "d0b5d880-70ae-49a2-8d7c-697616a435c9",
-      "name": "Done?1",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "position": [
-        9168,
-        3568
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "const { slo, windowDays, totalDownMs } = $json;\nconst windowSeconds = windowDays * 24 * 60 * 60;\n\nconst allowedSeconds = Math.floor(windowSeconds * (1 - slo));\nconst usedSeconds = Math.floor(totalDownMs / 1000);\nconst remainingSeconds = Math.max(0, allowedSeconds - usedSeconds);\nconst remainingMinutes = +(remainingSeconds / 60).toFixed(2);\n\nconst out = {\n  windowDays,\n  slo,\n  allowedSeconds,\n  usedSeconds,\n  remainingSeconds,\n  remainingMinutes,\n  downtimeUsedMs: totalDownMs\n};\n\n// New: attach budget math into debug output.\nif ($json.debug) {\n  out.debug = {\n    ...$json.debug,\n    allowedSeconds,\n    usedSeconds,\n    remainingSeconds,\n    remainingMinutes,\n  };\n}\n\nreturn [{ json: out }];\n"
-      },
-      "id": "352be1df-39d9-4975-9d1a-29767c83d7d4",
-      "name": "Compute budgets1",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        9392,
-        3728
-      ]
     },
     {
       "parameters": {
@@ -880,38 +294,72 @@
         "responseBody": "={{$json}}",
         "options": {}
       },
-      "id": "18b61a5f-f6c5-4c0d-bd35-efcba8458dd2",
+      "id": "3e4966b3-57a4-495b-a16b-790f1e4bc109",
       "name": "Respond to Webhook1",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        9840,
-        3728
+        8016,
+        4240
       ]
-    },
-    {
-      "parameters": {
-        "jsCode": "const response = {\n  data: [\n    {\n      timestamp: new Date().toISOString(),\n      value: Number($json.remainingMinutes),\n    },\n  ],\n};\n\n// New: only include debug block when explicitly requested.\nif ($json.debug) {\n  response.debug = $json.debug;\n}\n\nreturn [{ json: response }];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        9616,
-        3728
-      ],
-      "id": "b7650a99-4600-4989-a43b-fed3e9f145b7",
-      "name": "Build Response1"
     },
     {
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        7600,
-        3824
+        7120,
+        4336
       ],
-      "id": "aadee2f5-3ae8-4fcc-a781-52b8a667ea3f",
+      "id": "04e4d168-cbe7-40b1-9559-b275d85fde3b",
       "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  silver:  { testId: '7719640', slo: 0.995 },\n  emerald: { testId: '7719620', slo: 0.995 },\n  gold:    { testId: '7719621', slo: 0.9995 },\n  golddr:  { testId: '7719622', slo: 0.9995 },\n  'gold-ha': { primary: '7719621', secondary: '7719622', slo: 0.9995 },\n};\n\nconst testIdToCluster = {\n  '7719640': 'silver',\n  '7719620': 'emerald',\n  '7719621': 'gold',\n  '7719622': 'golddr',\n};\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\nif (days > 3650) days = 3650;\n\nconst slo = (query.slo !== undefined && String(query.slo).trim() !== '')\n  ? Number(query.slo)\n  : Number(clusters[cluster].slo);\n\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst sql = [\n  'SELECT day, value_minutes',\n  'FROM public.error_budget_daily',\n  \"WHERE cluster = '\" + safeCluster + \"'\",\n  '  AND day >= (current_date - (' + days + '::int - 1))',\n  'ORDER BY day;'\n].join('\\n');\n\nreturn [{ json: { cluster, days, slo, sql } }];"
+      },
+      "id": "aa14e018-a4d3-409b-9b3d-44f2b20daa73",
+      "name": "Init DB Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7344,
+        4240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.sql }}",
+        "additionalFields": {}
+      },
+      "id": "12bfa3e8-f124-4eb3-b70c-d2fee04149b0",
+      "name": "Read Daily Series",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        7568,
+        4240
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "21",
+          "name": "N8N database access"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.day !== undefined);\n\nconst data = rows.map((item) => {\n  const rawDay = item.json.day;\n  const day = rawDay instanceof Date\n    ? rawDay.toISOString().slice(0, 10)\n    : String(rawDay).slice(0, 10);\n  return {\n    timestamp: day + 'T00:00:00.000Z',\n    value: Number(item.json.value_minutes),\n  };\n});\n\nreturn [{ json: { data } }];"
+      },
+      "id": "e12cb5c2-04d6-473f-a8f1-1357cf092a94",
+      "name": "Build DB Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7792,
+        4240
+      ]
     }
   ],
   "pinData": {},
@@ -931,6 +379,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 1,
-  "updatedAt": "2026-04-01T00:25:33.091Z",
-  "versionId": "bf2f3716-f834-4349-a481-f205b0e0e4f2"
+  "updatedAt": "2026-04-22T20:45:50.637Z",
+  "versionId": "8e141589-3d70-4452-ad5b-1d23fe123bc5"
 }
