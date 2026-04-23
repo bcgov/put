@@ -168,10 +168,10 @@
   "staticData": null,
   "tags": [
     {
-      "updatedAt": "2023-04-28T17:02:25.793Z",
-      "createdAt": "2023-04-28T17:02:25.793Z",
-      "id": "2",
-      "name": "Trigger"
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     },
     {
       "updatedAt": "2023-04-29T00:07:24.473Z",
@@ -180,10 +180,10 @@
       "name": "Utility"
     },
     {
-      "updatedAt": "2023-04-28T17:02:25.792Z",
-      "createdAt": "2023-04-28T17:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
+      "updatedAt": "2023-04-28T17:02:25.793Z",
+      "createdAt": "2023-04-28T17:02:25.793Z",
+      "id": "2",
+      "name": "Trigger"
     }
   ],
   "triggerCount": 1,
