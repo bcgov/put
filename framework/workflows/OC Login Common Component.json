@@ -243,16 +243,16 @@
   "staticData": null,
   "tags": [
     {
-      "updatedAt": "2023-04-28T17:02:25.792Z",
-      "createdAt": "2023-04-28T17:02:25.792Z",
-      "id": "3",
-      "name": "PUT"
-    },
-    {
       "updatedAt": "2023-04-28T17:02:25.753Z",
       "createdAt": "2023-04-28T17:02:25.753Z",
       "id": "1",
       "name": "Common Component"
+    },
+    {
+      "updatedAt": "2023-04-28T17:02:25.792Z",
+      "createdAt": "2023-04-28T17:02:25.792Z",
+      "id": "3",
+      "name": "PUT"
     }
   ],
   "triggerCount": 0,
