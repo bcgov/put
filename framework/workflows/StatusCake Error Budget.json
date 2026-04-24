@@ -1,24 +1,24 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2026-04-22T20:45:52.861Z",
-    "createdAt": "2026-04-22T20:45:50.639Z",
-    "versionId": "8e141589-3d70-4452-ad5b-1d23fe123bc5",
+    "updatedAt": "2026-04-23T18:05:52.782Z",
+    "createdAt": "2026-04-23T18:05:51.039Z",
+    "versionId": "258ecc91-3592-4118-bbf5-c31b0398d80a",
     "workflowId": "bWQtIKtPc4qve6cX",
     "nodes": [
       {
         "parameters": {
-          "content": "## StatusCake Error Budget (DB-backed Webhook)\n\nReads precomputed daily points from Postgres table `public.error_budget_daily`.\n\nQuery parameters:\n- `cluster` (supported: `silver`, `emerald`, `gold`, `golddr`, `gold-ha`; default `silver`)\n- `days` (default `30`)\n- `slo` optional override (otherwise mapped by cluster)\n- `test_id` optional legacy mapping to cluster (7719640/7719620/7719621/7719622)\n\nExample URL:\n`/webhook/statuscake/error-budget?cluster=silver&days=30`",
-          "height": 300,
+          "content": "## StatusCake Error Budget (3-hour Timeseries Webhook)\n\nReads precomputed points from Postgres table `public.error_budget_timeseries`.\n\nQuery parameters:\n- `cluster` (supported: `silver`, `emerald`, `gold`, `golddr`, `gold-ha`; default `silver`)\n- `days` (default `30`)\n- `slo` optional override (otherwise mapped by cluster)\n- `test_id` optional legacy mapping to cluster (7719640/7719620/7719621/7719622)\n\nExample URL:\n`/webhook/statuscake/error-budget?cluster=silver&days=30`",
+          "height": 320,
           "width": 1060
         },
-        "id": "af79aec1-0a43-4c06-b46d-11f49a70bd65",
+        "id": "fb50a0d7-2a6a-452e-9ec2-cbfa29751928",
         "name": "Sticky Note",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          7504,
-          3760
+          7488,
+          4064
         ]
       },
       {
@@ -36,13 +36,13 @@
             }
           }
         },
-        "id": "33413875-af46-4a4e-b4b9-4f721db8de4a",
+        "id": "a39bfe6b-085b-4cdf-9391-00d04539de14",
         "name": "Webhook1",
         "type": "n8n-nodes-base.webhook",
         "typeVersion": 1,
         "position": [
-          7120,
-          4144
+          7312,
+          4448
         ],
         "webhookId": "19f59d61-1f16-4246-9f57-a61a249ce320"
       },
@@ -52,13 +52,13 @@
           "responseBody": "={{$json}}",
           "options": {}
         },
-        "id": "3e4966b3-57a4-495b-a16b-790f1e4bc109",
+        "id": "99a5445c-5894-48b5-9b60-cc61b11b97c0",
         "name": "Respond to Webhook1",
         "type": "n8n-nodes-base.respondToWebhook",
         "typeVersion": 1,
         "position": [
-          8016,
-          4240
+          8208,
+          4544
         ]
       },
       {
@@ -66,23 +66,23 @@
         "type": "n8n-nodes-base.manualTrigger",
         "typeVersion": 1,
         "position": [
-          7120,
-          4336
+          7312,
+          4640
         ],
-        "id": "04e4d168-cbe7-40b1-9559-b275d85fde3b",
+        "id": "881f88c3-4a94-4f7d-88bf-b4a962216dd3",
         "name": "When clicking ‘Execute workflow’"
       },
       {
         "parameters": {
-          "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  silver:  { testId: '7719640', slo: 0.995 },\n  emerald: { testId: '7719620', slo: 0.995 },\n  gold:    { testId: '7719621', slo: 0.9995 },\n  golddr:  { testId: '7719622', slo: 0.9995 },\n  'gold-ha': { primary: '7719621', secondary: '7719622', slo: 0.9995 },\n};\n\nconst testIdToCluster = {\n  '7719640': 'silver',\n  '7719620': 'emerald',\n  '7719621': 'gold',\n  '7719622': 'golddr',\n};\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\nif (days > 3650) days = 3650;\n\nconst slo = (query.slo !== undefined && String(query.slo).trim() !== '')\n  ? Number(query.slo)\n  : Number(clusters[cluster].slo);\n\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst sql = [\n  'SELECT day, value_minutes',\n  'FROM public.error_budget_daily',\n  \"WHERE cluster = '\" + safeCluster + \"'\",\n  '  AND day >= (current_date - (' + days + '::int - 1))',\n  'ORDER BY day;'\n].join('\\n');\n\nreturn [{ json: { cluster, days, slo, sql } }];"
+          "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  silver:  { testId: '7719640', slo: 0.995 },\n  emerald: { testId: '7719620', slo: 0.995 },\n  gold:    { testId: '7719621', slo: 0.9995 },\n  golddr:  { testId: '7719622', slo: 0.9995 },\n  'gold-ha': { primary: '7719621', secondary: '7719622', slo: 0.9995 },\n};\n\nconst testIdToCluster = {\n  '7719640': 'silver',\n  '7719620': 'emerald',\n  '7719621': 'gold',\n  '7719622': 'golddr',\n};\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\nif (days > 3650) days = 3650;\n\nconst slo = (query.slo !== undefined && String(query.slo).trim() !== '')\n  ? Number(query.slo)\n  : Number(clusters[cluster].slo);\n\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst sql = [\n  'SELECT bucket_ts, value_minutes',\n  'FROM public.error_budget_timeseries',\n  \"WHERE cluster = '\" + safeCluster + \"'\",\n  \"  AND bucket_ts >= (now() - interval '\" + days + \" days')\",\n  'ORDER BY bucket_ts;'\n].join('\\n');\n\nreturn [{ json: { cluster, days, slo, sql } }];"
         },
-        "id": "aa14e018-a4d3-409b-9b3d-44f2b20daa73",
+        "id": "417b7202-87e9-4da4-92d7-34cefc6d251b",
         "name": "Init DB Query",
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          7344,
-          4240
+          7536,
+          4544
         ]
       },
       {
@@ -91,13 +91,13 @@
           "query": "={{ $json.sql }}",
           "additionalFields": {}
         },
-        "id": "12bfa3e8-f124-4eb3-b70c-d2fee04149b0",
+        "id": "85e18efd-a1e8-4b99-8060-08f79a7fb71b",
         "name": "Read Daily Series",
         "type": "n8n-nodes-base.postgres",
         "typeVersion": 1,
         "position": [
-          7568,
-          4240
+          7760,
+          4544
         ],
         "credentials": {
           "postgres": {
@@ -108,15 +108,15 @@
       },
       {
         "parameters": {
-          "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.day !== undefined);\n\nconst data = rows.map((item) => {\n  const rawDay = item.json.day;\n  const day = rawDay instanceof Date\n    ? rawDay.toISOString().slice(0, 10)\n    : String(rawDay).slice(0, 10);\n  return {\n    timestamp: day + 'T00:00:00.000Z',\n    value: Number(item.json.value_minutes),\n  };\n});\n\nreturn [{ json: { data } }];"
+          "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.bucket_ts !== undefined);\n\nconst data = rows.map((item) => {\n  const rawTs = item.json.bucket_ts;\n  const ts = rawTs instanceof Date\n    ? rawTs.toISOString()\n    : new Date(rawTs).toISOString();\n\n  return {\n    timestamp: ts,\n    value: Number(item.json.value_minutes),\n  };\n});\n\nreturn [{ json: { data } }];"
         },
-        "id": "e12cb5c2-04d6-473f-a8f1-1357cf092a94",
+        "id": "d87949a2-11d2-415b-8669-99e953ef1231",
         "name": "Build DB Response",
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          7792,
-          4240
+          7984,
+          4544
         ]
       }
     ],
@@ -178,11 +178,11 @@
       }
     },
     "authors": "Billy li",
-    "name": "Version 8e141589",
+    "name": "Version 258ecc91",
     "description": "",
     "autosaved": false
   },
-  "activeVersionId": "8e141589-3d70-4452-ad5b-1d23fe123bc5",
+  "activeVersionId": "258ecc91-3592-4118-bbf5-c31b0398d80a",
   "connections": {
     "Webhook1": {
       "main": [
@@ -250,17 +250,17 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## StatusCake Error Budget (DB-backed Webhook)\n\nReads precomputed daily points from Postgres table `public.error_budget_daily`.\n\nQuery parameters:\n- `cluster` (supported: `silver`, `emerald`, `gold`, `golddr`, `gold-ha`; default `silver`)\n- `days` (default `30`)\n- `slo` optional override (otherwise mapped by cluster)\n- `test_id` optional legacy mapping to cluster (7719640/7719620/7719621/7719622)\n\nExample URL:\n`/webhook/statuscake/error-budget?cluster=silver&days=30`",
-        "height": 300,
+        "content": "## StatusCake Error Budget (3-hour Timeseries Webhook)\n\nReads precomputed points from Postgres table `public.error_budget_timeseries`.\n\nQuery parameters:\n- `cluster` (supported: `silver`, `emerald`, `gold`, `golddr`, `gold-ha`; default `silver`)\n- `days` (default `30`)\n- `slo` optional override (otherwise mapped by cluster)\n- `test_id` optional legacy mapping to cluster (7719640/7719620/7719621/7719622)\n\nExample URL:\n`/webhook/statuscake/error-budget?cluster=silver&days=30`",
+        "height": 320,
         "width": 1060
       },
-      "id": "af79aec1-0a43-4c06-b46d-11f49a70bd65",
+      "id": "fb50a0d7-2a6a-452e-9ec2-cbfa29751928",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        7504,
-        3760
+        7488,
+        4064
       ]
     },
     {
@@ -278,13 +278,13 @@
           }
         }
       },
-      "id": "33413875-af46-4a4e-b4b9-4f721db8de4a",
+      "id": "a39bfe6b-085b-4cdf-9391-00d04539de14",
       "name": "Webhook1",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        7120,
-        4144
+        7312,
+        4448
       ],
       "webhookId": "19f59d61-1f16-4246-9f57-a61a249ce320"
     },
@@ -294,13 +294,13 @@
         "responseBody": "={{$json}}",
         "options": {}
       },
-      "id": "3e4966b3-57a4-495b-a16b-790f1e4bc109",
+      "id": "99a5445c-5894-48b5-9b60-cc61b11b97c0",
       "name": "Respond to Webhook1",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        8016,
-        4240
+        8208,
+        4544
       ]
     },
     {
@@ -308,23 +308,23 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        7120,
-        4336
+        7312,
+        4640
       ],
-      "id": "04e4d168-cbe7-40b1-9559-b275d85fde3b",
+      "id": "881f88c3-4a94-4f7d-88bf-b4a962216dd3",
       "name": "When clicking ‘Execute workflow’"
     },
     {
       "parameters": {
-        "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  silver:  { testId: '7719640', slo: 0.995 },\n  emerald: { testId: '7719620', slo: 0.995 },\n  gold:    { testId: '7719621', slo: 0.9995 },\n  golddr:  { testId: '7719622', slo: 0.9995 },\n  'gold-ha': { primary: '7719621', secondary: '7719622', slo: 0.9995 },\n};\n\nconst testIdToCluster = {\n  '7719640': 'silver',\n  '7719620': 'emerald',\n  '7719621': 'gold',\n  '7719622': 'golddr',\n};\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\nif (days > 3650) days = 3650;\n\nconst slo = (query.slo !== undefined && String(query.slo).trim() !== '')\n  ? Number(query.slo)\n  : Number(clusters[cluster].slo);\n\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst sql = [\n  'SELECT day, value_minutes',\n  'FROM public.error_budget_daily',\n  \"WHERE cluster = '\" + safeCluster + \"'\",\n  '  AND day >= (current_date - (' + days + '::int - 1))',\n  'ORDER BY day;'\n].join('\\n');\n\nreturn [{ json: { cluster, days, slo, sql } }];"
+        "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  silver:  { testId: '7719640', slo: 0.995 },\n  emerald: { testId: '7719620', slo: 0.995 },\n  gold:    { testId: '7719621', slo: 0.9995 },\n  golddr:  { testId: '7719622', slo: 0.9995 },\n  'gold-ha': { primary: '7719621', secondary: '7719622', slo: 0.9995 },\n};\n\nconst testIdToCluster = {\n  '7719640': 'silver',\n  '7719620': 'emerald',\n  '7719621': 'gold',\n  '7719622': 'golddr',\n};\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\nif (days > 3650) days = 3650;\n\nconst slo = (query.slo !== undefined && String(query.slo).trim() !== '')\n  ? Number(query.slo)\n  : Number(clusters[cluster].slo);\n\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst sql = [\n  'SELECT bucket_ts, value_minutes',\n  'FROM public.error_budget_timeseries',\n  \"WHERE cluster = '\" + safeCluster + \"'\",\n  \"  AND bucket_ts >= (now() - interval '\" + days + \" days')\",\n  'ORDER BY bucket_ts;'\n].join('\\n');\n\nreturn [{ json: { cluster, days, slo, sql } }];"
       },
-      "id": "aa14e018-a4d3-409b-9b3d-44f2b20daa73",
+      "id": "417b7202-87e9-4da4-92d7-34cefc6d251b",
       "name": "Init DB Query",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7344,
-        4240
+        7536,
+        4544
       ]
     },
     {
@@ -333,13 +333,13 @@
         "query": "={{ $json.sql }}",
         "additionalFields": {}
       },
-      "id": "12bfa3e8-f124-4eb3-b70c-d2fee04149b0",
+      "id": "85e18efd-a1e8-4b99-8060-08f79a7fb71b",
       "name": "Read Daily Series",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
       "position": [
-        7568,
-        4240
+        7760,
+        4544
       ],
       "credentials": {
         "postgres": {
@@ -350,15 +350,15 @@
     },
     {
       "parameters": {
-        "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.day !== undefined);\n\nconst data = rows.map((item) => {\n  const rawDay = item.json.day;\n  const day = rawDay instanceof Date\n    ? rawDay.toISOString().slice(0, 10)\n    : String(rawDay).slice(0, 10);\n  return {\n    timestamp: day + 'T00:00:00.000Z',\n    value: Number(item.json.value_minutes),\n  };\n});\n\nreturn [{ json: { data } }];"
+        "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.bucket_ts !== undefined);\n\nconst data = rows.map((item) => {\n  const rawTs = item.json.bucket_ts;\n  const ts = rawTs instanceof Date\n    ? rawTs.toISOString()\n    : new Date(rawTs).toISOString();\n\n  return {\n    timestamp: ts,\n    value: Number(item.json.value_minutes),\n  };\n});\n\nreturn [{ json: { data } }];"
       },
-      "id": "e12cb5c2-04d6-473f-a8f1-1357cf092a94",
+      "id": "d87949a2-11d2-415b-8669-99e953ef1231",
       "name": "Build DB Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7792,
-        4240
+        7984,
+        4544
       ]
     }
   ],
@@ -379,6 +379,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 1,
-  "updatedAt": "2026-04-22T20:45:50.637Z",
-  "versionId": "8e141589-3d70-4452-ad5b-1d23fe123bc5"
+  "updatedAt": "2026-04-23T18:05:51.037Z",
+  "versionId": "258ecc91-3592-4118-bbf5-c31b0398d80a"
 }
