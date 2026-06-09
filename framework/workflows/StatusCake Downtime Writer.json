@@ -1,0 +1,336 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Ensure Downtime Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Ensure Downtime Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensure Downtime Table": {
+      "main": [
+        [
+          {
+            "node": "Build Check Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Check Jobs": {
+      "main": [
+        [
+          {
+            "node": "Split Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Checks": {
+      "main": [
+        [
+          {
+            "node": "Fetch Periods",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Periods": {
+      "main": [
+        [
+          {
+            "node": "Collect Rows + Next",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Rows + Next": {
+      "main": [
+        [
+          {
+            "node": "Done?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done?": {
+      "main": [
+        [
+          {
+            "node": "Build Upsert SQL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Periods",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Upsert SQL": {
+      "main": [
+        [
+          {
+            "node": "Upsert Downtime Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Downtime Rows": {
+      "main": [
+        [
+          {
+            "node": "Split Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-06-09T00:22:27.668Z",
+  "id": "YcLl5FgCPcdk1Oay",
+  "isArchived": false,
+  "meta": null,
+  "name": "StatusCake Downtime Writer",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## StatusCake Downtime Writer\n\nImports the most recent 30 days of StatusCake `down` periods into `public.statuscake_downtime_periods` for clab, klab, silver, emerald, gold, and golddr.\n\nManual false-positive handling: set `is_valid = false` and optionally fill `note`; re-imports preserve both columns.",
+        "height": 260,
+        "width": 1080
+      },
+      "id": "f0024437-ac94-477b-92c6-4f16d9eb98ab",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3,
+              "triggerAtMinute": 20
+            }
+          ]
+        }
+      },
+      "id": "1da61ecf-4e50-478c-9f51-ebe50e927986",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        192,
+        448
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "5f885a32-4631-460e-8b03-eddb66ee9481",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        192,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS public.statuscake_downtime_periods (\n  cluster TEXT NOT NULL,\n  test_id TEXT NOT NULL,\n  period_id TEXT NOT NULL,\n  started_at TIMESTAMPTZ NOT NULL,\n  ended_at TIMESTAMPTZ NOT NULL,\n  duration_seconds INTEGER NOT NULL,\n  is_valid BOOLEAN NOT NULL DEFAULT true,\n  note TEXT,\n  source_status TEXT NOT NULL DEFAULT 'down',\n  raw JSONB NOT NULL DEFAULT '{}'::jsonb,\n  imported_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  PRIMARY KEY (test_id, period_id)\n);\nCREATE INDEX IF NOT EXISTS statuscake_downtime_periods_cluster_started_idx\n  ON public.statuscake_downtime_periods (cluster, started_at DESC);\nCREATE INDEX IF NOT EXISTS statuscake_downtime_periods_valid_window_idx\n  ON public.statuscake_downtime_periods (cluster, is_valid, started_at, ended_at);\nSELECT 1 AS ready;",
+        "additionalFields": {}
+      },
+      "id": "d8d24213-2ad1-44d9-a0c5-40e3b927861c",
+      "name": "Ensure Downtime Table",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        416,
+        544
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "21",
+          "name": "N8N database access"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const windowDays = 30;\nconst now = Math.floor(Date.now() / 1000);\nconst cutoff = now - windowDays * 24 * 60 * 60;\n\nconst checks = [\n  { cluster: 'clab', testId: '7719616' },\n  { cluster: 'klab', testId: '7719618' },\n  { cluster: 'emerald', testId: '7719620' },\n  { cluster: 'gold', testId: '7719621' },\n  { cluster: 'golddr', testId: '7719622' },\n  { cluster: 'silver', testId: '7719640' },\n];\n\nreturn checks.map((c) => ({\n  json: {\n    ...c,\n    windowDays,\n    now,\n    cutoff,\n    url: 'https://api.statuscake.com/v1/uptime/' + c.testId + '/periods?limit=100',\n    downtimeRows: [],\n    done: false,\n  }\n}));"
+      },
+      "id": "301d18a0-cf4e-4b0a-ba16-218023273831",
+      "name": "Build Check Jobs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "29c031be-e4b7-4692-8391-20e675b12715",
+      "name": "Split Checks",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        864,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "id": "d25ea1d5-a7f6-43bb-b25c-5c101cde090a",
+      "name": "Fetch Periods",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1088,
+        472
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "iAM8OHBHv2ufqIfF",
+          "name": "Statuscake Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function toEpoch(s) {\n  const t = new Date(s).getTime();\n  return Number.isFinite(t) ? Math.floor(t / 1000) : null;\n}\n\nfunction clamp(x, lo, hi) {\n  return Math.max(lo, Math.min(hi, x));\n}\n\nconst baseState = $items('Split Checks')[0].json;\nconst previousState = $runIndex > 0 ? $items('Collect Rows + Next', 0, $runIndex - 1)[0].json : null;\nconst sameCheck = previousState && previousState.cluster === baseState.cluster && String(previousState.testId) === String(baseState.testId);\nconst state = sameCheck\n  ? { ...previousState, downtimeRows: Array.isArray(previousState.downtimeRows) ? [...previousState.downtimeRows] : [] }\n  : { ...baseState, downtimeRows: [] };\n\nconst resp = $json;\nconst data = Array.isArray(resp.data) ? resp.data : [];\n\nfor (const p of data) {\n  if (String(p.status || '').toLowerCase() !== 'down') continue;\n  if (!p.created_at) continue;\n\n  const start = toEpoch(p.created_at);\n  const rawEnd = p.ended_at ? toEpoch(p.ended_at) : state.now;\n  if (start === null || rawEnd === null) continue;\n\n  const os = clamp(start, state.cutoff, state.now);\n  const oe = clamp(rawEnd, state.cutoff, state.now);\n  if (oe <= os) continue;\n\n  const periodId = String(p.id || p.period_id || p.uuid || [state.testId, p.created_at, p.ended_at || 'open'].join(':'));\n  state.downtimeRows.push({\n    cluster: state.cluster,\n    testId: String(state.testId),\n    periodId,\n    startedAt: new Date(os * 1000).toISOString(),\n    endedAt: new Date(oe * 1000).toISOString(),\n    durationSeconds: oe - os,\n    sourceStatus: String(p.status || 'down'),\n    raw: p,\n  });\n}\n\nlet oldest = state.now;\nfor (const p of data) {\n  if (p.created_at) {\n    const t = toEpoch(p.created_at);\n    if (t !== null) oldest = Math.min(oldest, t);\n  }\n}\n\nconst nextUrl = resp.links?.next || null;\nstate.done = (!nextUrl) || (oldest < state.cutoff);\nstate.url = state.done ? null : nextUrl;\n\nreturn [{ json: state }];"
+      },
+      "id": "60966787-61f8-4a37-8568-116e3f5c01ae",
+      "name": "Collect Rows + Next",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ ($json.done || !$json.url) ? \"true\" : \"false\" }}",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "id": "0c661c7c-8ca9-4469-b984-1ea29be9d8b9",
+      "name": "Done?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        472
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function sqlString(value) {\n  if (value === null || value === undefined) return 'NULL';\n  return \"'\" + String(value).replace(/'/g, \"''\") + \"'\";\n}\n\nfunction sqlJson(value) {\n  return sqlString(JSON.stringify(value || {})) + '::jsonb';\n}\n\nconst rows = Array.isArray($json.downtimeRows) ? $json.downtimeRows : [];\nif (!rows.length) {\n  return [{ json: { ...$json, upsertSql: 'SELECT 0 AS upserted_rows;' } }];\n}\n\nconst values = rows.map((r) => [\n  sqlString(r.cluster),\n  sqlString(r.testId),\n  sqlString(r.periodId),\n  sqlString(r.startedAt) + '::timestamptz',\n  sqlString(r.endedAt) + '::timestamptz',\n  Number.isFinite(Number(r.durationSeconds)) ? Math.max(0, Math.floor(Number(r.durationSeconds))) : 0,\n  sqlString(r.sourceStatus || 'down'),\n  sqlJson(r.raw),\n].join(', '));\n\nconst upsertSql = [\n  'INSERT INTO public.statuscake_downtime_periods',\n  '  (cluster, test_id, period_id, started_at, ended_at, duration_seconds, source_status, raw)',\n  'VALUES',\n  values.map((v) => '  (' + v + ')').join(',\\n'),\n  'ON CONFLICT (test_id, period_id) DO UPDATE SET',\n  '  cluster = EXCLUDED.cluster,',\n  '  started_at = EXCLUDED.started_at,',\n  '  ended_at = EXCLUDED.ended_at,',\n  '  duration_seconds = EXCLUDED.duration_seconds,',\n  '  source_status = EXCLUDED.source_status,',\n  '  raw = EXCLUDED.raw,',\n  '  imported_at = now(),',\n  '  updated_at = now()',\n  'RETURNING cluster, test_id, period_id, started_at, ended_at, duration_seconds, is_valid, note;'\n].join('\\n');\n\nreturn [{ json: { ...$json, upsertSql } }];"
+      },
+      "id": "7619e340-6960-4ddc-ad06-5914f34039bb",
+      "name": "Build Upsert SQL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        472
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.upsertSql }}",
+        "additionalFields": {}
+      },
+      "id": "eb486587-c9e1-4c88-ad22-b4624e4536ec",
+      "name": "Upsert Downtime Rows",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        544
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "21",
+          "name": "N8N database access"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-06-09T00:22:27.668Z",
+      "createdAt": "2026-06-09T00:22:27.668Z",
+      "role": "workflow:owner",
+      "workflowId": "YcLl5FgCPcdk1Oay",
+      "projectId": "8TL7f7Zh5T94reb3"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-06-09T00:22:27.668Z",
+  "versionId": "6ab568d5-7681-46fb-94df-c842da3c12f7"
+}
