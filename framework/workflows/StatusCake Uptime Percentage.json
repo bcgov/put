@@ -1,7 +1,188 @@
 {
-  "active": false,
-  "activeVersion": null,
-  "activeVersionId": null,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-06-10T01:23:57.369Z",
+    "createdAt": "2026-06-10T01:23:55.329Z",
+    "versionId": "a62e8e27-8c61-4374-bf86-8df4100a6118",
+    "workflowId": "X9Y6XibaUrfd3MS3",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## StatusCake Uptime Percentage Webhook\n\nReturns timestamped rolling-30-day uptime percentage points computed from `public.statuscake_downtime_periods` so StatusPage can draw a continuous line.\n\nQuery parameters:\n- `cluster`: clab, klab, silver, emerald, gold, golddr; default silver\n- `days`: default 30\n- `bucket_hours`: default 1; use 3 for a lighter line\n- `test_id`: optional mapping to cluster",
+          "height": 320,
+          "width": 1080
+        },
+        "id": "27471f55-1110-493e-b953-f5dd6941c8be",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          352,
+          480
+        ]
+      },
+      {
+        "parameters": {
+          "path": "statuscake/uptime-percentage",
+          "responseMode": "responseNode",
+          "options": {
+            "responseHeaders": {
+              "entries": [
+                {
+                  "name": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "id": "f0bb8d77-ec95-4b33-8ddb-42af7602bcb4",
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1,
+        "position": [
+          352,
+          1088
+        ],
+        "webhookId": "7d4a00b0-816b-4031-ac70-a709f11d4ef4"
+      },
+      {
+        "parameters": {},
+        "id": "53190109-8609-4ffd-883d-62717a4fb164",
+        "name": "When clicking \"Execute Workflow\"",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          352,
+          1280
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  clab: { testId: '7719616' },\n  klab: { testId: '7719618' },\n  emerald: { testId: '7719620' },\n  gold: { testId: '7719621' },\n  golddr: { testId: '7719622' },\n  silver: { testId: '7719640' },\n};\n\nconst testIdToCluster = Object.fromEntries(Object.entries(clusters).map(([cluster, cfg]) => [cfg.testId, cluster]));\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\nif (days > 30) days = 30;\n\nlet bucketHours = parseInt(String(query.bucket_hours || '1'), 10);\nif (!Number.isFinite(bucketHours) || bucketHours < 1) bucketHours = 1;\nif (bucketHours > 24) bucketHours = 24;\n\nconst rollingDays = 30;\nconst rollingSeconds = rollingDays * 24 * 60 * 60;\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst sql = [\n  'WITH params AS (',\n  \"  SELECT now() AS end_ts, now() - interval '\" + days + \" days' AS start_ts, interval '\" + bucketHours + \" hours' AS step, \" + rollingSeconds + '::numeric AS rolling_seconds',\n  '), points AS (',\n  '  SELECT generate_series(date_trunc(\\'hour\\', start_ts), end_ts, step) AS bucket_ts, rolling_seconds',\n  '  FROM params',\n  '), uptime AS (',\n  '  SELECT',\n  '    p.bucket_ts,',\n  '    COALESCE(SUM(EXTRACT(EPOCH FROM (LEAST(d.ended_at, p.bucket_ts) - GREATEST(d.started_at, p.bucket_ts - interval \\'30 days\\')))), 0)::numeric AS down_seconds,',\n  '    p.rolling_seconds',\n  '  FROM points p',\n  '  LEFT JOIN public.statuscake_downtime_periods d',\n  \"    ON d.cluster = '\" + safeCluster + \"'\",\n  '   AND d.is_valid = true',\n  '   AND d.started_at < p.bucket_ts',\n  '   AND d.ended_at > p.bucket_ts - interval \\'30 days\\'',\n  '  GROUP BY p.bucket_ts, p.rolling_seconds',\n  ')',\n  'SELECT',\n  '  bucket_ts,',\n  '  GREATEST(0, LEAST(100, ROUND((100 * (1 - (down_seconds / NULLIF(rolling_seconds, 0))))::numeric, 4))) AS uptime_percentage',\n  'FROM uptime',\n  'ORDER BY bucket_ts;'\n].join('\\n');\n\nreturn [{ json: { cluster, testId: clusters[cluster].testId, days, bucketHours, rollingDays, sql } }];"
+        },
+        "id": "de3f4f29-0091-455a-a725-515b604e5f9b",
+        "name": "Build Uptime Query",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          576,
+          1088
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "={{ $json.sql }}",
+          "additionalFields": {}
+        },
+        "id": "6c4b2169-d5e2-4432-bc65-5a404b72eeec",
+        "name": "Read Uptime",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 1,
+        "position": [
+          800,
+          1088
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "21",
+            "name": "N8N database access"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.bucket_ts !== undefined);\n\nconst data = rows.map((item) => {\n  const rawTs = item.json.bucket_ts;\n  const timestamp = rawTs instanceof Date ? rawTs.toISOString() : new Date(rawTs).toISOString();\n\n  return {\n    timestamp,\n    value: Number(item.json.uptime_percentage),\n  };\n});\n\nreturn [{ json: { data } }];"
+        },
+        "id": "7fa4b452-3326-4142-81be-984b53c7ef16",
+        "name": "Build Response",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1024,
+          1088
+        ]
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{$json}}",
+          "options": {}
+        },
+        "id": "1e74c142-2ff8-4114-87c8-d5cc6d4aa3a5",
+        "name": "Respond to Webhook",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          1232,
+          1088
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Build Uptime Query",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking \"Execute Workflow\"": {
+        "main": [
+          [
+            {
+              "node": "Build Uptime Query",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Uptime Query": {
+        "main": [
+          [
+            {
+              "node": "Read Uptime",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Uptime": {
+        "main": [
+          [
+            {
+              "node": "Build Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Response": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Billy li",
+    "name": "Version a62e8e27",
+    "description": "",
+    "autosaved": false
+  },
+  "activeVersionId": "a62e8e27-8c61-4374-bf86-8df4100a6118",
   "connections": {
     "Webhook": {
       "main": [
@@ -67,17 +248,17 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## StatusCake Uptime Percentage Webhook\n\nReturns uptime percentage from `public.statuscake_downtime_periods`, excluding rows where `is_valid = false`.\n\nQuery parameters:\n- `cluster`: clab, klab, silver, emerald, gold, golddr; default silver\n- `days`: default 30\n- `test_id`: optional mapping to cluster\n- `include_invalid=true`: debug mode that includes false-positive rows",
+        "content": "## StatusCake Uptime Percentage Webhook\n\nReturns timestamped rolling-30-day uptime percentage points computed from `public.statuscake_downtime_periods` so StatusPage can draw a continuous line.\n\nQuery parameters:\n- `cluster`: clab, klab, silver, emerald, gold, golddr; default silver\n- `days`: default 30\n- `bucket_hours`: default 1; use 3 for a lighter line\n- `test_id`: optional mapping to cluster",
         "height": 320,
         "width": 1080
       },
-      "id": "5de47978-c00d-47ec-8c24-7d3574e5074f",
+      "id": "8e778efd-d370-4f62-901f-f382c41bc464",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        16,
-        -240
+        768,
+        944
       ]
     },
     {
@@ -95,38 +276,38 @@
           }
         }
       },
-      "id": "9dda3705-256d-41aa-9b35-5569d0f3f96d",
+      "id": "a101d9fb-d00c-4171-9aea-8022130b80fe",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        16,
-        368
+        768,
+        1552
       ],
       "webhookId": "7d4a00b0-816b-4031-ac70-a709f11d4ef4"
     },
     {
       "parameters": {},
-      "id": "a177757e-a218-44e4-b6e8-3d8b88c521a4",
+      "id": "d2fa3bcd-95d3-49bc-afb1-8fe481260d62",
       "name": "When clicking \"Execute Workflow\"",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        16,
-        560
+        768,
+        1744
       ]
     },
     {
       "parameters": {
-        "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  clab: { testId: '7719616' },\n  klab: { testId: '7719618' },\n  emerald: { testId: '7719620' },\n  gold: { testId: '7719621' },\n  golddr: { testId: '7719622' },\n  silver: { testId: '7719640' },\n};\n\nconst testIdToCluster = Object.fromEntries(Object.entries(clusters).map(([cluster, cfg]) => [cfg.testId, cluster]));\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\nif (days > 3650) days = 3650;\n\nconst includeInvalid = ['1', 'true', 'yes'].includes(String(query.include_invalid || '').toLowerCase());\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst validFilter = includeInvalid ? '' : '    AND d.is_valid = true';\n\nconst sql = [\n  'WITH params AS (',\n  \"  SELECT now() AS end_ts, now() - interval '\" + days + \" days' AS start_ts, \" + (days * 24 * 60 * 60) + '::numeric AS window_seconds',\n  '), overlap AS (',\n  '  SELECT COALESCE(SUM(EXTRACT(EPOCH FROM (LEAST(d.ended_at, p.end_ts) - GREATEST(d.started_at, p.start_ts)))), 0)::numeric AS down_seconds',\n  '  FROM params p',\n  '  LEFT JOIN public.statuscake_downtime_periods d',\n  \"    ON d.cluster = '\" + safeCluster + \"'\",\n  '   AND d.started_at < p.end_ts',\n  '   AND d.ended_at > p.start_ts',\n  validFilter,\n  '), point AS (',\n  '  SELECT',\n  '    p.end_ts AS bucket_ts,',\n  '    GREATEST(0, LEAST(100, ROUND((100 * (1 - (o.down_seconds / NULLIF(p.window_seconds, 0))))::numeric, 4))) AS uptime_percentage,',\n  '    ROUND(o.down_seconds::numeric, 0) AS downtime_seconds',\n  '  FROM params p CROSS JOIN overlap o',\n  ')',\n  'SELECT bucket_ts, uptime_percentage, downtime_seconds FROM point;'\n].filter((line) => line !== '').join('\\n');\n\nreturn [{ json: { cluster, testId: clusters[cluster].testId, days, includeInvalid, sql } }];"
+        "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  clab: { testId: '7719616' },\n  klab: { testId: '7719618' },\n  emerald: { testId: '7719620' },\n  gold: { testId: '7719621' },\n  golddr: { testId: '7719622' },\n  silver: { testId: '7719640' },\n};\n\nconst testIdToCluster = Object.fromEntries(Object.entries(clusters).map(([cluster, cfg]) => [cfg.testId, cluster]));\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\nif (days > 30) days = 30;\n\nlet bucketHours = parseInt(String(query.bucket_hours || '1'), 10);\nif (!Number.isFinite(bucketHours) || bucketHours < 1) bucketHours = 1;\nif (bucketHours > 24) bucketHours = 24;\n\nconst rollingDays = 30;\nconst rollingSeconds = rollingDays * 24 * 60 * 60;\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst sql = [\n  'WITH params AS (',\n  \"  SELECT now() AS end_ts, now() - interval '\" + days + \" days' AS start_ts, interval '\" + bucketHours + \" hours' AS step, \" + rollingSeconds + '::numeric AS rolling_seconds',\n  '), points AS (',\n  '  SELECT generate_series(date_trunc(\\'hour\\', start_ts), end_ts, step) AS bucket_ts, rolling_seconds',\n  '  FROM params',\n  '), uptime AS (',\n  '  SELECT',\n  '    p.bucket_ts,',\n  '    COALESCE(SUM(CASE',\n  '      WHEN d.period_id IS NULL THEN 0',\n  '      ELSE EXTRACT(EPOCH FROM (LEAST(d.ended_at, p.bucket_ts) - GREATEST(d.started_at, p.bucket_ts - interval \\'30 days\\')))',\n  '    END), 0)::numeric AS down_seconds,',\n  '    p.rolling_seconds',\n  '  FROM points p',\n  '  LEFT JOIN public.statuscake_downtime_periods d',\n  \"    ON d.cluster = '\" + safeCluster + \"'\",\n  '   AND d.is_valid = true',\n  '   AND d.started_at < p.bucket_ts',\n  '   AND d.ended_at > p.bucket_ts - interval \\'30 days\\'',\n  '  GROUP BY p.bucket_ts, p.rolling_seconds',\n  ')',\n  'SELECT',\n  '  bucket_ts,',\n  '  GREATEST(0, LEAST(100, ROUND((100 * (1 - (down_seconds / NULLIF(rolling_seconds, 0))))::numeric, 4))) AS uptime_percentage',\n  'FROM uptime',\n  'ORDER BY bucket_ts;'\n].join('\\n');\n\nreturn [{ json: { cluster, testId: clusters[cluster].testId, days, bucketHours, rollingDays, sql } }];"
       },
-      "id": "e7c39965-585b-4d4f-a3d1-213d53458dc6",
+      "id": "78a5a947-dad4-4f57-b248-73d78f803f37",
       "name": "Build Uptime Query",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        240,
-        368
+        992,
+        1552
       ]
     },
     {
@@ -135,13 +316,13 @@
         "query": "={{ $json.sql }}",
         "additionalFields": {}
       },
-      "id": "2d183731-bb6c-46ff-abd0-127ce48b1e3b",
+      "id": "6062af41-6e03-4f11-96a3-cc68901b652b",
       "name": "Read Uptime",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
       "position": [
-        464,
-        368
+        1216,
+        1552
       ],
       "credentials": {
         "postgres": {
@@ -152,15 +333,15 @@
     },
     {
       "parameters": {
-        "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.bucket_ts !== undefined);\nconst row = rows[0]?.json || {};\nconst timestamp = row.bucket_ts instanceof Date ? row.bucket_ts.toISOString() : new Date(row.bucket_ts || Date.now()).toISOString();\nconst value = Number(row.uptime_percentage ?? 100);\n\nreturn [{\n  json: {\n    data: [\n      { timestamp, value }\n    ]\n  }\n}];"
+        "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.bucket_ts !== undefined);\n\nconst data = rows.map((item) => {\n  const rawTs = item.json.bucket_ts;\n  const timestamp = rawTs instanceof Date ? rawTs.toISOString() : new Date(rawTs).toISOString();\n\n  return {\n    timestamp,\n    value: Number(item.json.uptime_percentage),\n  };\n});\n\nreturn [{ json: { data } }];"
       },
-      "id": "3e7e4388-99df-4def-8db0-d41c47ebf925",
+      "id": "ef4ad955-90be-4b3a-9295-c6a232087d88",
       "name": "Build Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        688,
-        368
+        1440,
+        1552
       ]
     },
     {
@@ -169,13 +350,13 @@
         "responseBody": "={{$json}}",
         "options": {}
       },
-      "id": "eacb9c38-bd9c-4f5d-b9ee-9d2398c772a8",
+      "id": "1e11008e-49f8-4ba6-ac32-0e4df2e761e1",
       "name": "Respond to Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        896,
-        368
+        1648,
+        1552
       ]
     }
   ],
@@ -195,7 +376,7 @@
   ],
   "staticData": null,
   "tags": [],
-  "triggerCount": 0,
-  "updatedAt": "2026-06-09T00:22:01.788Z",
-  "versionId": "ef3f42c7-af55-4d11-a9d6-bc7df5dfba7c"
+  "triggerCount": 1,
+  "updatedAt": "2026-06-10T03:26:24.810Z",
+  "versionId": "47d068f8-7da7-4275-97ab-dd8dd6fceac4"
 }
