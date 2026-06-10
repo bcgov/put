@@ -1,0 +1,153 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "devx-router/:route",
+        "options": {}
+      },
+      "webhookId": "7499cb76-ae1d-4f73-9d2f-d67afb9b0158",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [1088, 6672],
+      "id": "6899d4f2-8723-4e6e-b650-55a2c39f8789"
+    },
+    {
+      "parameters": {
+        "source": "generic",
+        "payload": "={{ (() => { const b = ($json.body && typeof $json.body === 'object') ? $json.body : ($json || {}); const s = (v) => (v == null ? '' : String(v)).trim(); const status = s(b.Status || b.status).toUpperCase(); const source = s(b.source).toLowerCase(); const app = s(b.Name || b.name || b.app || b.application); const titleIn = s(b.title || b.subject || b.subJect); const msg = s(b.msg || b.message || b.text || b.body || b.rcMessage); const rawUrl = s(b.URL || b.url || b.executionUrl || b.runUrl || b.jobUrl); const msgUrl = ((msg.match(/https?:\\/\\/[^\\s)\\]>]+/i) || [])[0] || '').trim(); const isGoodUrl = (u) => /^https?:\\/\\/[^\\s]+$/i.test(u) && !u.includes('<no value>') && !u.includes('undefined') && !u.includes('null'); const url = isGoodUrl(rawUrl) ? rawUrl : (isGoodUrl(msgUrl) ? msgUrl : ''); const mapSeverity = (value, fallback = 'info') => { const x = s(value).toLowerCase(); if (x.includes('critical') || x.includes('error') || x.includes('fail') || x === 'down') return 'critical'; if (x.includes('warn')) return 'warning'; if (x.includes('success') || x.includes('ok') || x.includes('resolved') || x === 'up') return 'success'; return fallback; }; if (titleIn || msg || b.severity || b.source) { const out = { title: titleIn || (app ? ('Alert for ' + app) : 'Notification'), body: msg || (app ? ('Application ' + app + ' sent a notification.') : 'Notification received.'), severity: mapSeverity(b.severity, status === 'DOWN' ? 'critical' : status === 'UP' ? 'success' : 'info'), source: source || 'generic-webhook' }; if (url) { out.url = url; out.urlLabel = b.urlLabel || 'Open Details'; } return out; } if (status === 'UP' || status === 'DOWN') { const up = status === 'UP'; const out = { title: (up ? '🟢 UP' : '🔴 DOWN') + ' Uptime Monitor', body: 'App: ' + (app || 'Unknown monitor') + (url ? ('\\nApp URL: ' + url) : ''), severity: up ? 'success' : 'critical', source: source || 'status-cake' }; if (url) { out.url = url; out.urlLabel = b.urlLabel || 'App URL'; } return out; } const out = { title: app ? ('Alert for ' + app) : 'Notification', body: msg || 'Notification received.', severity: 'info', source: source || 'generic-webhook' }; if (url) { out.url = url; out.urlLabel = b.urlLabel || 'Open Details'; } return out; })() }}"
+      },
+      "name": "DevX Message Connector - internal-platform-services",
+      "type": "CUSTOM.devXMessageConnector",
+      "typeVersion": 0.1,
+      "position": [1536, 6480],
+      "id": "834b5cc5-f02d-450d-ad3e-5d74d9b30420",
+      "credentials": {
+        "devXConnector": {
+          "id": "dj37rgSEG50Hit5E",
+          "name": "internal-platform-services"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ ($json.params.route || '').toLowerCase() }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "internal-platform-services"
+            },
+            {
+              "value2": "artifactory-project-approvals",
+              "output": 1
+            },
+            {
+              "value2": "devops-vault",
+              "output": 2
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "name": "Route Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [1312, 6640],
+      "id": "ebee4bec-a7a4-4634-96db-ab2b2ef229a6"
+    },
+    {
+      "parameters": {},
+      "name": "Unknown Route (NoOp)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1360, 7008],
+      "id": "9d16bac8-c8e0-40b8-aa43-01d1b7b74d13"
+    },
+    {
+      "parameters": {
+        "source": "generic",
+        "payload": "={{ (() => { const b = ($json.body && typeof $json.body === 'object') ? $json.body : {}; const message = (b.text == null ? '' : String(b.text)).trim(); return { title: 'Artifactory Project Approval Request', body: message || 'Archeobot approval notification received.', severity: 'info', source: 'archeobot' }; })() }}"
+      },
+      "name": "DevX Message Connector - artifactory-project-approvals",
+      "type": "CUSTOM.devXMessageConnector",
+      "typeVersion": 0.1,
+      "position": [1536, 6672],
+      "id": "44ab25f2-f85f-44d6-9b66-d2dbf8b3074e",
+      "credentials": {
+        "devXConnector": {
+          "id": "FqmWgQFswdJtvsy6",
+          "name": "artifactory-project-approvals"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "source": "generic",
+        "payload": "={{ (() => { const b = ($json.body && typeof $json.body === 'object') ? $json.body : {}; const s = (v) => (v == null ? '' : String(v)).trim(); const severityIn = s(b.severity).toLowerCase(); const severity = ['critical', 'warning', 'success', 'info'].includes(severityIn) ? severityIn : 'info'; const out = { title: s(b.title) || 'Vault Notification', body: s(b.msg || b.message || b.text || b.body) || 'Notification received.', severity, source: s(b.source) || 'devops-vault' }; const url = s(b.url); if (/^https?:\\/\\//i.test(url)) { out.url = url; out.urlLabel = s(b.urlLabel) || 'Open Details'; } return out; })() }}"
+      },
+      "name": "DevX Message Connector - devops-vault",
+      "type": "CUSTOM.devXMessageConnector",
+      "typeVersion": 0.1,
+      "position": [1536, 6832],
+      "id": "9141be37-e1a6-483e-960a-3e60a928499d",
+      "credentials": {
+        "devXConnector": {
+          "id": "QXno6mkPANcDjVxW",
+          "name": "Internal-devops-vault"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Route Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Switch": {
+      "main": [
+        [
+          {
+            "node": "DevX Message Connector - internal-platform-services",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DevX Message Connector - artifactory-project-approvals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DevX Message Connector - devops-vault",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unknown Route (NoOp)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "83cad9e9972504e8525533acaef39badf73ad4b5e6442e7889e48eca7e897f81"
+  }
+}
