@@ -288,4 +288,3 @@ for template in n8n-deployment n8n-worker-deployment n8n-webhook-deployment; do 
 # Development
 for template in n8n-deployment n8n-worker-deployment n8n-webhook-deployment; do oc process -f templates/${template}.yaml --param-file=values-dev.env | oc apply -f -; done
 ```
-

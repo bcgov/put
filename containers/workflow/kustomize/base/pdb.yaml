@@ -1,0 +1,38 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/part-of: n8n-app
+  name: n8n
+spec:
+  selector:
+    matchLabels:
+      app: n8n
+      component: main
+  maxUnavailable: 1
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/part-of: n8n-app
+  name: n8n-worker
+spec:
+  selector:
+    matchLabels:
+      app: n8n
+      component: worker
+  maxUnavailable: 2
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/part-of: n8n-app
+  name: n8n-webhook
+spec:
+  selector:
+    matchLabels:
+      app: n8n
+      component: webhook
+  maxUnavailable: 1
