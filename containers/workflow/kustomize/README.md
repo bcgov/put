@@ -35,7 +35,7 @@ oc apply -k containers/workflow/kustomize/overlays/dev
 - n8n image namespace: `bf5ef6-tools`
 - Cluster route host: `apps.gold.devops.gov.bc.ca`
 - Worker concurrency: `n8n worker --concurrency=5`
-- Main n8n runs `replicas: 2` with PDB `maxUnavailable: 1`
+- Main n8n runs `replicas: 1` to avoid duplicate schedule triggers without n8n multi-main leader election
 - Webhook runs with HPA `minReplicas: 2` and PDB `maxUnavailable: 1`
 - Worker runs with HPA `minReplicas: 3` and PDB `maxUnavailable: 2`
 - Main, webhook, and worker pods use topology spread constraints across `kubernetes.io/hostname`
