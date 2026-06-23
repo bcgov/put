@@ -1,0 +1,47 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    haproxy.router.openshift.io/balance: leastconn
+    haproxy.router.openshift.io/timeout: 1d
+    openshift.io/host.generated: "true"
+    router.openshift.io/cookie_name: n8n
+  labels:
+    app.kubernetes.io/part-of: n8n-app
+  name: n8n
+spec:
+  host: n8n-bf5ef6-prod.apps.gold.devops.gov.bc.ca
+  path: /
+  port:
+    targetPort: 5678-tcp
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: n8n
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    haproxy.router.openshift.io/balance: leastconn
+    haproxy.router.openshift.io/timeout: 1d
+    openshift.io/host.generated: "true"
+    router.openshift.io/cookie_name: n8n-webhook
+  labels:
+    app.kubernetes.io/part-of: n8n-app
+  name: n8n-webhook
+spec:
+  host: n8n-bf5ef6-prod.apps.gold.devops.gov.bc.ca
+  path: /webhook
+  port:
+    targetPort: 5678-tcp
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: n8n-webhook
+  wildcardPolicy: None

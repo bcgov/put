@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+spec:
+  template:
+    spec:
+      containers:
+        - name: n8n
+          env:
+            - name: WEBHOOK_URL
+              value: https://n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca

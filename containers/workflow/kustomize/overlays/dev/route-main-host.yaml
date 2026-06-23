@@ -1,0 +1,6 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: n8n
+spec:
+  host: n8n-bf5ef6-dev.apps.gold.devops.gov.bc.ca

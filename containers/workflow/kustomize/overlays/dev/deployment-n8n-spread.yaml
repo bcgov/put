@@ -1,0 +1,4 @@
+- op: replace
+  path: /spec/template/spec/topologySpreadConstraints/0/labelSelector/matchLabels
+  value:
+    app: n8n

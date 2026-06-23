@@ -1,0 +1,195 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "devx-router/:route",
+        "options": {}
+      },
+      "webhookId": "67108286-493e-4d5c-8c5c-2450167b001f",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        3456,
+        4432
+      ],
+      "id": "f0e62069-9994-4cb2-8ee1-db272f4f212c"
+    },
+    {
+      "parameters": {
+        "source": "generic",
+        "payload": "={{ (() => { const b = ($json.body && typeof $json.body === 'object') ? $json.body : ($json || {}); const str = (v) => (v == null ? '' : String(v)).trim(); const source = str(b.source).toLowerCase(); const status = str(b.Status || b.status).toUpperCase(); const app = str(b.Name || b.name || b.app || b.application); const msg = str(b.msg || b.message || b.text || b.body || b.rcMessage); const titleIn = str(b.title || b.subject || b.subJect); const rawUrl = str(b.URL || b.url || b.executionUrl || b.runUrl || b.jobUrl); const msgUrl = ((msg.match(/https?:\\/\\/[^\\s)\\]>]+/i) || [])[0] || '').trim(); const isGoodUrl = (u) => /^https?:\\/\\/[^\\s]+$/i.test(u) && !u.includes('<no value>') && !u.includes('undefined') && !u.includes('null'); const url = isGoodUrl(rawUrl) ? rawUrl : (isGoodUrl(msgUrl) ? msgUrl : ''); const inferSeverity = (explicit, text) => { const s = str(explicit).toLowerCase(); const t = str(text).toLowerCase(); if (s.includes('warn') || t.includes('warn')) return 'warning'; if (s.includes('success') || s.includes('ok') || s.includes('resolved') || t.includes('success') || t.includes('resolved')) return 'success'; if (s.includes('critical') || s.includes('error') || s.includes('fail') || t.includes('critical') || t.includes('error') || t.includes('fail')) return 'critical'; return 'info'; }; const out = {}; const isOutOfSync = source === 'argocd' || /out[\\s-]?of[\\s-]?sync/i.test(msg); if (isOutOfSync) { out.title = titleIn || 'ArgoCD OutOfSync'; const lines = []; if (app) lines.push('Application: ' + app); if (msg) lines.push('Message: ' + msg); if (url) lines.push('App URL: ' + url); out.body = lines.length ? lines.join('\\n') : 'Application is out of sync.'; out.severity = 'info'; out.source = source || 'argocd'; if (url) { out.url = url; out.urlLabel = b.urlLabel || 'Open Application'; } return out; } if (status === 'UP' || status === 'DOWN') { const up = status === 'UP'; out.title = (up ? '🟢 UP' : '🔴 DOWN') + ' Uptime Monitor'; const lines = ['App: ' + (app || 'Unknown monitor')]; if (msg) lines.push('Message: ' + msg); if (url) lines.push('App URL: ' + url); out.body = lines.join('\\n'); out.severity = up ? 'success' : inferSeverity(b.severity, 'critical'); out.source = source || 'status-cake'; if (url) { out.url = url; out.urlLabel = b.urlLabel || 'App URL'; } return out; } out.title = titleIn || (app ? ('Alert for ' + app) : 'Notification'); out.body = msg || (app ? ('Application ' + app + ' sent a notification.') : 'Notification received.'); out.severity = inferSeverity(b.severity, msg); out.source = source || 'generic-webhook'; if (url) { out.url = url; out.urlLabel = b.urlLabel || 'Open Details'; } return out; })() }}"
+      },
+      "name": "DevX Message Connector",
+      "type": "CUSTOM.devXMessageConnector",
+      "typeVersion": 0.1,
+      "position": [
+        4208,
+        4160
+      ],
+      "id": "0ff8a2f0-5577-4015-9468-f5a174d34f1b",
+      "credentials": {
+        "devXConnector": {
+          "id": "0OpcXiY6aDJz3e7W",
+          "name": "platform-monitoring-notifications"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ ($json.params.route || '').toLowerCase() }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "platform-monitoring-notifications"
+            },
+            {
+              "value2": "sysdig",
+              "output": 1
+            },
+            {
+              "value2": "put",
+              "output": 2
+            },
+            {
+              "value2": "provisioner",
+              "output": 3
+            }
+          ]
+        },
+        "fallbackOutput": 0
+      },
+      "name": "Route Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        3760,
+        4416
+      ],
+      "id": "3840ce40-728c-4f0a-a1bc-7927ea7b0049"
+    },
+    {
+      "parameters": {
+        "source": "generic",
+        "payload": "={{ { title: (($json.body && $json.body.alert && $json.body.alert.severityLabel ? String($json.body.alert.severityLabel).toUpperCase() : 'ALERT') + ' - ' + ($json.body && $json.body.alert && $json.body.alert.name ? $json.body.alert.name : 'Sysdig Alert')), body: ('State: ' + ($json.body && $json.body.state ? $json.body.state : 'UNKNOWN') + '\\nCondition: ' + ($json.body && $json.body.condition ? $json.body.condition : 'n/a') + '\\nScope: ' + ($json.body && $json.body.alert && $json.body.alert.scope ? $json.body.alert.scope : 'n/a') + '\\nAlert URL: ' + ($json.body && $json.body.alert && $json.body.alert.editUrl ? $json.body.alert.editUrl : 'n/a')), severity: (($json.body && $json.body.alert && Number($json.body.alert.severity) === 0) ? 'critical' : 'warning'), url: ($json.body && $json.body.alert && $json.body.alert.editUrl ? $json.body.alert.editUrl : ($json.body && $json.body.event && $json.body.event.url ? $json.body.event.url : '')), urlLabel: 'Open Sysdig Alert', source: 'sysdig' } }}"
+      },
+      "name": "Send sysdig to platform channel",
+      "type": "CUSTOM.devXMessageConnector",
+      "typeVersion": 0.1,
+      "position": [
+        4208,
+        4352
+      ],
+      "id": "d6f98f3c-1c0f-4261-ab94-06e9a9c1805a",
+      "credentials": {
+        "devXConnector": {
+          "id": "0OpcXiY6aDJz3e7W",
+          "name": "platform-monitoring-notifications"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "source": "generic",
+        "payload": "={{ (() => { const b = $json.body || {}; const rawTitle = b.subJect || b.subject || b['=subJect'] || b.title || 'Workflow Execution Problem'; const primaryMsg = b.rcMessage || b.textMessage || b.body || b.message || 'Triggered from n8n'; const rawSeverity = (b.severity || b.errorCategory || '').toString().toLowerCase(); const severity = rawSeverity.includes('critical') || rawSeverity.includes('high') || rawSeverity.includes('error') ? 'critical' : rawSeverity.includes('warn') ? 'warning' : rawSeverity.includes('success') ? 'success' : 'info'; const detectedUrl = b.executionUrl || b.url || (typeof primaryMsg === 'string' ? ((primaryMsg.match(/https?:\\/\\/\\S+/) || [''])[0]) : ''); const lines = []; if (b.rcMessage) lines.push('Message: ' + b.rcMessage); if (b.textMessage && b.textMessage !== b.rcMessage) lines.push('Text: ' + b.textMessage); if (b.rcChannel) lines.push('Channel: ' + b.rcChannel); if (b.count) lines.push('Count: ' + b.count); if (b.executionUrl) lines.push('Execution URL: ' + b.executionUrl); if (lines.length === 0) lines.push(String(primaryMsg)); const out = { title: String(rawTitle), body: lines.join('\\n'), severity, source: b.source || 'n8n-put' }; if (detectedUrl) { out.url = String(detectedUrl); out.urlLabel = b.urlLabel || 'Open Execution'; } return out; })() }}"
+      },
+      "name": "Send put to platform channel",
+      "type": "CUSTOM.devXMessageConnector",
+      "typeVersion": 0.1,
+      "position": [
+        4208,
+        4544
+      ],
+      "id": "5c238066-2307-41c0-949f-18be09172bca",
+      "credentials": {
+        "devXConnector": {
+          "id": "yT0ugJxdyKsuKXr5",
+          "name": "devops-post-update-testing"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "source": "generic",
+        "payload": "={{ (() => { const b = ($json.body && typeof $json.body === 'object') ? $json.body : {}; const s = (v) => (v == null ? '' : String(v)).trim(); const severityIn = s(b.severity).toLowerCase(); const severity = ['critical', 'warning', 'success', 'info'].includes(severityIn) ? severityIn : 'info'; return { title: s(b.title) || 'Provisioner Notification', body: s(b.msg || b.message || b.text || b.body) || 'Provisioner notification received.', severity, source: s(b.source) || 'provisioner' }; })() }}"
+      },
+      "name": "Send provisioner to platform channel",
+      "type": "CUSTOM.devXMessageConnector",
+      "typeVersion": 0.1,
+      "position": [
+        4208,
+        4736
+      ],
+      "id": "f9d5bf7b-378a-4c1c-8b1e-f6f6a3bcedd8",
+      "credentials": {
+        "devXConnector": {
+          "id": "a6fbB98zin6eKvZP",
+          "name": "internal-provisioner"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "name": "Unknown Route (NoOp)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3760,
+        4960
+      ],
+      "id": "2f338458-2bca-4f83-9637-7f92453a9791"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Route Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Switch": {
+      "main": [
+        [
+          {
+            "node": "DevX Message Connector",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send sysdig to platform channel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send put to platform channel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send provisioner to platform channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "83cad9e9972504e8525533acaef39badf73ad4b5e6442e7889e48eca7e897f81"
+  }
+}

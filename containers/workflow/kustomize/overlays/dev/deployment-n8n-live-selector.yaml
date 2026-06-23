@@ -1,0 +1,8 @@
+- op: replace
+  path: /spec/selector/matchLabels
+  value:
+    app: n8n
+- op: replace
+  path: /spec/template/metadata/labels
+  value:
+    app: n8n

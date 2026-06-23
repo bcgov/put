@@ -16,7 +16,7 @@ objects:
         apiVersion: apps/v1
         kind: Deployment
         name: "${NAME}-worker"
-      minReplicas: 1
+      minReplicas: 2
       maxReplicas: 3
       metrics:
         - type: Resource
@@ -43,7 +43,7 @@ objects:
         apiVersion: apps/v1
         kind: Deployment
         name: "${NAME}-webhook"
-      minReplicas: 1
+      minReplicas: 2
       maxReplicas: 3
       metrics:
         - type: Resource
@@ -63,4 +63,3 @@ parameters:
     value: n8n
   - name: NAMESPACE
     required: true
-

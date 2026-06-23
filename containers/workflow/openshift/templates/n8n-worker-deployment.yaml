@@ -131,7 +131,7 @@ objects:
               image: "image-registry.openshift-image-registry.svc:5000/${N8N_IMAGE_NAMESPACE}/${NAME}:latest"
               imagePullPolicy: Always
               command: ["n8n"]
-              args: ["worker"]
+              args: ["worker", "--concurrency=5"]
               name: n8n-worker
               resources:
                 limits:
@@ -173,4 +173,3 @@ parameters:
     value: 1Gi
   - name: MEMORY_LIMIT
     value: 3Gi
-
