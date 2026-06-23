@@ -2,7 +2,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## StatusCake Downtime Writer\n\nRuns hourly. Imports 60 days of StatusCake `down` periods into `public.statuscake_downtime_periods`, then writes one current rolling-30-day uptime percentage point per cluster into `public.statuscake_uptime_timeseries`.\n\nThe webhook can draw the last 30 days of rolling-30-day uptime because the importer keeps the previous 60 days of raw downtime. Manual false-positive handling: set `is_valid = false` and optionally fill `note`; re-imports preserve both columns.",
+        "content": "## StatusCake Downtime Writer\n\nRuns hourly. Imports 60 days of StatusCake `down` periods into `public.statuscake_downtime_periods`.\n\nThis table is the single source of truth for the StatusCake uptime and error-budget webhooks. Manual false-positive handling: set `is_valid = false` and optionally fill `note`; re-imports preserve both columns.",
         "height": 260,
         "width": 1080
       },
@@ -10,7 +10,10 @@
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [80, -112]
+      "position": [
+        80,
+        -112
+      ]
     },
     {
       "parameters": {
@@ -28,7 +31,10 @@
       "name": "Schedule Trigger",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1,
-      "position": [192, 448]
+      "position": [
+        192,
+        448
+      ]
     },
     {
       "parameters": {},
@@ -36,19 +42,25 @@
       "name": "When clicking \"Execute Workflow\"",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [192, 640]
+      "position": [
+        192,
+        640
+      ]
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "CREATE TABLE IF NOT EXISTS public.statuscake_downtime_periods (\n  cluster TEXT NOT NULL,\n  test_id TEXT NOT NULL,\n  period_id TEXT NOT NULL,\n  started_at TIMESTAMPTZ NOT NULL,\n  ended_at TIMESTAMPTZ NOT NULL,\n  duration_seconds INTEGER NOT NULL,\n  is_valid BOOLEAN NOT NULL DEFAULT true,\n  note TEXT,\n  source_status TEXT NOT NULL DEFAULT 'down',\n  raw JSONB NOT NULL DEFAULT '{}'::jsonb,\n  imported_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  PRIMARY KEY (test_id, period_id)\n);\nCREATE INDEX IF NOT EXISTS statuscake_downtime_periods_cluster_started_idx\n  ON public.statuscake_downtime_periods (cluster, started_at DESC);\nCREATE INDEX IF NOT EXISTS statuscake_downtime_periods_valid_window_idx\n  ON public.statuscake_downtime_periods (cluster, is_valid, started_at, ended_at);\nCREATE TABLE IF NOT EXISTS public.statuscake_uptime_timeseries (\n  cluster TEXT NOT NULL,\n  bucket_ts TIMESTAMPTZ NOT NULL,\n  uptime_percentage NUMERIC NOT NULL,\n  downtime_seconds INTEGER NOT NULL,\n  window_days INTEGER NOT NULL DEFAULT 30,\n  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  PRIMARY KEY (cluster, bucket_ts)\n);\nCREATE INDEX IF NOT EXISTS statuscake_uptime_timeseries_cluster_bucket_idx\n  ON public.statuscake_uptime_timeseries (cluster, bucket_ts DESC);\nSELECT 1 AS ready;",
+        "query": "CREATE TABLE IF NOT EXISTS public.statuscake_downtime_periods (\n  cluster TEXT NOT NULL,\n  test_id TEXT NOT NULL,\n  period_id TEXT NOT NULL,\n  started_at TIMESTAMPTZ NOT NULL,\n  ended_at TIMESTAMPTZ NOT NULL,\n  duration_seconds INTEGER NOT NULL,\n  is_valid BOOLEAN NOT NULL DEFAULT true,\n  note TEXT,\n  source_status TEXT NOT NULL DEFAULT 'down',\n  raw JSONB NOT NULL DEFAULT '{}'::jsonb,\n  imported_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  PRIMARY KEY (test_id, period_id)\n);\nCREATE INDEX IF NOT EXISTS statuscake_downtime_periods_cluster_started_idx\n  ON public.statuscake_downtime_periods (cluster, started_at DESC);\nCREATE INDEX IF NOT EXISTS statuscake_downtime_periods_valid_window_idx\n  ON public.statuscake_downtime_periods (cluster, is_valid, started_at, ended_at);\nSELECT 1 AS ready;",
         "additionalFields": {}
       },
       "id": "d8d24213-2ad1-44d9-a0c5-40e3b927861c",
       "name": "Ensure Downtime Table",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
-      "position": [416, 544],
+      "position": [
+        416,
+        544
+      ],
       "alwaysOutputData": true,
       "credentials": {
         "postgres": {
@@ -65,7 +77,10 @@
       "name": "Build Check Jobs",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [640, 544]
+      "position": [
+        640,
+        544
+      ]
     },
     {
       "parameters": {
@@ -76,7 +91,10 @@
       "name": "Split Checks",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 1,
-      "position": [864, 544]
+      "position": [
+        864,
+        544
+      ]
     },
     {
       "parameters": {
@@ -89,7 +107,10 @@
       "name": "Fetch Periods",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [1088, 472],
+      "position": [
+        1088,
+        472
+      ],
       "credentials": {
         "httpBearerAuth": {
           "id": "iAM8OHBHv2ufqIfF",
@@ -105,7 +126,10 @@
       "name": "Collect Rows + Next",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1312, 400]
+      "position": [
+        1312,
+        400
+      ]
     },
     {
       "parameters": {
@@ -122,17 +146,23 @@
       "name": "Done?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [1536, 472]
+      "position": [
+        1536,
+        472
+      ]
     },
     {
       "parameters": {
-        "jsCode": "function sqlString(value) {\n  if (value === null || value === undefined) return 'NULL';\n  return \"'\" + String(value).replace(/'/g, \"''\") + \"'\";\n}\n\nfunction sqlJson(value) {\n  return sqlString(JSON.stringify(value || {})) + '::jsonb';\n}\n\nconst rows = Array.isArray($json.downtimeRows) ? $json.downtimeRows : [];\nif (!rows.length) {\n  return [{ json: { ...$json, upsertSql: 'SELECT 0 AS upserted_rows;' } }];\n}\n\nconst values = rows.map((r) => [\n  sqlString(r.cluster),\n  sqlString(r.testId),\n  sqlString(r.periodId),\n  sqlString(r.startedAt) + '::timestamptz',\n  sqlString(r.endedAt) + '::timestamptz',\n  Number.isFinite(Number(r.durationSeconds)) ? Math.max(0, Math.floor(Number(r.durationSeconds))) : 0,\n  sqlString(r.sourceStatus || 'down'),\n  sqlJson(r.raw),\n].join(', '));\n\nconst upsertSql = [\n  'INSERT INTO public.statuscake_downtime_periods',\n  '  (cluster, test_id, period_id, started_at, ended_at, duration_seconds, source_status, raw)',\n  'VALUES',\n  values.map((v) => '  (' + v + ')').join(',\\n'),\n  'ON CONFLICT (test_id, period_id) DO UPDATE SET',\n  '  cluster = EXCLUDED.cluster,',\n  '  started_at = EXCLUDED.started_at,',\n  '  ended_at = EXCLUDED.ended_at,',\n  '  duration_seconds = EXCLUDED.duration_seconds,',\n  '  source_status = EXCLUDED.source_status,',\n  '  raw = EXCLUDED.raw,',\n  '  imported_at = now(),',\n  '  updated_at = now()',\n  'RETURNING cluster, test_id, period_id, started_at, ended_at, duration_seconds, is_valid, note;'\n].join('\\n');\n\nreturn [{ json: { ...$json, upsertSql } }];"
+        "jsCode": "function sqlString(value) {\n  if (value === null || value === undefined) return 'NULL';\n  return \"'\" + String(value).replace(/'/g, \"''\") + \"'\";\n}\n\nfunction sqlJson(value) {\n  return sqlString(JSON.stringify(value || {})) + '::jsonb';\n}\n\nconst rows = Array.isArray($json.downtimeRows) ? $json.downtimeRows : [];\nconst cleanupSql = \"DELETE FROM public.statuscake_downtime_periods WHERE ended_at < now() - interval '90 days' RETURNING 1\";\n\nif (!rows.length) {\n  const upsertSql = [\n    'WITH cleanup AS (',\n    '  ' + cleanupSql,\n    ')',\n    'SELECT 0 AS upserted_rows, (SELECT count(*) FROM cleanup) AS deleted_old_rows;'\n  ].join('\\n');\n\n  return [{ json: { ...$json, upsertSql } }];\n}\n\nconst values = rows.map((r) => [\n  sqlString(r.cluster),\n  sqlString(r.testId),\n  sqlString(r.periodId),\n  sqlString(r.startedAt) + '::timestamptz',\n  sqlString(r.endedAt) + '::timestamptz',\n  Number.isFinite(Number(r.durationSeconds)) ? Math.max(0, Math.floor(Number(r.durationSeconds))) : 0,\n  sqlString(r.sourceStatus || 'down'),\n  sqlJson(r.raw),\n].join(', '));\n\nconst upsertSql = [\n  'WITH upserted AS (',\n  '  INSERT INTO public.statuscake_downtime_periods',\n  '    (cluster, test_id, period_id, started_at, ended_at, duration_seconds, source_status, raw)',\n  '  VALUES',\n  values.map((v) => '    (' + v + ')').join(',\\n'),\n  '  ON CONFLICT (test_id, period_id) DO UPDATE SET',\n  '    cluster = EXCLUDED.cluster,',\n  '    started_at = EXCLUDED.started_at,',\n  '    ended_at = EXCLUDED.ended_at,',\n  '    duration_seconds = EXCLUDED.duration_seconds,',\n  '    source_status = EXCLUDED.source_status,',\n  '    raw = EXCLUDED.raw,',\n  '    imported_at = now(),',\n  '    updated_at = now()',\n  '  RETURNING 1',\n  '), cleanup AS (',\n  '  ' + cleanupSql,\n  ')',\n  'SELECT',\n  '  (SELECT count(*) FROM upserted) AS upserted_rows,',\n  '  (SELECT count(*) FROM cleanup) AS deleted_old_rows;'\n].join('\\n');\n\nreturn [{ json: { ...$json, upsertSql } }];"
       },
       "id": "7619e340-6960-4ddc-ad06-5914f34039bb",
       "name": "Build Upsert SQL",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1760, 472]
+      "position": [
+        1760,
+        472
+      ]
     },
     {
       "parameters": {
@@ -144,36 +174,10 @@
       "name": "Upsert Downtime Rows",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
-      "position": [1984, 544],
-      "alwaysOutputData": true,
-      "credentials": {
-        "postgres": {
-          "id": "21",
-          "name": "N8N database access"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "function sqlString(value) {\n  if (value === null || value === undefined) return 'NULL';\n  return \"'\" + String(value).replace(/'/g, \"''\") + \"'\";\n}\n\nconst state = $items('Split Checks')[0].json;\nconst cluster = String(state.cluster || '').toLowerCase();\nconst pointTs = new Date().toISOString();\nconst windowDays = Number(state.windowDays || 30);\nconst windowSeconds = Math.floor(windowDays * 24 * 60 * 60);\nconst safeCluster = cluster.replace(/'/g, \"''\");\nconst safePointTs = pointTs.replace(/'/g, \"''\");\n\nconst snapshotSql = [\n  'WITH params AS (',\n  \"  SELECT '\" + safePointTs + \"'::timestamptz AS end_ts,\",\n  \"         ('\" + safePointTs + \"'::timestamptz - interval '\" + windowDays + \" days') AS start_ts,\",\n  '         ' + windowSeconds + '::numeric AS window_seconds',\n  '), overlap AS (',\n  '  SELECT COALESCE(SUM(CASE',\n  '    WHEN d.period_id IS NULL THEN 0',\n  '    ELSE EXTRACT(EPOCH FROM (LEAST(d.ended_at, p.end_ts) - GREATEST(d.started_at, p.start_ts)))',\n  '  END), 0)::numeric AS down_seconds',\n  '  FROM params p',\n  '  LEFT JOIN public.statuscake_downtime_periods d',\n  \"    ON d.cluster = '\" + safeCluster + \"'\",\n  '   AND d.is_valid = true',\n  '   AND d.started_at < p.end_ts',\n  '   AND d.ended_at > p.start_ts',\n  '), inserted AS (',\n  '  INSERT INTO public.statuscake_uptime_timeseries (cluster, bucket_ts, uptime_percentage, downtime_seconds, window_days)',\n  '  SELECT',\n  \"    '\" + safeCluster + \"',\",\n  '    p.end_ts,',\n  '    GREATEST(0, LEAST(100, ROUND((100 * (1 - (o.down_seconds / NULLIF(p.window_seconds, 0))))::numeric, 4))),',\n  '    ROUND(o.down_seconds::numeric, 0)::integer,',\n  '    ' + windowDays,\n  '  FROM params p CROSS JOIN overlap o',\n  '  ON CONFLICT (cluster, bucket_ts) DO UPDATE SET',\n  '    uptime_percentage = EXCLUDED.uptime_percentage,',\n  '    downtime_seconds = EXCLUDED.downtime_seconds,',\n  '    window_days = EXCLUDED.window_days,',\n  '    updated_at = now()',\n  '  RETURNING cluster, bucket_ts, uptime_percentage, downtime_seconds, window_days',\n  '), cleanup_downtime AS (',\n  \"  DELETE FROM public.statuscake_downtime_periods WHERE ended_at < now() - interval '90 days' RETURNING 1\",\n  '), cleanup_series AS (',\n  \"  DELETE FROM public.statuscake_uptime_timeseries WHERE bucket_ts < now() - interval '90 days' RETURNING 1\",\n  ')',\n  'SELECT * FROM inserted;'\n].join('\\n');\n\nreturn [{ json: { ...state, pointTs, snapshotSql } }];"
-      },
-      "id": "5d3b9dc9-7229-4486-8664-aa04adf26466",
-      "name": "Build Snapshot SQL",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [2208, 544]
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "={{ $json.snapshotSql }}",
-        "additionalFields": {}
-      },
-      "id": "6a209a8a-8279-4bf8-9c6c-c898cf90dd0c",
-      "name": "Upsert Rolling Uptime Point",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 1,
-      "position": [2432, 544],
+      "position": [
+        1984,
+        544
+      ],
       "alwaysOutputData": true,
       "credentials": {
         "postgres": {
@@ -291,28 +295,6 @@
       ]
     },
     "Upsert Downtime Rows": {
-      "main": [
-        [
-          {
-            "node": "Build Snapshot SQL",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Build Snapshot SQL": {
-      "main": [
-        [
-          {
-            "node": "Upsert Rolling Uptime Point",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Upsert Rolling Uptime Point": {
       "main": [
         [
           {

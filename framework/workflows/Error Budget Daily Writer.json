@@ -2,7 +2,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Error Budget Daily Writer\n\nRuns every 3 hours at minute 10 and UPSERTs 3-hour bucketed error budget points into `public.error_budget_timeseries` for silver, emerald, gold, golddr, and gold-ha.\n\nUses Postgres credential: `N8N database access`.",
+        "content": "## Deprecated: Error Budget Daily Writer\n\nThis workflow is deprecated. Error budget is now calculated from `public.statuscake_downtime_periods`, which is populated by `StatusCake Downtime Writer`.\n\nThe scheduled trigger is intentionally disconnected to avoid duplicate StatusCake API calls and duplicate writer state. Keep the manual trigger only for temporary backfill/debug work if needed.",
         "height": 220,
         "width": 980
       },
@@ -10,7 +10,10 @@
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [7088, 2608]
+      "position": [
+        7088,
+        2608
+      ]
     },
     {
       "parameters": {
@@ -28,7 +31,10 @@
       "name": "Schedule Trigger",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1,
-      "position": [7200, 3160]
+      "position": [
+        7200,
+        3160
+      ]
     },
     {
       "parameters": {},
@@ -36,7 +42,10 @@
       "name": "When clicking \"Execute Workflow\"",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [7200, 3352]
+      "position": [
+        7200,
+        3352
+      ]
     },
     {
       "parameters": {
@@ -48,7 +57,10 @@
       "name": "Ensure Table",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
-      "position": [7424, 3256],
+      "position": [
+        7424,
+        3256
+      ],
       "alwaysOutputData": true,
       "credentials": {
         "postgres": {
@@ -65,7 +77,10 @@
       "name": "Build Cluster Jobs",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [7648, 3256]
+      "position": [
+        7648,
+        3256
+      ]
     },
     {
       "parameters": {
@@ -76,7 +91,10 @@
       "name": "Split Clusters",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 1,
-      "position": [7872, 3256]
+      "position": [
+        7872,
+        3256
+      ]
     },
     {
       "parameters": {
@@ -93,7 +111,10 @@
       "name": "Mode?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [8096, 3184]
+      "position": [
+        8096,
+        3184
+      ]
     },
     {
       "parameters": {
@@ -106,7 +127,10 @@
       "name": "Fetch periods1",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [8768, 3016],
+      "position": [
+        8768,
+        3016
+      ],
       "credentials": {
         "httpBearerAuth": {
           "id": "iAM8OHBHv2ufqIfF",
@@ -122,7 +146,10 @@
       "name": "Accumulate + Next1",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [8992, 2944]
+      "position": [
+        8992,
+        2944
+      ]
     },
     {
       "parameters": {
@@ -139,7 +166,10 @@
       "name": "Done?1",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [9216, 3016]
+      "position": [
+        9216,
+        3016
+      ]
     },
     {
       "parameters": {
@@ -149,7 +179,10 @@
       "name": "Init Pair State",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [8320, 3328]
+      "position": [
+        8320,
+        3328
+      ]
     },
     {
       "parameters": {
@@ -162,7 +195,10 @@
       "name": "Fetch periods (pair)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [8544, 3328],
+      "position": [
+        8544,
+        3328
+      ],
       "credentials": {
         "httpBearerAuth": {
           "id": "iAM8OHBHv2ufqIfF",
@@ -178,7 +214,10 @@
       "name": "Collect Pair + Next",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [8768, 3256]
+      "position": [
+        8768,
+        3256
+      ]
     },
     {
       "parameters": {
@@ -195,7 +234,10 @@
       "name": "Pair Done?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [8992, 3328]
+      "position": [
+        8992,
+        3328
+      ]
     },
     {
       "parameters": {
@@ -205,7 +247,10 @@
       "name": "Compute Pair Overlap",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [9216, 3328]
+      "position": [
+        9216,
+        3328
+      ]
     },
     {
       "parameters": {
@@ -215,7 +260,10 @@
       "name": "Compute budgets1",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [9440, 3184]
+      "position": [
+        9440,
+        3184
+      ]
     },
     {
       "parameters": {
@@ -225,7 +273,10 @@
       "name": "Build Upsert SQL",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [9664, 3184]
+      "position": [
+        9664,
+        3184
+      ]
     },
     {
       "parameters": {
@@ -237,7 +288,10 @@
       "name": "Upsert Daily Row",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
-      "position": [9904, 3712],
+      "position": [
+        9904,
+        3712
+      ],
       "alwaysOutputData": true,
       "credentials": {
         "postgres": {
@@ -248,17 +302,6 @@
     }
   ],
   "connections": {
-    "Schedule Trigger": {
-      "main": [
-        [
-          {
-            "node": "Ensure Table",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "When clicking \"Execute Workflow\"": {
       "main": [
         [
