@@ -88,6 +88,10 @@ objects:
                   value: no-reply@gov.bc.ca
                 - name: N8N_SMTP_SSL
                   value: "false"
+                - name: N8N_CONCURRENCY_PRODUCTION_LIMIT
+                  value: "1"
+                - name: N8N_WORKER_CONCURRENCY
+                  value: "1"
                 - name: N8N_ENCRYPTION_KEY
                   valueFrom:
                     secretKeyRef:

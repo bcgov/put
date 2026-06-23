@@ -1,0 +1,125 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "DB Smoke Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB Smoke Query": {
+      "main": [
+        [
+          {
+            "node": "Read Latest Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-22T20:36:39.760Z",
+  "id": "8VF7MyqqMrOwgi2A",
+  "isArchived": false,
+  "meta": null,
+  "name": "Error Budget DB Smoke Test",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Error Budget DB Smoke Test\\n\\nRuns a simple DB write/read smoke test against `public.error_budget_daily` using credential `N8N database access`.",
+        "height": 170,
+        "width": 760
+      },
+      "id": "33c35e82-f4a0-4579-9698-49a9f35cac3b",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "4565d4fb-41ae-4efd-a8bf-7d69f4c0feb8",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        64,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS public.error_budget_daily (\n  cluster TEXT NOT NULL,\n  day DATE NOT NULL,\n  value_minutes NUMERIC NOT NULL,\n  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n  PRIMARY KEY (cluster, day)\n);\n\nWITH upsert AS (\n  INSERT INTO public.error_budget_daily (cluster, day, value_minutes)\n  VALUES ('smoke-test', current_date, 999.99)\n  ON CONFLICT (cluster, day)\n  DO UPDATE SET value_minutes = EXCLUDED.value_minutes, updated_at = now()\n  RETURNING cluster, day, value_minutes, updated_at\n)\nSELECT\n  current_database() AS db,\n  current_user AS usr,\n  COALESCE(inet_server_addr()::text, 'local-socket') AS host,\n  inet_server_port() AS port,\n  current_schema() AS schema,\n  current_setting('search_path') AS search_path,\n  u.cluster,\n  u.day,\n  u.value_minutes,\n  u.updated_at,\n  (SELECT count(*)::int FROM public.error_budget_daily WHERE day = current_date) AS rows_today_total,\n  (SELECT count(*)::int FROM public.error_budget_daily) AS rows_all_time\nFROM upsert u;",
+        "additionalFields": {}
+      },
+      "id": "3ab8600b-5199-47ee-98a0-c3be139c01dd",
+      "name": "DB Smoke Query",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        304,
+        240
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "21",
+          "name": "N8N database access"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT cluster, day, value_minutes, updated_at FROM public.error_budget_daily ORDER BY day DESC, cluster LIMIT 20;",
+        "additionalFields": {}
+      },
+      "id": "590b742c-1bca-44c7-9fec-0d5b16cfe8e6",
+      "name": "Read Latest Rows",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        544,
+        240
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "21",
+          "name": "N8N database access"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-22T20:36:39.760Z",
+      "createdAt": "2026-04-22T20:36:39.760Z",
+      "role": "workflow:owner",
+      "workflowId": "8VF7MyqqMrOwgi2A",
+      "projectId": "8TL7f7Zh5T94reb3"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-22T20:36:39.760Z",
+  "versionId": "ef32a18f-7b48-4d9d-83cd-14004eb73396"
+}

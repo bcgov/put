@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2025-12-24T01:40:31.698Z",
-    "createdAt": "2025-12-24T00:27:15.818Z",
-    "versionId": "fadc1ae1-891e-4c87-8be5-55708385c484",
+    "updatedAt": "2026-05-11T22:08:09.743Z",
+    "createdAt": "2026-05-11T22:08:08.278Z",
+    "versionId": "ece08a69-7e16-461f-bd5d-a97537047c05",
     "workflowId": "17",
     "nodes": [
       {
@@ -13,32 +13,9 @@
         "type": "n8n-nodes-base.executeWorkflowTrigger",
         "typeVersion": 1,
         "position": [
-          -368,
-          320
+          -208,
+          400
         ]
-      },
-      {
-        "parameters": {
-          "channel": "={{ $json.rcChannel }}",
-          "text": "={{ $json.rcMessage }}",
-          "options": {},
-          "attachments": []
-        },
-        "id": "a6f21027-0b68-494b-b22f-913e086a5ec5",
-        "name": "RocketChat",
-        "type": "n8n-nodes-base.rocketchat",
-        "typeVersion": 1,
-        "position": [
-          0,
-          208
-        ],
-        "alwaysOutputData": true,
-        "credentials": {
-          "rocketchatApi": {
-            "id": "4",
-            "name": "Rocket account"
-          }
-        }
       },
       {
         "parameters": {
@@ -73,8 +50,8 @@
         "type": "n8n-nodes-base.noOp",
         "typeVersion": 1,
         "position": [
-          272,
-          288
+          368,
+          400
         ]
       },
       {
@@ -88,8 +65,8 @@
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          -736,
-          48
+          -928,
+          32
         ]
       },
       {
@@ -106,6 +83,24 @@
           -736,
           -240
         ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://n8n.developer.gov.bc.ca/webhook/67108286-493e-4d5c-8c5c-2450167b001f/devx-router/put",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          64,
+          288
+        ],
+        "id": "6b87e9e3-d1c7-4258-8e4f-853742e207f9",
+        "name": "HTTP Request"
       }
     ],
     "connections": {
@@ -114,7 +109,18 @@
           []
         ]
       },
-      "RocketChat": {
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request": {
         "main": [
           [
             {
@@ -124,47 +130,36 @@
             }
           ]
         ]
-      },
-      "Execute Workflow Trigger": {
-        "main": [
-          [
-            {
-              "node": "RocketChat",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
       }
     },
     "authors": "Billy li",
-    "name": "Version fadc1ae1",
+    "name": "Version ece08a69",
     "description": "",
     "autosaved": false
   },
-  "activeVersionId": "fadc1ae1-891e-4c87-8be5-55708385c484",
+  "activeVersionId": "ece08a69-7e16-461f-bd5d-a97537047c05",
   "connections": {
     "Send Email": {
       "main": [
         []
       ]
     },
-    "RocketChat": {
+    "Execute Workflow Trigger": {
       "main": [
         [
           {
-            "node": "No Operation, do nothing",
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Execute Workflow Trigger": {
+    "HTTP Request": {
       "main": [
         [
           {
-            "node": "RocketChat",
+            "node": "No Operation, do nothing",
             "type": "main",
             "index": 0
           }
@@ -185,32 +180,9 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -368,
-        320
+        -208,
+        400
       ]
-    },
-    {
-      "parameters": {
-        "channel": "={{ $json.rcChannel }}",
-        "text": "={{ $json.rcMessage }}",
-        "options": {},
-        "attachments": []
-      },
-      "id": "a6f21027-0b68-494b-b22f-913e086a5ec5",
-      "name": "RocketChat",
-      "type": "n8n-nodes-base.rocketchat",
-      "typeVersion": 1,
-      "position": [
-        0,
-        208
-      ],
-      "alwaysOutputData": true,
-      "credentials": {
-        "rocketchatApi": {
-          "id": "4",
-          "name": "Rocket account"
-        }
-      }
     },
     {
       "parameters": {
@@ -245,8 +217,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        272,
-        288
+        368,
+        400
       ]
     },
     {
@@ -260,8 +232,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -736,
-        48
+        -928,
+        32
       ]
     },
     {
@@ -278,6 +250,24 @@
         -736,
         -240
       ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.developer.gov.bc.ca/webhook/67108286-493e-4d5c-8c5c-2450167b001f/devx-router/put",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        64,
+        288
+      ],
+      "id": "6b87e9e3-d1c7-4258-8e4f-853742e207f9",
+      "name": "HTTP Request"
     }
   ],
   "pinData": {},
@@ -303,6 +293,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2025-12-24T00:27:15.815Z",
-  "versionId": "fadc1ae1-891e-4c87-8be5-55708385c484"
+  "updatedAt": "2026-05-11T22:08:08.277Z",
+  "versionId": "ece08a69-7e16-461f-bd5d-a97537047c05"
 }

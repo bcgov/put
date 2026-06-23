@@ -64,7 +64,7 @@ export ENV_FILE="values-prod.env"
 oc process -f templates/secrets.yaml --param-file=${ENV_FILE} | oc create -f -
 
 # Deploy remaining components
-for template in services routes postgresql-statefulset redis-statefulset n8n-deployment n8n-worker-deployment n8n-webhook-deployment hpa pdb networkpolicy; do 
+for template in services routes postgresql-statefulset redis-statefulset n8n-deployment n8n-worker-deployment n8n-worker-restart-cronjob n8n-webhook-deployment hpa pdb networkpolicy; do 
   oc process -f templates/${template}.yaml --param-file=${ENV_FILE} | oc apply -f -
 done
 
@@ -82,7 +82,7 @@ export ENV_FILE="values-dev.env"
 oc process -f templates/secrets.yaml --param-file=${ENV_FILE} | oc create -f -
 
 # Deploy remaining components
-for template in services routes postgresql-statefulset redis-statefulset n8n-deployment n8n-worker-deployment n8n-webhook-deployment hpa pdb networkpolicy; do 
+for template in services routes postgresql-statefulset redis-statefulset n8n-deployment n8n-worker-deployment n8n-worker-restart-cronjob n8n-webhook-deployment hpa pdb networkpolicy; do 
   oc process -f templates/${template}.yaml --param-file=${ENV_FILE} | oc apply -f -
 done
 
@@ -104,6 +104,8 @@ This deployment creates the following:
 |                   | PodDisruptionBudget | Makes sure we have at least one pod running                                                                        | `pdb.yaml`                      |
 |                   |         PVC         | Persistent Storage for N8N                                                                                         | `pvcs.yaml`                     |
 | **N8N (Worker)**  |     Deployment      | Deploys N8N worker Pods, they use the same storage, database and configuration as the main N8N pod                 | `n8n-worker-deployment.yaml`    |
+|                   |       CronJob       | Restarts worker pods weekly (default: Sunday 12:00 PM America/Vancouver) to reduce intermittent worker failures    | `n8n-worker-restart-cronjob.yaml` |
+|                   |        RBAC         | ServiceAccount + Role + RoleBinding with minimal access for the worker restart CronJob                              | `n8n-worker-restart-cronjob.yaml` |
 |                   |       Service       | The service is responsible for enabling access to a **set** of worker pods                                         | `services.yaml`                 |
 |                   |  HorizontalScaler   | Scales up the number of pods depending on load, this allows for automatic scalability                              | `hpa.yaml`                      |
 |                   | PodDisruptionBudget | Makes sure we have at least one pod running                                                                        | `pdb.yaml`                      |
@@ -145,6 +147,7 @@ containers/workflow/openshift/
 │   ├── postgresql-statefulset.yaml    # PostgreSQL StatefulSet
 │   ├── n8n-deployment.yaml            # N8N main Deployment
 │   ├── n8n-worker-deployment.yaml     # N8N worker Deployment
+│   ├── n8n-worker-restart-cronjob.yaml # Weekly worker restart CronJob + RBAC
 │   ├── n8n-webhook-deployment.yaml    # N8N webhook Deployment
 │   ├── hpa.yaml                        # HorizontalPodAutoscalers
 │   ├── pdb.yaml                        # PodDisruptionBudgets

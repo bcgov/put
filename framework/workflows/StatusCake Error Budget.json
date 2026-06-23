@@ -1,4 +1,252 @@
 {
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-06-22T20:34:33.111Z",
+    "createdAt": "2026-06-22T20:34:30.559Z",
+    "versionId": "f2fe97cc-8a27-4c53-be9c-9e73bd192cd6",
+    "workflowId": "bWQtIKtPc4qve6cX",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## StatusCake Error Budget (3-hour Timeseries Webhook)\n\nReads raw StatusCake downtime periods from `public.statuscake_downtime_periods` and computes rolling-30-day remaining error budget points.\n\nQuery parameters:\n- `cluster` (supported: `silver`, `emerald`, `gold`, `golddr`, `gold-ha`; default `silver`)\n- `days` (default `30`, max `60` because the downtime writer retains 90 days and each point needs a 30-day lookback)\n- `slo` optional override (otherwise mapped by cluster)\n- `test_id` optional legacy mapping to cluster (7719640/7719620/7719621/7719622)\n\n`gold-ha` is calculated as overlapping downtime between `gold` and `golddr`.\n\nExample URL:\n`/webhook/statuscake/error-budget?cluster=silver&days=30`",
+          "height": 320,
+          "width": 1060
+        },
+        "id": "7bd669c8-f303-4cfe-869f-6636f1c2d121",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          7744,
+          4400
+        ]
+      },
+      {
+        "parameters": {
+          "path": "statuscake/error-budget",
+          "responseMode": "responseNode",
+          "options": {
+            "responseHeaders": {
+              "entries": [
+                {
+                  "name": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "id": "8b4606d3-ccca-4bcc-8b56-6d4d42c5e348",
+        "name": "Webhook1",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1,
+        "position": [
+          7360,
+          4784
+        ],
+        "webhookId": "19f59d61-1f16-4246-9f57-a61a249ce320"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{$json}}",
+          "options": {}
+        },
+        "id": "dd4b7112-fdcf-4dda-a1a5-4253f557ffce",
+        "name": "Respond to Webhook1",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          8256,
+          4880
+        ]
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          7360,
+          4976
+        ],
+        "id": "5618469a-42e7-4f09-9610-b736415403f4",
+        "name": "When clicking ‘Execute workflow’"
+      },
+      {
+        "parameters": {
+          "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  silver:  { testId: '7719640', slo: 0.995 },\n  emerald: { testId: '7719620', slo: 0.995 },\n  gold:    { testId: '7719621', slo: 0.9995 },\n  golddr:  { testId: '7719622', slo: 0.9995 },\n  'gold-ha': { primaryCluster: 'gold', secondaryCluster: 'golddr', slo: 0.9995 },\n};\n\nconst testIdToCluster = {\n  '7719640': 'silver',\n  '7719620': 'emerald',\n  '7719621': 'gold',\n  '7719622': 'golddr',\n};\n\nfunction sqlString(value) {\n  if (value === null || value === undefined) return 'NULL';\n  return \"'\" + String(value).replace(/'/g, \"''\") + \"'\";\n}\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\n// The raw downtime writer keeps 90 days; each error-budget point needs a 30-day lookback.\nif (days > 60) days = 60;\n\nconst slo = (query.slo !== undefined && String(query.slo).trim() !== '')\n  ? Number(query.slo)\n  : Number(clusters[cluster].slo);\nconst safeSlo = Number.isFinite(slo) && slo > 0 && slo < 1 ? slo : Number(clusters[cluster].slo);\n\nconst rollingDays = 30;\nconst rollingSeconds = rollingDays * 24 * 60 * 60;\nconst allowedSeconds = Math.floor(rollingSeconds * (1 - safeSlo));\nconst cfg = clusters[cluster];\n\nlet sql;\n\nif (cluster === 'gold-ha') {\n  const primaryCluster = sqlString(cfg.primaryCluster);\n  const secondaryCluster = sqlString(cfg.secondaryCluster);\n  sql = [\n    'WITH params AS (',\n    \"  SELECT now() AS end_ts, now() - interval '\" + days + \" days' AS start_ts, interval '3 hours' AS step, \" + allowedSeconds + '::numeric AS allowed_seconds',\n    '), points AS (',\n    \"  SELECT generate_series(date_trunc('hour', start_ts), end_ts, step) AS bucket_ts, allowed_seconds\",\n    '  FROM params',\n    '), overlap AS (',\n    '  SELECT',\n    '    p.bucket_ts,',\n    '    COALESCE(SUM(CASE',\n    '      WHEN primary_down.period_id IS NULL OR secondary_down.period_id IS NULL THEN 0',\n    \"      ELSE GREATEST(0, EXTRACT(EPOCH FROM (LEAST(primary_down.ended_at, secondary_down.ended_at, p.bucket_ts) - GREATEST(primary_down.started_at, secondary_down.started_at, p.bucket_ts - interval '30 days'))))\",\n    '    END), 0)::numeric AS down_seconds,',\n    '    p.allowed_seconds',\n    '  FROM points p',\n    '  LEFT JOIN public.statuscake_downtime_periods primary_down',\n    '    ON primary_down.cluster = ' + primaryCluster,\n    '   AND primary_down.is_valid = true',\n    '   AND primary_down.started_at < p.bucket_ts',\n    \"   AND primary_down.ended_at > p.bucket_ts - interval '30 days'\",\n    '  LEFT JOIN public.statuscake_downtime_periods secondary_down',\n    '    ON secondary_down.cluster = ' + secondaryCluster,\n    '   AND secondary_down.is_valid = true',\n    '   AND secondary_down.started_at < p.bucket_ts',\n    \"   AND secondary_down.ended_at > p.bucket_ts - interval '30 days'\",\n    '  GROUP BY p.bucket_ts, p.allowed_seconds',\n    ')',\n    'SELECT',\n    '  bucket_ts,',\n    '  GREATEST(0, ROUND(((allowed_seconds - down_seconds) / 60)::numeric, 2)) AS value_minutes',\n    'FROM overlap',\n    'ORDER BY bucket_ts;'\n  ].join('\\n');\n} else {\n  const safeCluster = sqlString(cluster);\n  sql = [\n    'WITH params AS (',\n    \"  SELECT now() AS end_ts, now() - interval '\" + days + \" days' AS start_ts, interval '3 hours' AS step, \" + allowedSeconds + '::numeric AS allowed_seconds',\n    '), points AS (',\n    \"  SELECT generate_series(date_trunc('hour', start_ts), end_ts, step) AS bucket_ts, allowed_seconds\",\n    '  FROM params',\n    '), downtime AS (',\n    '  SELECT',\n    '    p.bucket_ts,',\n    '    COALESCE(SUM(CASE',\n    '      WHEN d.period_id IS NULL THEN 0',\n    \"      ELSE GREATEST(0, EXTRACT(EPOCH FROM (LEAST(d.ended_at, p.bucket_ts) - GREATEST(d.started_at, p.bucket_ts - interval '30 days'))))\",\n    '    END), 0)::numeric AS down_seconds,',\n    '    p.allowed_seconds',\n    '  FROM points p',\n    '  LEFT JOIN public.statuscake_downtime_periods d',\n    '    ON d.cluster = ' + safeCluster,\n    '   AND d.is_valid = true',\n    '   AND d.started_at < p.bucket_ts',\n    \"   AND d.ended_at > p.bucket_ts - interval '30 days'\",\n    '  GROUP BY p.bucket_ts, p.allowed_seconds',\n    ')',\n    'SELECT',\n    '  bucket_ts,',\n    '  GREATEST(0, ROUND(((allowed_seconds - down_seconds) / 60)::numeric, 2)) AS value_minutes',\n    'FROM downtime',\n    'ORDER BY bucket_ts;'\n  ].join('\\n');\n}\n\nreturn [{ json: { cluster, days, slo: safeSlo, rollingDays, sql } }];"
+        },
+        "id": "eb84d459-dbd2-4509-98f5-fa3ffa1b3046",
+        "name": "Init DB Query",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          7584,
+          4880
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "={{ $json.sql }}",
+          "additionalFields": {}
+        },
+        "id": "a6c82ec0-9b1f-4c30-aaf0-7d7926040a29",
+        "name": "Read Daily Series",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 1,
+        "position": [
+          7808,
+          4880
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "21",
+            "name": "N8N database access"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.bucket_ts !== undefined);\n\nconst data = rows.map((item) => {\n  const rawTs = item.json.bucket_ts;\n  const ts = rawTs instanceof Date\n    ? rawTs.toISOString()\n    : new Date(rawTs).toISOString();\n\n  return {\n    timestamp: ts,\n    value: Number(item.json.value_minutes),\n  };\n});\n\nreturn [{ json: { data } }];"
+        },
+        "id": "5420155a-bd77-46b6-9cfb-32bf0664b4ac",
+        "name": "Build DB Response",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          8032,
+          4880
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook1": {
+        "main": [
+          [
+            {
+              "node": "Init DB Query",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Init DB Query": {
+        "main": [
+          [
+            {
+              "node": "Read Daily Series",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Daily Series": {
+        "main": [
+          [
+            {
+              "node": "Build DB Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build DB Response": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking ‘Execute workflow’": {
+        "main": [
+          [
+            {
+              "node": "Init DB Query",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Billy li",
+    "name": "Version f2fe97cc",
+    "description": "",
+    "autosaved": false
+  },
+  "activeVersionId": "f2fe97cc-8a27-4c53-be9c-9e73bd192cd6",
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Init DB Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init DB Query": {
+      "main": [
+        [
+          {
+            "node": "Read Daily Series",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Daily Series": {
+      "main": [
+        [
+          {
+            "node": "Build DB Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build DB Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Init DB Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-03T21:35:43.771Z",
+  "id": "bWQtIKtPc4qve6cX",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "StatusCake Error Budget",
   "nodes": [
     {
       "parameters": {
@@ -114,66 +362,63 @@
       ]
     }
   ],
-  "connections": {
-    "Webhook1": {
-      "main": [
-        [
-          {
-            "node": "Init DB Query",
-            "type": "main",
-            "index": 0
-          }
-        ]
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "parameters": {
+        "jsCode": "const query = $json.query || {};\n\nconst clusters = {\n  silver:  { testId: '7719640', slo: 0.995 },\n  emerald: { testId: '7719620', slo: 0.995 },\n  gold:    { testId: '7719621', slo: 0.9995 },\n  golddr:  { testId: '7719622', slo: 0.9995 },\n  'gold-ha': { primaryCluster: 'gold', secondaryCluster: 'golddr', slo: 0.9995 },\n};\n\nconst testIdToCluster = {\n  '7719640': 'silver',\n  '7719620': 'emerald',\n  '7719621': 'gold',\n  '7719622': 'golddr',\n};\n\nfunction sqlString(value) {\n  if (value === null || value === undefined) return 'NULL';\n  return \"'\" + String(value).replace(/'/g, \"''\") + \"'\";\n}\n\nlet cluster = query.cluster ? String(query.cluster).toLowerCase() : '';\nif (!cluster && query.test_id && testIdToCluster[String(query.test_id)]) {\n  cluster = testIdToCluster[String(query.test_id)];\n}\nif (!clusters[cluster]) cluster = 'silver';\n\nlet days = parseInt(String(query.days || '30'), 10);\nif (!Number.isFinite(days) || days < 1) days = 30;\n// The raw downtime writer keeps 90 days; each error-budget point needs a 30-day lookback.\nif (days > 60) days = 60;\n\nconst slo = (query.slo !== undefined && String(query.slo).trim() !== '')\n  ? Number(query.slo)\n  : Number(clusters[cluster].slo);\nconst safeSlo = Number.isFinite(slo) && slo > 0 && slo < 1 ? slo : Number(clusters[cluster].slo);\n\nconst rollingDays = 30;\nconst rollingSeconds = rollingDays * 24 * 60 * 60;\nconst allowedSeconds = Math.floor(rollingSeconds * (1 - safeSlo));\nconst cfg = clusters[cluster];\n\nlet sql;\n\nif (cluster === 'gold-ha') {\n  const primaryCluster = sqlString(cfg.primaryCluster);\n  const secondaryCluster = sqlString(cfg.secondaryCluster);\n  sql = [\n    'WITH params AS (',\n    \"  SELECT now() AS end_ts, now() - interval '\" + days + \" days' AS start_ts, interval '3 hours' AS step, \" + allowedSeconds + '::numeric AS allowed_seconds',\n    '), points AS (',\n    \"  SELECT generate_series(date_trunc('hour', start_ts), end_ts, step) AS bucket_ts, allowed_seconds\",\n    '  FROM params',\n    '), overlap AS (',\n    '  SELECT',\n    '    p.bucket_ts,',\n    '    COALESCE(SUM(CASE',\n    '      WHEN primary_down.period_id IS NULL OR secondary_down.period_id IS NULL THEN 0',\n    \"      ELSE GREATEST(0, EXTRACT(EPOCH FROM (LEAST(primary_down.ended_at, secondary_down.ended_at, p.bucket_ts) - GREATEST(primary_down.started_at, secondary_down.started_at, p.bucket_ts - interval '30 days'))))\",\n    '    END), 0)::numeric AS down_seconds,',\n    '    p.allowed_seconds',\n    '  FROM points p',\n    '  LEFT JOIN public.statuscake_downtime_periods primary_down',\n    '    ON primary_down.cluster = ' + primaryCluster,\n    '   AND primary_down.is_valid = true',\n    '   AND primary_down.started_at < p.bucket_ts',\n    \"   AND primary_down.ended_at > p.bucket_ts - interval '30 days'\",\n    '  LEFT JOIN public.statuscake_downtime_periods secondary_down',\n    '    ON secondary_down.cluster = ' + secondaryCluster,\n    '   AND secondary_down.is_valid = true',\n    '   AND secondary_down.started_at < p.bucket_ts',\n    \"   AND secondary_down.ended_at > p.bucket_ts - interval '30 days'\",\n    '  GROUP BY p.bucket_ts, p.allowed_seconds',\n    ')',\n    'SELECT',\n    '  bucket_ts,',\n    '  GREATEST(0, ROUND(((allowed_seconds - down_seconds) / 60)::numeric, 2)) AS value_minutes',\n    'FROM overlap',\n    'ORDER BY bucket_ts;'\n  ].join('\\n');\n} else {\n  const safeCluster = sqlString(cluster);\n  sql = [\n    'WITH params AS (',\n    \"  SELECT now() AS end_ts, now() - interval '\" + days + \" days' AS start_ts, interval '3 hours' AS step, \" + allowedSeconds + '::numeric AS allowed_seconds',\n    '), points AS (',\n    \"  SELECT generate_series(date_trunc('hour', start_ts), end_ts, step) AS bucket_ts, allowed_seconds\",\n    '  FROM params',\n    '), downtime AS (',\n    '  SELECT',\n    '    p.bucket_ts,',\n    '    COALESCE(SUM(CASE',\n    '      WHEN d.period_id IS NULL THEN 0',\n    \"      ELSE GREATEST(0, EXTRACT(EPOCH FROM (LEAST(d.ended_at, p.bucket_ts) - GREATEST(d.started_at, p.bucket_ts - interval '30 days'))))\",\n    '    END), 0)::numeric AS down_seconds,',\n    '    p.allowed_seconds',\n    '  FROM points p',\n    '  LEFT JOIN public.statuscake_downtime_periods d',\n    '    ON d.cluster = ' + safeCluster,\n    '   AND d.is_valid = true',\n    '   AND d.started_at < p.bucket_ts',\n    \"   AND d.ended_at > p.bucket_ts - interval '30 days'\",\n    '  GROUP BY p.bucket_ts, p.allowed_seconds',\n    ')',\n    'SELECT',\n    '  bucket_ts,',\n    '  GREATEST(0, ROUND(((allowed_seconds - down_seconds) / 60)::numeric, 2)) AS value_minutes',\n    'FROM downtime',\n    'ORDER BY bucket_ts;'\n  ].join('\\n');\n}\n\nreturn [{ json: { cluster, days, slo: safeSlo, rollingDays, sql } }];"
+      },
+      "id": "eb84d459-dbd2-4509-98f5-fa3ffa1b3046",
+      "name": "Init DB Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7584,
+        4880
       ]
     },
-    "When clicking ‘Execute workflow’": {
-      "main": [
-        [
-          {
-            "node": "Init DB Query",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.sql }}",
+        "additionalFields": {}
+      },
+      "id": "a6c82ec0-9b1f-4c30-aaf0-7d7926040a29",
+      "name": "Read Daily Series",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        7808,
+        4880
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "21",
+          "name": "N8N database access"
+        }
+      }
     },
-    "Init DB Query": {
-      "main": [
-        [
-          {
-            "node": "Read Daily Series",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Read Daily Series": {
-      "main": [
-        [
-          {
-            "node": "Build DB Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Build DB Response": {
-      "main": [
-        [
-          {
-            "node": "Respond to Webhook1",
-            "type": "main",
-            "index": 0
-          }
-        ]
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().filter((item) => item.json && item.json.bucket_ts !== undefined);\n\nconst data = rows.map((item) => {\n  const rawTs = item.json.bucket_ts;\n  const ts = rawTs instanceof Date\n    ? rawTs.toISOString()\n    : new Date(rawTs).toISOString();\n\n  return {\n    timestamp: ts,\n    value: Number(item.json.value_minutes),\n  };\n});\n\nreturn [{ json: { data } }];"
+      },
+      "id": "5420155a-bd77-46b6-9cfb-32bf0664b4ac",
+      "name": "Build DB Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8032,
+        4880
       ]
     }
-  },
-  "pinData": {},
-  "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "c2a9f7d67da59ff35a95e297fb86c74cce47a81a86b2e53fd994d5c3a75af39c"
-  }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-06-22T20:34:30.557Z",
+  "versionId": "f2fe97cc-8a27-4c53-be9c-9e73bd192cd6"
 }
