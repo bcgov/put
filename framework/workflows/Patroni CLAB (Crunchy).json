@@ -1,57 +1,60 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2026-02-19T20:54:47.609Z",
-    "createdAt": "2026-02-19T20:54:46.098Z",
-    "versionId": "7b332474-5968-49c4-9205-26674e4bd920",
+    "updatedAt": "2026-06-23T20:18:22.635Z",
+    "createdAt": "2026-06-23T20:18:20.380Z",
+    "versionId": "cffff578-ccd5-4723-b9e5-b6688e0db757",
     "workflowId": "33",
     "nodes": [
       {
         "parameters": {},
-        "id": "b80845cf-ba65-45e6-a54c-c534cc7b0adf",
+        "id": "0d7fa34f-c160-4528-a118-b4aa5184c4e2",
         "name": "When clicking \"Execute Workflow\"",
         "type": "n8n-nodes-base.manualTrigger",
         "typeVersion": 1,
         "position": [
-          -960,
-          -176
+          -1984,
+          240
         ]
       },
       {
         "parameters": {
-          "command": "=set -u\n\nNAMESPACE=\"{{ $node[\"Set Token Name\"].json.nameSpace }}\"\nSERVICE=\"hippo-pgbouncer\"\nLOCAL_PORT=15438\nREMOTE_PORT=5432\nPID_FILE=\"/tmp/patroni-portforward.pid\"\n\necho \"Starting port-forward to svc/$SERVICE in namespace $NAMESPACE on ${LOCAL_PORT} -> ${REMOTE_PORT}\"\n\n# Best-effort cleanup of previous port-forward\nif [ -f \"$PID_FILE\" ]; then\n  OLD_PID=\"$(cat \"$PID_FILE\" 2>/dev/null || true)\"\n  if [ -n \"${OLD_PID:-}\" ] && ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n    echo \"Killing existing port-forward PID $OLD_PID\"\n    kill \"$OLD_PID\" 2>/dev/null || true\n    sleep 1\n    if ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n      kill -9 \"$OLD_PID\" 2>/dev/null || true\n    fi\n  fi\nfi\n\n# Start port-forward in background (silent)\noc -n \"$NAMESPACE\" port-forward \"svc/$SERVICE\" \"${LOCAL_PORT}:${REMOTE_PORT}\" \\\n  > /dev/null 2>&1 &\n\nPFPID=$!\necho \"$PFPID\" > \"$PID_FILE\"\n\necho \"Port-forward started with PID $PFPID on port $LOCAL_PORT\"\n\n# Give it time to establish\nsleep 10\n\n# Always succeed so workflow continues\nexit 0\n"
+          "command": "=#!/usr/bin/env bash\nset -euo pipefail\n\nNAMESPACE=\"{{ $node[\"Set Token Name\"].json.nameSpace }}\"\nLOCAL_PORT=15438\nPID_FILE=\"/tmp/patroni-portforward-15438.pid\"\nLEGACY_PID_FILE=\"/tmp/patroni-portforward.pid\"\nLOG_FILE=\"/tmp/patroni-portforward-15438.log\"\n\ncleanup_pid_file() {\n  local file=\"$1\"\n  if [[ ! -f \"$file\" ]]; then\n    return 0\n  fi\n\n  local old_pid\n  old_pid=\"$(cat \"$file\" 2>/dev/null || true)\"\n  if [[ -n \"${old_pid:-}\" ]] && ps -p \"$old_pid\" >/dev/null 2>&1; then\n    echo \"Killing existing port-forward PID $old_pid from $file\"\n    kill \"$old_pid\" 2>/dev/null || true\n    sleep 1\n    if ps -p \"$old_pid\" >/dev/null 2>&1; then\n      kill -9 \"$old_pid\" 2>/dev/null || true\n    fi\n  fi\n  rm -f \"$file\"\n}\n\ncleanup_pid_file \"$PID_FILE\"\ncleanup_pid_file \"$LEGACY_PID_FILE\"\n\nTARGET=\"svc/hippo-pgbouncer\"\nREMOTE_PORT=5432\n\n: > \"$LOG_FILE\"\necho \"Starting port-forward to $TARGET in namespace $NAMESPACE on 15438 -> $REMOTE_PORT\"\noc -n \"$NAMESPACE\" port-forward \"$TARGET\" \"15438:$REMOTE_PORT\" > \"$LOG_FILE\" 2>&1 &\nPFPID=$!\necho \"$PFPID\" > \"$PID_FILE\"\n\nfor attempt in $(seq 1 20); do\n  if ! ps -p \"$PFPID\" >/dev/null 2>&1; then\n    echo \"Port-forward process died before port 15438 was ready\" >&2\n    cat \"$LOG_FILE\" >&2 || true\n    exit 1\n  fi\n\n  if bash -c \": > /dev/tcp/127.0.0.1/15438\" >/dev/null 2>&1; then\n    echo \"Port-forward ready with PID $PFPID on port 15438\"\n    exit 0\n  fi\n\n  sleep 1\ndone\n\necho \"Port-forward did not become ready on port 15438\" >&2\ncat \"$LOG_FILE\" >&2 || true\nexit 1\n"
         },
-        "id": "53a0b590-ebf9-4446-9e15-8d4f4bee9447",
+        "id": "45827c43-b271-4eb5-bb74-843f32bfe447",
         "name": "Set Port Forward Patroni",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          -224,
-          -80
-        ]
+          -1248,
+          336
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       },
       {
         "parameters": {},
-        "id": "9d6d07ce-ba3b-4b1a-88c8-429b0aaaad48",
+        "id": "eb3f874a-5892-44e3-945e-4472dd77e452",
         "name": "No Operation, do nothing",
         "type": "n8n-nodes-base.noOp",
         "typeVersion": 1,
         "position": [
-          1232,
-          -368
+          208,
+          48
         ]
       },
       {
         "parameters": {
-          "command": "#!/usr/bin/env bash\nset -euo pipefail\n\nPID_FILE=\"/tmp/patroni-portforward.pid\"\n\n# Kill port-forward if it exists\nif [[ -f \"$PID_FILE\" ]]; then\n  PFPID=$(cat \"$PID_FILE\")\n\n  if ps -p \"$PFPID\" >/dev/null 2>&1; then\n    echo \"Killing port-forward PID $PFPID\"\n    kill \"$PFPID\"\n\n    # Wait briefly, then force kill if needed\n    sleep 2\n    if ps -p \"$PFPID\" >/dev/null 2>&1; then\n      echo \"Force killing port-forward PID $PFPID\"\n      kill -9 \"$PFPID\"\n    fi\n  else\n    echo \"Port-forward PID $PFPID not running\"\n  fi\n\n  rm -f \"$PID_FILE\"\nelse\n  echo \"No port-forward PID file found\"\nfi\n\n# Logout cleanly\noc logout || true\n"
+          "command": "#!/usr/bin/env bash\nset -euo pipefail\n\nfor PID_FILE in \"/tmp/patroni-portforward-15438.pid\" \"/tmp/patroni-portforward.pid\"; do\n  if [[ ! -f \"$PID_FILE\" ]]; then\n    continue\n  fi\n\n  PFPID=\"$(cat \"$PID_FILE\" 2>/dev/null || true)\"\n  if [[ -n \"${PFPID:-}\" ]] && ps -p \"$PFPID\" >/dev/null 2>&1; then\n    echo \"Killing port-forward PID $PFPID from $PID_FILE\"\n    kill \"$PFPID\" 2>/dev/null || true\n    sleep 2\n    if ps -p \"$PFPID\" >/dev/null 2>&1; then\n      echo \"Force killing port-forward PID $PFPID\"\n      kill -9 \"$PFPID\" 2>/dev/null || true\n    fi\n  else\n    echo \"Port-forward PID from $PID_FILE is not running\"\n  fi\n\n  rm -f \"$PID_FILE\"\ndone\n\noc logout || true\n"
         },
-        "id": "3fa7d87b-42fe-4159-9160-aed2b066f4e9",
+        "id": "b1fda7cb-5046-4e39-b855-b27e0049f1d1",
         "name": "OC Logout",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          1040,
-          -368
+          16,
+          48
         ]
       },
       {
@@ -59,13 +62,13 @@
           "workflowId": "17",
           "options": {}
         },
-        "id": "5318823c-35ec-4be0-8a5f-55d6f1b123c6",
+        "id": "1799d9d4-cf95-45a0-8c8d-e409169de457",
         "name": "Report Error",
         "type": "n8n-nodes-base.executeWorkflow",
         "typeVersion": 1,
         "position": [
-          752,
-          -64
+          -272,
+          352
         ]
       },
       {
@@ -84,13 +87,13 @@
           },
           "options": {}
         },
-        "id": "749e016d-51fe-4bfd-8109-db5f743c3f55",
+        "id": "396693e3-d63e-48d1-ba0a-bef760bf244a",
         "name": "Set Token Name",
         "type": "n8n-nodes-base.set",
         "typeVersion": 1,
         "position": [
-          -736,
-          -80
+          -1760,
+          336
         ]
       },
       {
@@ -98,13 +101,13 @@
           "workflowId": "28",
           "options": {}
         },
-        "id": "d5336de7-de90-4857-8f72-a9d4c51de862",
+        "id": "9e13e351-94d6-4bc1-b890-0cb17b3b9ab3",
         "name": "Build Login Command",
         "type": "n8n-nodes-base.executeWorkflow",
         "typeVersion": 1,
         "position": [
-          -576,
-          -80
+          -1600,
+          336
         ],
         "alwaysOutputData": true
       },
@@ -112,24 +115,27 @@
         "parameters": {
           "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}\n"
         },
-        "id": "889a321f-714e-470a-b4bb-b0199764108e",
+        "id": "3b9a1ef2-3154-4624-82c2-6e3ff0241c8b",
         "name": "OC Login",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          -416,
-          -80
-        ]
+          -1440,
+          336
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       },
       {
         "parameters": {},
-        "id": "c877c612-0b57-4728-bd1e-c13e1c02d45d",
+        "id": "cd653125-d293-4f2c-b285-1274b4ad772e",
         "name": "Execute Workflow Trigger",
         "type": "n8n-nodes-base.executeWorkflowTrigger",
         "typeVersion": 1,
         "position": [
-          -960,
-          0
+          -1984,
+          416
         ]
       },
       {
@@ -138,13 +144,13 @@
           "height": 336.5625,
           "width": 471.25
         },
-        "id": "a5b4db6a-02c9-43d7-a7bc-a5d7f158e341",
+        "id": "3b75ee07-7fad-482e-9f2a-589312e7a51b",
         "name": "Sticky Note",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          -784,
-          -176
+          -1808,
+          240
         ]
       },
       {
@@ -153,13 +159,13 @@
           "height": 336.5625,
           "width": 252.5
         },
-        "id": "4257e21a-2aaf-47ef-98ad-185fbe92aaa5",
+        "id": "6f2a719b-43dd-4a5b-97e8-6a770f383856",
         "name": "Sticky Note1",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          -304,
-          -192
+          -1328,
+          224
         ]
       },
       {
@@ -168,13 +174,13 @@
           "height": 331.875,
           "width": 252.5
         },
-        "id": "b7830838-816f-48d5-9b5a-ee091c7abe87",
+        "id": "8de99759-8790-4f53-a74b-d53800b3e297",
         "name": "Sticky Note2",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          -48,
-          -176
+          -1072,
+          240
         ]
       },
       {
@@ -183,13 +189,13 @@
           "height": 331.875,
           "width": 233.75
         },
-        "id": "90c80ddf-0c4f-4bd3-91fe-efe4b865405b",
+        "id": "c289cf76-f70d-45ac-9e9a-ac916d0b26b1",
         "name": "Sticky Note3",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          224,
-          -176
+          -800,
+          240
         ]
       },
       {
@@ -198,14 +204,17 @@
           "query": "CREATE TEMP TABLE lat_longs (\n  c1 bigint GENERATED ALWAYS AS IDENTITY,\n  c2 double precision\n) ON COMMIT DROP;\n\nINSERT INTO lat_longs(c2)\nSELECT random() * 100\nFROM generate_series(1, 10000);\n\nSELECT count(*) AS count FROM lat_longs;\n",
           "additionalFields": {}
         },
-        "id": "4123be6d-b46a-45ee-b289-e792b07a5255",
+        "id": "6e745caf-a7a1-4c81-9326-57be6585a2c0",
         "name": "Postgres Test",
         "type": "n8n-nodes-base.postgres",
         "typeVersion": 1,
         "position": [
-          48,
-          -80
+          -976,
+          336
         ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000,
         "credentials": {
           "postgres": {
             "id": "15",
@@ -219,13 +228,13 @@
           "height": 527.5937657589516,
           "width": 418.125
         },
-        "id": "7c2a8bee-4087-4516-8f74-7dc41ecafd94",
+        "id": "a8d9406b-cee2-4d45-9b7a-8a96fc4feb26",
         "name": "Sticky Note4",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          1024,
-          -416
+          0,
+          0
         ]
       },
       {
@@ -234,13 +243,13 @@
           "height": 217.8125,
           "width": 418.125
         },
-        "id": "7b3d4318-d7b0-4df0-94f9-406effcc7d20",
+        "id": "33d53a26-2315-41e1-a214-c268f7fbf45e",
         "name": "Sticky Note5",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          528,
-          -128
+          -496,
+          288
         ]
       },
       {
@@ -254,13 +263,13 @@
             ]
           }
         },
-        "id": "7f86bdc4-bbd1-4ac0-8b0f-c1a0fe7e2d87",
+        "id": "adf1d493-cf51-43a4-84ca-7d38c8694636",
         "name": "Check",
         "type": "n8n-nodes-base.if",
         "typeVersion": 1,
         "position": [
-          288,
-          -80
+          -736,
+          336
         ]
       },
       {
@@ -304,26 +313,26 @@
           },
           "options": {}
         },
-        "id": "8c88bea2-8350-4473-8d20-3eaf0e3f7008",
+        "id": "082c217a-e106-4972-a35e-c3ff9e12381f",
         "name": "Set Message Params for Error Report",
         "type": "n8n-nodes-base.set",
         "typeVersion": 1,
         "position": [
-          560,
-          -64
+          -464,
+          352
         ]
       },
       {
         "parameters": {
           "errorMessage": "=Error in {{ $workflow.name }}"
         },
-        "id": "506d371f-4d5a-4e97-bbd4-73f5bf4563eb",
+        "id": "50d3fe29-4f3c-49b9-a5d3-fc7277623c61",
         "name": "Stop and Error",
         "type": "n8n-nodes-base.stopAndError",
         "typeVersion": 1,
         "position": [
-          1072,
-          -64
+          48,
+          352
         ]
       }
     ],
@@ -463,11 +472,11 @@
       }
     },
     "authors": "Billy li",
-    "name": "Version 7b332474",
+    "name": "Version cffff578",
     "description": "",
     "autosaved": false
   },
-  "activeVersionId": "7b332474-5968-49c4-9205-26674e4bd920",
+  "activeVersionId": "cffff578-ccd5-4723-b9e5-b6688e0db757",
   "connections": {
     "When clicking \"Execute Workflow\"": {
       "main": [
@@ -611,50 +620,53 @@
   "nodes": [
     {
       "parameters": {},
-      "id": "b80845cf-ba65-45e6-a54c-c534cc7b0adf",
+      "id": "0d7fa34f-c160-4528-a118-b4aa5184c4e2",
       "name": "When clicking \"Execute Workflow\"",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -960,
-        -176
+        -1984,
+        240
       ]
     },
     {
       "parameters": {
-        "command": "=set -u\n\nNAMESPACE=\"{{ $node[\"Set Token Name\"].json.nameSpace }}\"\nSERVICE=\"hippo-pgbouncer\"\nLOCAL_PORT=15438\nREMOTE_PORT=5432\nPID_FILE=\"/tmp/patroni-portforward.pid\"\n\necho \"Starting port-forward to svc/$SERVICE in namespace $NAMESPACE on ${LOCAL_PORT} -> ${REMOTE_PORT}\"\n\n# Best-effort cleanup of previous port-forward\nif [ -f \"$PID_FILE\" ]; then\n  OLD_PID=\"$(cat \"$PID_FILE\" 2>/dev/null || true)\"\n  if [ -n \"${OLD_PID:-}\" ] && ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n    echo \"Killing existing port-forward PID $OLD_PID\"\n    kill \"$OLD_PID\" 2>/dev/null || true\n    sleep 1\n    if ps -p \"$OLD_PID\" >/dev/null 2>&1; then\n      kill -9 \"$OLD_PID\" 2>/dev/null || true\n    fi\n  fi\nfi\n\n# Start port-forward in background (silent)\noc -n \"$NAMESPACE\" port-forward \"svc/$SERVICE\" \"${LOCAL_PORT}:${REMOTE_PORT}\" \\\n  > /dev/null 2>&1 &\n\nPFPID=$!\necho \"$PFPID\" > \"$PID_FILE\"\n\necho \"Port-forward started with PID $PFPID on port $LOCAL_PORT\"\n\n# Give it time to establish\nsleep 10\n\n# Always succeed so workflow continues\nexit 0\n"
+        "command": "=#!/usr/bin/env bash\nset -euo pipefail\n\nNAMESPACE=\"{{ $node[\"Set Token Name\"].json.nameSpace }}\"\nLOCAL_PORT=15438\nPID_FILE=\"/tmp/patroni-portforward-15438.pid\"\nLEGACY_PID_FILE=\"/tmp/patroni-portforward.pid\"\nLOG_FILE=\"/tmp/patroni-portforward-15438.log\"\n\ncleanup_pid_file() {\n  local file=\"$1\"\n  if [[ ! -f \"$file\" ]]; then\n    return 0\n  fi\n\n  local old_pid\n  old_pid=\"$(cat \"$file\" 2>/dev/null || true)\"\n  if [[ -n \"${old_pid:-}\" ]] && ps -p \"$old_pid\" >/dev/null 2>&1; then\n    echo \"Killing existing port-forward PID $old_pid from $file\"\n    kill \"$old_pid\" 2>/dev/null || true\n    sleep 1\n    if ps -p \"$old_pid\" >/dev/null 2>&1; then\n      kill -9 \"$old_pid\" 2>/dev/null || true\n    fi\n  fi\n  rm -f \"$file\"\n}\n\ncleanup_pid_file \"$PID_FILE\"\ncleanup_pid_file \"$LEGACY_PID_FILE\"\n\nTARGET=\"svc/hippo-pgbouncer\"\nREMOTE_PORT=5432\n\n: > \"$LOG_FILE\"\necho \"Starting port-forward to $TARGET in namespace $NAMESPACE on 15438 -> $REMOTE_PORT\"\noc -n \"$NAMESPACE\" port-forward \"$TARGET\" \"15438:$REMOTE_PORT\" > \"$LOG_FILE\" 2>&1 &\nPFPID=$!\necho \"$PFPID\" > \"$PID_FILE\"\n\nfor attempt in $(seq 1 20); do\n  if ! ps -p \"$PFPID\" >/dev/null 2>&1; then\n    echo \"Port-forward process died before port 15438 was ready\" >&2\n    cat \"$LOG_FILE\" >&2 || true\n    exit 1\n  fi\n\n  if bash -c \": > /dev/tcp/127.0.0.1/15438\" >/dev/null 2>&1; then\n    echo \"Port-forward ready with PID $PFPID on port 15438\"\n    exit 0\n  fi\n\n  sleep 1\ndone\n\necho \"Port-forward did not become ready on port 15438\" >&2\ncat \"$LOG_FILE\" >&2 || true\nexit 1\n"
       },
-      "id": "53a0b590-ebf9-4446-9e15-8d4f4bee9447",
+      "id": "45827c43-b271-4eb5-bb74-843f32bfe447",
       "name": "Set Port Forward Patroni",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -224,
-        -80
-      ]
+        -1248,
+        336
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     },
     {
       "parameters": {},
-      "id": "9d6d07ce-ba3b-4b1a-88c8-429b0aaaad48",
+      "id": "eb3f874a-5892-44e3-945e-4472dd77e452",
       "name": "No Operation, do nothing",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1232,
-        -368
+        208,
+        48
       ]
     },
     {
       "parameters": {
-        "command": "#!/usr/bin/env bash\nset -euo pipefail\n\nPID_FILE=\"/tmp/patroni-portforward.pid\"\n\n# Kill port-forward if it exists\nif [[ -f \"$PID_FILE\" ]]; then\n  PFPID=$(cat \"$PID_FILE\")\n\n  if ps -p \"$PFPID\" >/dev/null 2>&1; then\n    echo \"Killing port-forward PID $PFPID\"\n    kill \"$PFPID\"\n\n    # Wait briefly, then force kill if needed\n    sleep 2\n    if ps -p \"$PFPID\" >/dev/null 2>&1; then\n      echo \"Force killing port-forward PID $PFPID\"\n      kill -9 \"$PFPID\"\n    fi\n  else\n    echo \"Port-forward PID $PFPID not running\"\n  fi\n\n  rm -f \"$PID_FILE\"\nelse\n  echo \"No port-forward PID file found\"\nfi\n\n# Logout cleanly\noc logout || true\n"
+        "command": "#!/usr/bin/env bash\nset -euo pipefail\n\nfor PID_FILE in \"/tmp/patroni-portforward-15438.pid\" \"/tmp/patroni-portforward.pid\"; do\n  if [[ ! -f \"$PID_FILE\" ]]; then\n    continue\n  fi\n\n  PFPID=\"$(cat \"$PID_FILE\" 2>/dev/null || true)\"\n  if [[ -n \"${PFPID:-}\" ]] && ps -p \"$PFPID\" >/dev/null 2>&1; then\n    echo \"Killing port-forward PID $PFPID from $PID_FILE\"\n    kill \"$PFPID\" 2>/dev/null || true\n    sleep 2\n    if ps -p \"$PFPID\" >/dev/null 2>&1; then\n      echo \"Force killing port-forward PID $PFPID\"\n      kill -9 \"$PFPID\" 2>/dev/null || true\n    fi\n  else\n    echo \"Port-forward PID from $PID_FILE is not running\"\n  fi\n\n  rm -f \"$PID_FILE\"\ndone\n\noc logout || true\n"
       },
-      "id": "3fa7d87b-42fe-4159-9160-aed2b066f4e9",
+      "id": "b1fda7cb-5046-4e39-b855-b27e0049f1d1",
       "name": "OC Logout",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1040,
-        -368
+        16,
+        48
       ]
     },
     {
@@ -662,13 +674,13 @@
         "workflowId": "17",
         "options": {}
       },
-      "id": "5318823c-35ec-4be0-8a5f-55d6f1b123c6",
+      "id": "1799d9d4-cf95-45a0-8c8d-e409169de457",
       "name": "Report Error",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        752,
-        -64
+        -272,
+        352
       ]
     },
     {
@@ -687,13 +699,13 @@
         },
         "options": {}
       },
-      "id": "749e016d-51fe-4bfd-8109-db5f743c3f55",
+      "id": "396693e3-d63e-48d1-ba0a-bef760bf244a",
       "name": "Set Token Name",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        -736,
-        -80
+        -1760,
+        336
       ]
     },
     {
@@ -701,13 +713,13 @@
         "workflowId": "28",
         "options": {}
       },
-      "id": "d5336de7-de90-4857-8f72-a9d4c51de862",
+      "id": "9e13e351-94d6-4bc1-b890-0cb17b3b9ab3",
       "name": "Build Login Command",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -576,
-        -80
+        -1600,
+        336
       ],
       "alwaysOutputData": true
     },
@@ -715,24 +727,27 @@
       "parameters": {
         "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}\n"
       },
-      "id": "889a321f-714e-470a-b4bb-b0199764108e",
+      "id": "3b9a1ef2-3154-4624-82c2-6e3ff0241c8b",
       "name": "OC Login",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -416,
-        -80
-      ]
+        -1440,
+        336
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     },
     {
       "parameters": {},
-      "id": "c877c612-0b57-4728-bd1e-c13e1c02d45d",
+      "id": "cd653125-d293-4f2c-b285-1274b4ad772e",
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -960,
-        0
+        -1984,
+        416
       ]
     },
     {
@@ -741,13 +756,13 @@
         "height": 336.5625,
         "width": 471.25
       },
-      "id": "a5b4db6a-02c9-43d7-a7bc-a5d7f158e341",
+      "id": "3b75ee07-7fad-482e-9f2a-589312e7a51b",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -784,
-        -176
+        -1808,
+        240
       ]
     },
     {
@@ -756,13 +771,13 @@
         "height": 336.5625,
         "width": 252.5
       },
-      "id": "4257e21a-2aaf-47ef-98ad-185fbe92aaa5",
+      "id": "6f2a719b-43dd-4a5b-97e8-6a770f383856",
       "name": "Sticky Note1",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -304,
-        -192
+        -1328,
+        224
       ]
     },
     {
@@ -771,13 +786,13 @@
         "height": 331.875,
         "width": 252.5
       },
-      "id": "b7830838-816f-48d5-9b5a-ee091c7abe87",
+      "id": "8de99759-8790-4f53-a74b-d53800b3e297",
       "name": "Sticky Note2",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -48,
-        -176
+        -1072,
+        240
       ]
     },
     {
@@ -786,13 +801,13 @@
         "height": 331.875,
         "width": 233.75
       },
-      "id": "90c80ddf-0c4f-4bd3-91fe-efe4b865405b",
+      "id": "c289cf76-f70d-45ac-9e9a-ac916d0b26b1",
       "name": "Sticky Note3",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        224,
-        -176
+        -800,
+        240
       ]
     },
     {
@@ -801,14 +816,17 @@
         "query": "CREATE TEMP TABLE lat_longs (\n  c1 bigint GENERATED ALWAYS AS IDENTITY,\n  c2 double precision\n) ON COMMIT DROP;\n\nINSERT INTO lat_longs(c2)\nSELECT random() * 100\nFROM generate_series(1, 10000);\n\nSELECT count(*) AS count FROM lat_longs;\n",
         "additionalFields": {}
       },
-      "id": "4123be6d-b46a-45ee-b289-e792b07a5255",
+      "id": "6e745caf-a7a1-4c81-9326-57be6585a2c0",
       "name": "Postgres Test",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 1,
       "position": [
-        48,
-        -80
+        -976,
+        336
       ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000,
       "credentials": {
         "postgres": {
           "id": "15",
@@ -822,13 +840,13 @@
         "height": 527.5937657589516,
         "width": 418.125
       },
-      "id": "7c2a8bee-4087-4516-8f74-7dc41ecafd94",
+      "id": "a8d9406b-cee2-4d45-9b7a-8a96fc4feb26",
       "name": "Sticky Note4",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1024,
-        -416
+        0,
+        0
       ]
     },
     {
@@ -837,13 +855,13 @@
         "height": 217.8125,
         "width": 418.125
       },
-      "id": "7b3d4318-d7b0-4df0-94f9-406effcc7d20",
+      "id": "33d53a26-2315-41e1-a214-c268f7fbf45e",
       "name": "Sticky Note5",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        528,
-        -128
+        -496,
+        288
       ]
     },
     {
@@ -857,13 +875,13 @@
           ]
         }
       },
-      "id": "7f86bdc4-bbd1-4ac0-8b0f-c1a0fe7e2d87",
+      "id": "adf1d493-cf51-43a4-84ca-7d38c8694636",
       "name": "Check",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        288,
-        -80
+        -736,
+        336
       ]
     },
     {
@@ -907,26 +925,26 @@
         },
         "options": {}
       },
-      "id": "8c88bea2-8350-4473-8d20-3eaf0e3f7008",
+      "id": "082c217a-e106-4972-a35e-c3ff9e12381f",
       "name": "Set Message Params for Error Report",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        560,
-        -64
+        -464,
+        352
       ]
     },
     {
       "parameters": {
         "errorMessage": "=Error in {{ $workflow.name }}"
       },
-      "id": "506d371f-4d5a-4e97-bbd4-73f5bf4563eb",
+      "id": "50d3fe29-4f3c-49b9-a5d3-fc7277623c61",
       "name": "Stop and Error",
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        1072,
-        -64
+        48,
+        352
       ]
     }
   ],
@@ -961,6 +979,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2026-05-11T23:15:54.415Z",
-  "versionId": "7b332474-5968-49c4-9205-26674e4bd920"
+  "updatedAt": "2026-06-23T20:18:20.376Z",
+  "versionId": "cffff578-ccd5-4723-b9e5-b6688e0db757"
 }
