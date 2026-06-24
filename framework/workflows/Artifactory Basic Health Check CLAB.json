@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2025-12-23T22:20:38.190Z",
-    "createdAt": "2025-12-23T22:20:38.190Z",
-    "versionId": "32dc61cc-ff20-4900-bfd5-2d11e07fe1d9",
+    "updatedAt": "2026-06-23T20:17:28.220Z",
+    "createdAt": "2026-06-23T20:17:26.422Z",
+    "versionId": "2ddb3af5-9574-485e-90e2-d340dc35edf3",
     "workflowId": "3",
     "nodes": [
       {
@@ -33,37 +33,38 @@
             ]
           }
         },
-        "id": "cb2dbfce-8389-452d-97ff-6e239d54914d",
+        "id": "55adfcd6-56a3-47d8-b8e4-b49b1f03ce0f",
         "name": "IF",
         "type": "n8n-nodes-base.if",
         "typeVersion": 1,
         "position": [
-          600,
-          660
+          1008,
+          1024
         ]
       },
       {
         "parameters": {},
-        "id": "3cf820df-a75c-49fe-bef0-3cbbecc0627e",
+        "id": "03b150f7-a83e-4d33-8b9b-4dd7344ce684",
         "name": "NoOp",
         "type": "n8n-nodes-base.noOp",
         "typeVersion": 1,
         "position": [
-          1680,
-          480
+          2096,
+          848
         ]
       },
       {
         "parameters": {
-          "workflowId": "17"
+          "workflowId": "17",
+          "options": {}
         },
-        "id": "b5832f26-e972-4c29-a776-c57662e5ba22",
+        "id": "0c963016-4a29-4be9-af26-f58840b98b20",
         "name": "Report Error",
         "type": "n8n-nodes-base.executeWorkflow",
         "typeVersion": 1,
         "position": [
-          1468,
-          780
+          1872,
+          1136
         ]
       },
       {
@@ -72,13 +73,13 @@
           "height": 217.8125,
           "width": 570.4296383481571
         },
-        "id": "3660c539-9e1b-46cb-b9ae-5403d7885b9d",
+        "id": "7c4dc02d-508a-4013-8cc8-8fbf99b98fd9",
         "name": "Sticky Note5",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          1260,
-          720
+          1664,
+          1088
         ]
       },
       {
@@ -122,36 +123,36 @@
           },
           "options": {}
         },
-        "id": "2edf4b5d-dd25-4541-8609-e941d54194b7",
+        "id": "d91a9f90-94c0-4a56-9bbe-391309db5472",
         "name": "Set Message Params for Error Report",
         "type": "n8n-nodes-base.set",
         "typeVersion": 1,
         "position": [
-          1320,
-          780
+          1728,
+          1136
         ]
       },
       {
         "parameters": {},
-        "id": "53eceb43-33d0-4fbd-abac-f9c65c367ca7",
+        "id": "e3edd72a-243c-41c8-a594-390ae03ea168",
         "name": "When clicking \"Execute Workflow\"",
         "type": "n8n-nodes-base.manualTrigger",
         "typeVersion": 1,
         "position": [
-          -160,
-          160
+          256,
+          528
         ],
         "disabled": true
       },
       {
         "parameters": {},
-        "id": "ee30fd19-9da2-48f4-8b9b-eb863497f362",
+        "id": "4cb28595-c6a9-4a76-bf2f-faa3cfc94b13",
         "name": "Execute Workflow Trigger",
         "type": "n8n-nodes-base.executeWorkflowTrigger",
         "typeVersion": 1,
         "position": [
-          -160,
-          340
+          256,
+          704
         ]
       },
       {
@@ -160,26 +161,26 @@
           "height": 80,
           "width": 1076
         },
-        "id": "2f3c1e8f-6c90-498a-8668-9a52462f5bc8",
+        "id": "c1051b40-e3a1-4ab4-9c50-851b594d0b03",
         "name": "Sticky Note",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          223,
-          60
+          624,
+          416
         ]
       },
       {
         "parameters": {
           "errorMessage": "Error in {{ $workflow.name }}"
         },
-        "id": "684720e8-b221-4521-b681-a73ba46309ea",
+        "id": "87fc0db8-379c-4bca-99df-eb1f8807a57f",
         "name": "Stop and Error",
         "type": "n8n-nodes-base.stopAndError",
         "typeVersion": 1,
         "position": [
-          1700,
-          780
+          2112,
+          1136
         ]
       },
       {
@@ -192,14 +193,17 @@
             "timeout": 10000
           }
         },
-        "id": "41a4e919-e0ea-4217-af52-b227045e3d92",
+        "id": "2b5b4eb6-ed08-4175-841d-12e8c8788f66",
         "name": "Get Config",
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 2,
         "position": [
-          700,
-          220
+          1104,
+          576
         ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000,
         "credentials": {
           "httpBasicAuth": {
             "id": "33",
@@ -211,13 +215,13 @@
         "parameters": {
           "options": {}
         },
-        "id": "40cd465c-2b36-46d8-a578-9d4b444bb5e1",
+        "id": "5e526c37-ba7e-4f9d-ae62-67469e36ec7b",
         "name": "XML",
         "type": "n8n-nodes-base.xml",
         "typeVersion": 1,
         "position": [
-          880,
-          220
+          1296,
+          576
         ]
       },
       {
@@ -231,13 +235,13 @@
             ]
           }
         },
-        "id": "19a23e34-3f6d-4023-9705-18243bc2b8ce",
+        "id": "99def9ab-1bfc-4256-9fea-1b2b8f5b7608",
         "name": "IF1",
         "type": "n8n-nodes-base.if",
         "typeVersion": 1,
         "position": [
-          1060,
-          220
+          1472,
+          576
         ]
       },
       {
@@ -248,14 +252,17 @@
             "timeout": 10000
           }
         },
-        "id": "ee5e961e-c5b6-4bd7-ba1a-461f4db93e33",
+        "id": "e48b8e5a-c7bb-4b74-92d5-72e4562a329c",
         "name": "Artifactory Ping",
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 2,
         "position": [
-          140,
-          320
-        ]
+          544,
+          688
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       },
       {
         "parameters": {
@@ -264,16 +271,17 @@
             "timeout": 10000
           }
         },
-        "id": "04274721-7408-4823-ad12-16524760ee54",
+        "id": "6cfaab06-d7e3-4d9f-b998-35fb58760f02",
         "name": "Artifactory Health",
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 2,
         "position": [
-          20,
-          160
+          432,
+          528
         ],
         "retryOnFail": true,
-        "waitBetweenTries": 5000
+        "waitBetweenTries": 10000,
+        "maxTries": 3
       },
       {
         "parameters": {
@@ -283,14 +291,17 @@
             "timeout": 10000
           }
         },
-        "id": "52f89292-dd6f-42f3-9613-87869076326e",
+        "id": "a40e4f3d-17a4-4074-ae88-8193db29e315",
         "name": "Artifactory Liveness",
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 2,
         "position": [
-          280,
-          480
-        ]
+          688,
+          848
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       },
       {
         "parameters": {
@@ -300,14 +311,17 @@
             "timeout": 10000
           }
         },
-        "id": "66c29629-e954-4d45-a164-6472d0198460",
+        "id": "991cd5e6-eb2b-499b-995a-111b73c69356",
         "name": "Artifactory Readiness",
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 2,
         "position": [
-          420,
-          660
-        ]
+          832,
+          1024
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       }
     ],
     "connections": {
@@ -395,12 +409,6 @@
           ]
         ]
       },
-      "IF1": {
-        "main": [
-          [],
-          []
-        ]
-      },
       "Artifactory Ping": {
         "main": [
           [
@@ -446,12 +454,12 @@
         ]
       }
     },
-    "authors": "system migration",
-    "name": null,
-    "description": null,
+    "authors": "Billy li",
+    "name": "Version 2ddb3af5",
+    "description": "",
     "autosaved": false
   },
-  "activeVersionId": "32dc61cc-ff20-4900-bfd5-2d11e07fe1d9",
+  "activeVersionId": "2ddb3af5-9574-485e-90e2-d340dc35edf3",
   "connections": {
     "IF": {
       "main": [
@@ -537,12 +545,6 @@
         ]
       ]
     },
-    "IF1": {
-      "main": [
-        [],
-        []
-      ]
-    },
     "Artifactory Ping": {
       "main": [
         [
@@ -621,37 +623,38 @@
           ]
         }
       },
-      "id": "cb2dbfce-8389-452d-97ff-6e239d54914d",
+      "id": "55adfcd6-56a3-47d8-b8e4-b49b1f03ce0f",
       "name": "IF",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        600,
-        660
+        1008,
+        1024
       ]
     },
     {
       "parameters": {},
-      "id": "3cf820df-a75c-49fe-bef0-3cbbecc0627e",
+      "id": "03b150f7-a83e-4d33-8b9b-4dd7344ce684",
       "name": "NoOp",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1680,
-        480
+        2096,
+        848
       ]
     },
     {
       "parameters": {
-        "workflowId": "17"
+        "workflowId": "17",
+        "options": {}
       },
-      "id": "b5832f26-e972-4c29-a776-c57662e5ba22",
+      "id": "0c963016-4a29-4be9-af26-f58840b98b20",
       "name": "Report Error",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1468,
-        780
+        1872,
+        1136
       ]
     },
     {
@@ -660,13 +663,13 @@
         "height": 217.8125,
         "width": 570.4296383481571
       },
-      "id": "3660c539-9e1b-46cb-b9ae-5403d7885b9d",
+      "id": "7c4dc02d-508a-4013-8cc8-8fbf99b98fd9",
       "name": "Sticky Note5",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1260,
-        720
+        1664,
+        1088
       ]
     },
     {
@@ -710,36 +713,36 @@
         },
         "options": {}
       },
-      "id": "2edf4b5d-dd25-4541-8609-e941d54194b7",
+      "id": "d91a9f90-94c0-4a56-9bbe-391309db5472",
       "name": "Set Message Params for Error Report",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        1320,
-        780
+        1728,
+        1136
       ]
     },
     {
       "parameters": {},
-      "id": "53eceb43-33d0-4fbd-abac-f9c65c367ca7",
+      "id": "e3edd72a-243c-41c8-a594-390ae03ea168",
       "name": "When clicking \"Execute Workflow\"",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -160,
-        160
+        256,
+        528
       ],
       "disabled": true
     },
     {
       "parameters": {},
-      "id": "ee30fd19-9da2-48f4-8b9b-eb863497f362",
+      "id": "4cb28595-c6a9-4a76-bf2f-faa3cfc94b13",
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -160,
-        340
+        256,
+        704
       ]
     },
     {
@@ -748,26 +751,26 @@
         "height": 80,
         "width": 1076
       },
-      "id": "2f3c1e8f-6c90-498a-8668-9a52462f5bc8",
+      "id": "c1051b40-e3a1-4ab4-9c50-851b594d0b03",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        223,
-        60
+        624,
+        416
       ]
     },
     {
       "parameters": {
         "errorMessage": "Error in {{ $workflow.name }}"
       },
-      "id": "684720e8-b221-4521-b681-a73ba46309ea",
+      "id": "87fc0db8-379c-4bca-99df-eb1f8807a57f",
       "name": "Stop and Error",
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        1700,
-        780
+        2112,
+        1136
       ]
     },
     {
@@ -780,14 +783,17 @@
           "timeout": 10000
         }
       },
-      "id": "41a4e919-e0ea-4217-af52-b227045e3d92",
+      "id": "2b5b4eb6-ed08-4175-841d-12e8c8788f66",
       "name": "Get Config",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
       "position": [
-        700,
-        220
+        1104,
+        576
       ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000,
       "credentials": {
         "httpBasicAuth": {
           "id": "33",
@@ -799,13 +805,13 @@
       "parameters": {
         "options": {}
       },
-      "id": "40cd465c-2b36-46d8-a578-9d4b444bb5e1",
+      "id": "5e526c37-ba7e-4f9d-ae62-67469e36ec7b",
       "name": "XML",
       "type": "n8n-nodes-base.xml",
       "typeVersion": 1,
       "position": [
-        880,
-        220
+        1296,
+        576
       ]
     },
     {
@@ -819,13 +825,13 @@
           ]
         }
       },
-      "id": "19a23e34-3f6d-4023-9705-18243bc2b8ce",
+      "id": "99def9ab-1bfc-4256-9fea-1b2b8f5b7608",
       "name": "IF1",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        1060,
-        220
+        1472,
+        576
       ]
     },
     {
@@ -836,14 +842,17 @@
           "timeout": 10000
         }
       },
-      "id": "ee5e961e-c5b6-4bd7-ba1a-461f4db93e33",
+      "id": "e48b8e5a-c7bb-4b74-92d5-72e4562a329c",
       "name": "Artifactory Ping",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
       "position": [
-        140,
-        320
-      ]
+        544,
+        688
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     },
     {
       "parameters": {
@@ -852,16 +861,17 @@
           "timeout": 10000
         }
       },
-      "id": "04274721-7408-4823-ad12-16524760ee54",
+      "id": "6cfaab06-d7e3-4d9f-b998-35fb58760f02",
       "name": "Artifactory Health",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
       "position": [
-        20,
-        160
+        432,
+        528
       ],
       "retryOnFail": true,
-      "waitBetweenTries": 5000
+      "waitBetweenTries": 10000,
+      "maxTries": 3
     },
     {
       "parameters": {
@@ -871,14 +881,17 @@
           "timeout": 10000
         }
       },
-      "id": "52f89292-dd6f-42f3-9613-87869076326e",
+      "id": "a40e4f3d-17a4-4074-ae88-8193db29e315",
       "name": "Artifactory Liveness",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
       "position": [
-        280,
-        480
-      ]
+        688,
+        848
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     },
     {
       "parameters": {
@@ -888,14 +901,17 @@
           "timeout": 10000
         }
       },
-      "id": "66c29629-e954-4d45-a164-6472d0198460",
+      "id": "991cd5e6-eb2b-499b-995a-111b73c69356",
       "name": "Artifactory Readiness",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
       "position": [
-        420,
-        660
-      ]
+        832,
+        1024
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     }
   ],
   "pinData": {},
@@ -933,6 +949,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-10-27T17:21:41.680Z",
-  "versionId": "32dc61cc-ff20-4900-bfd5-2d11e07fe1d9"
+  "updatedAt": "2026-06-23T20:17:26.418Z",
+  "versionId": "2ddb3af5-9574-485e-90e2-d340dc35edf3"
 }
