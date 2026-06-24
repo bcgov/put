@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2025-12-24T01:02:59.492Z",
-    "createdAt": "2025-12-24T00:04:07.365Z",
-    "versionId": "686e2524-5af2-4b51-857c-97f8bac90322",
+    "updatedAt": "2026-06-23T20:22:24.305Z",
+    "createdAt": "2026-06-23T20:22:22.612Z",
+    "versionId": "f21aaf0b-972f-48f1-ac6b-bb5e53a8f0c0",
     "workflowId": "12",
     "nodes": [
       {
@@ -28,65 +28,66 @@
             "dotNotation": false
           }
         },
-        "id": "6ceba2f4-c168-478f-ab84-b6e91bb488dd",
+        "id": "c08455c5-82a7-4e11-8e10-bdfd64935b98",
         "name": "General Parameters",
         "type": "n8n-nodes-base.set",
         "typeVersion": 1,
         "position": [
-          160,
-          -16
+          1232,
+          128
         ]
       },
       {
         "parameters": {
           "command": "rm test.txt\noc logout"
         },
-        "id": "81af0e70-55e5-4f81-b31e-ba8b799c530b",
+        "id": "15006f0d-d942-4fb5-9fc9-dc91da2820d4",
         "name": "OC Logout",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          1280,
-          144
+          2352,
+          288
         ]
       },
       {
         "parameters": {},
-        "id": "3cb41cec-6831-4e46-b9c9-9817f7b094d8",
+        "id": "efd4d15d-5a59-4ab8-8308-eddb864f7f76",
         "name": "NoOp",
         "type": "n8n-nodes-base.noOp",
         "typeVersion": 1,
         "position": [
-          1424,
-          144
+          2496,
+          288
         ]
       },
       {
         "parameters": {
           "command": "=oc rsh $(oc get pods -o name --selector app=vault-test | head -n 1) \\\n  cat /vault/secrets/helloworld > /opt/app-root/src/.n8n-files/test.txt\n"
         },
-        "id": "a507c191-5696-4b29-acb5-56d1f7f1440f",
+        "id": "e50f205f-90cc-4c2a-8d4a-5bea2f534289",
         "name": "Vault health check",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          352,
-          208
+          1424,
+          352
         ],
-        "retryOnFail": false,
-        "waitBetweenTries": 5000
+        "retryOnFail": true,
+        "waitBetweenTries": 10000,
+        "maxTries": 3
       },
       {
         "parameters": {
           "filePath": "/opt/app-root/src/.n8n-files/test.txt"
         },
-        "id": "e9e73508-62ae-4560-a31a-d39c4356eda0",
+        "id": "6f8c3fb4-1a1a-49f1-a215-1fb139589681",
         "name": "Read Binary File",
         "type": "n8n-nodes-base.readBinaryFile",
         "typeVersion": 1,
         "position": [
-          528,
-          208
+          1600,
+          352
         ]
       },
       {
@@ -101,13 +102,13 @@
             ]
           }
         },
-        "id": "bbdbe52e-f999-4486-8675-23bac1ac76c0",
+        "id": "cee4cb37-b956-4716-a815-7423576b3d08",
         "name": "IF",
         "type": "n8n-nodes-base.if",
         "typeVersion": 1,
         "position": [
-          704,
-          400
+          1776,
+          544
         ]
       },
       {
@@ -116,13 +117,13 @@
           "sourceKey": "=data",
           "options": {}
         },
-        "id": "ab1424f8-d09b-4c55-a486-a63cbe0a4710",
+        "id": "57417398-11af-4e1b-8c58-3ff18e0e83ae",
         "name": "Move Binary Data",
         "type": "n8n-nodes-base.moveBinaryData",
         "typeVersion": 1,
         "position": [
-          704,
-          208
+          1776,
+          352
         ]
       },
       {
@@ -131,13 +132,13 @@
           "height": 390,
           "width": 532
         },
-        "id": "24335933-3d33-4504-a6eb-366165104794",
+        "id": "b6080f5a-9d87-45c0-b1ef-6745c4556cde",
         "name": "Sticky Note",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          320,
-          160
+          1392,
+          304
         ]
       },
       {
@@ -145,14 +146,17 @@
           "url": "https://vault-lab.developer.gov.bc.ca/v1/sys/health",
           "options": {}
         },
-        "id": "9cd5fd5b-6a6b-4849-84b8-87317f7b1280",
+        "id": "c836de16-1a31-4424-a1a5-d22485cf223a",
         "name": "HTTP Request",
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 3,
         "position": [
-          352,
-          -16
-        ]
+          1424,
+          128
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       },
       {
         "parameters": {
@@ -165,13 +169,13 @@
             ]
           }
         },
-        "id": "86a3ad33-f80f-419a-817f-cb53c0dd9ff7",
+        "id": "60829b41-7ec6-4805-a033-fd90cc96bb58",
         "name": "IF1",
         "type": "n8n-nodes-base.if",
         "typeVersion": 1,
         "position": [
-          512,
-          -16
+          1584,
+          128
         ]
       },
       {
@@ -180,13 +184,13 @@
           "height": 206,
           "width": 700.0479072112973
         },
-        "id": "939788fc-8518-47ab-9d7d-d5e55075e23e",
+        "id": "f6cb8928-f34a-47af-a6de-d88bbc36af71",
         "name": "Sticky Note1",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          144,
-          -80
+          1216,
+          64
         ]
       },
       {
@@ -231,13 +235,13 @@
           },
           "options": {}
         },
-        "id": "11934ffb-0384-4242-a813-47a01a6456a5",
+        "id": "43c6eb3c-4609-4858-9a33-ca5a037e9da7",
         "name": "Set Message Params1",
         "type": "n8n-nodes-base.set",
         "typeVersion": 1,
         "position": [
-          912,
-          0
+          1984,
+          144
         ]
       },
       {
@@ -245,13 +249,13 @@
           "workflowId": "17",
           "options": {}
         },
-        "id": "0f58a9cd-2b72-4559-ad4c-a65392f104d1",
+        "id": "47ef6950-0068-4ebd-a15e-b4a006f0107c",
         "name": "Report Error",
         "type": "n8n-nodes-base.executeWorkflow",
         "typeVersion": 1,
         "position": [
-          1104,
-          432
+          2176,
+          576
         ]
       },
       {
@@ -296,24 +300,24 @@
           },
           "options": {}
         },
-        "id": "142b6b3e-3570-48a0-9084-814f7bd7cf6c",
+        "id": "b3e459d9-85e5-49b6-bb02-ea4eaf8fd7c5",
         "name": "Set Message Params",
         "type": "n8n-nodes-base.set",
         "typeVersion": 1,
         "position": [
-          912,
-          432
+          1984,
+          576
         ]
       },
       {
         "parameters": {},
-        "id": "7a9c1c7f-879d-45ae-b34d-47752cf9b32c",
+        "id": "89a10d8d-4bf8-42a0-8edb-400cb67e85b0",
         "name": "Execute Workflow Trigger",
         "type": "n8n-nodes-base.executeWorkflowTrigger",
         "typeVersion": 1,
         "position": [
-          -176,
-          -16
+          896,
+          128
         ]
       },
       {
@@ -321,13 +325,13 @@
           "workflowId": "28",
           "options": {}
         },
-        "id": "abc8a8f2-657c-4cc3-9a59-d71832270745",
+        "id": "e9df5418-30ec-4c3d-9d13-20b7db86bf4a",
         "name": "Build Login Command",
         "type": "n8n-nodes-base.executeWorkflow",
         "typeVersion": 1,
         "position": [
-          0,
-          208
+          1072,
+          352
         ],
         "alwaysOutputData": true
       },
@@ -347,27 +351,30 @@
           },
           "options": {}
         },
-        "id": "2e4fab5c-b2ae-4043-b982-a9206c9deac4",
+        "id": "024b7073-d6db-41d6-8c4c-b182fb7c72cd",
         "name": "Set Token Name1",
         "type": "n8n-nodes-base.set",
         "typeVersion": 1,
         "position": [
-          -160,
-          208
+          912,
+          352
         ]
       },
       {
         "parameters": {
           "command": "={{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name1\"].json.nameSpace }}"
         },
-        "id": "dd6c74b9-d4c7-4b8c-b41c-4f2449b318f9",
+        "id": "0fb043f2-ca96-4542-9866-8537a82b812d",
         "name": "OC Login",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          160,
-          208
-        ]
+          1232,
+          352
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       },
       {
         "parameters": {
@@ -375,26 +382,26 @@
           "height": 210.2471003530007,
           "width": 489.09732728189647
         },
-        "id": "06d3e57d-da1e-4dc8-8331-96dc6b5eedd2",
+        "id": "0a50365d-841c-4403-a380-6ab563efd2eb",
         "name": "Sticky Note2",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          -208,
-          160
+          864,
+          304
         ]
       },
       {
         "parameters": {
           "errorMessage": "=Error in {{ $workflow.name }}"
         },
-        "id": "b3f53262-a103-458c-8fe1-a989bf57e661",
+        "id": "8101dffc-b26b-480f-9788-6d00062140de",
         "name": "Stop and Error",
         "type": "n8n-nodes-base.stopAndError",
         "typeVersion": 1,
         "position": [
-          1312,
-          432
+          2384,
+          576
         ]
       },
       {
@@ -402,13 +409,13 @@
           "height": 297.9122541603631,
           "width": 545.7589510842159
         },
-        "id": "1c107aef-7e69-4fa2-91ec-1a9f97f4553c",
+        "id": "006f32cf-fca2-4035-ae73-8366e40d5f2e",
         "name": "Sticky Note3",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          880,
-          336
+          1952,
+          480
         ]
       }
     ],
@@ -599,11 +606,11 @@
       }
     },
     "authors": "Billy li",
-    "name": "Version 686e2524",
+    "name": "Version f21aaf0b",
     "description": "",
     "autosaved": false
   },
-  "activeVersionId": "686e2524-5af2-4b51-857c-97f8bac90322",
+  "activeVersionId": "f21aaf0b-972f-48f1-ac6b-bb5e53a8f0c0",
   "connections": {
     "General Parameters": {
       "main": [
@@ -818,65 +825,66 @@
           "dotNotation": false
         }
       },
-      "id": "6ceba2f4-c168-478f-ab84-b6e91bb488dd",
+      "id": "c08455c5-82a7-4e11-8e10-bdfd64935b98",
       "name": "General Parameters",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        160,
-        -16
+        1232,
+        128
       ]
     },
     {
       "parameters": {
         "command": "rm test.txt\noc logout"
       },
-      "id": "81af0e70-55e5-4f81-b31e-ba8b799c530b",
+      "id": "15006f0d-d942-4fb5-9fc9-dc91da2820d4",
       "name": "OC Logout",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1280,
-        144
+        2352,
+        288
       ]
     },
     {
       "parameters": {},
-      "id": "3cb41cec-6831-4e46-b9c9-9817f7b094d8",
+      "id": "efd4d15d-5a59-4ab8-8308-eddb864f7f76",
       "name": "NoOp",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1424,
-        144
+        2496,
+        288
       ]
     },
     {
       "parameters": {
         "command": "=oc rsh $(oc get pods -o name --selector app=vault-test | head -n 1) \\\n  cat /vault/secrets/helloworld > /opt/app-root/src/.n8n-files/test.txt\n"
       },
-      "id": "a507c191-5696-4b29-acb5-56d1f7f1440f",
+      "id": "e50f205f-90cc-4c2a-8d4a-5bea2f534289",
       "name": "Vault health check",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        352,
-        208
+        1424,
+        352
       ],
-      "retryOnFail": false,
-      "waitBetweenTries": 5000
+      "retryOnFail": true,
+      "waitBetweenTries": 10000,
+      "maxTries": 3
     },
     {
       "parameters": {
         "filePath": "/opt/app-root/src/.n8n-files/test.txt"
       },
-      "id": "e9e73508-62ae-4560-a31a-d39c4356eda0",
+      "id": "6f8c3fb4-1a1a-49f1-a215-1fb139589681",
       "name": "Read Binary File",
       "type": "n8n-nodes-base.readBinaryFile",
       "typeVersion": 1,
       "position": [
-        528,
-        208
+        1600,
+        352
       ]
     },
     {
@@ -891,13 +899,13 @@
           ]
         }
       },
-      "id": "bbdbe52e-f999-4486-8675-23bac1ac76c0",
+      "id": "cee4cb37-b956-4716-a815-7423576b3d08",
       "name": "IF",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        704,
-        400
+        1776,
+        544
       ]
     },
     {
@@ -906,13 +914,13 @@
         "sourceKey": "=data",
         "options": {}
       },
-      "id": "ab1424f8-d09b-4c55-a486-a63cbe0a4710",
+      "id": "57417398-11af-4e1b-8c58-3ff18e0e83ae",
       "name": "Move Binary Data",
       "type": "n8n-nodes-base.moveBinaryData",
       "typeVersion": 1,
       "position": [
-        704,
-        208
+        1776,
+        352
       ]
     },
     {
@@ -921,13 +929,13 @@
         "height": 390,
         "width": 532
       },
-      "id": "24335933-3d33-4504-a6eb-366165104794",
+      "id": "b6080f5a-9d87-45c0-b1ef-6745c4556cde",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        320,
-        160
+        1392,
+        304
       ]
     },
     {
@@ -935,14 +943,17 @@
         "url": "https://vault-lab.developer.gov.bc.ca/v1/sys/health",
         "options": {}
       },
-      "id": "9cd5fd5b-6a6b-4849-84b8-87317f7b1280",
+      "id": "c836de16-1a31-4424-a1a5-d22485cf223a",
       "name": "HTTP Request",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
       "position": [
-        352,
-        -16
-      ]
+        1424,
+        128
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     },
     {
       "parameters": {
@@ -955,13 +966,13 @@
           ]
         }
       },
-      "id": "86a3ad33-f80f-419a-817f-cb53c0dd9ff7",
+      "id": "60829b41-7ec6-4805-a033-fd90cc96bb58",
       "name": "IF1",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        512,
-        -16
+        1584,
+        128
       ]
     },
     {
@@ -970,13 +981,13 @@
         "height": 206,
         "width": 700.0479072112973
       },
-      "id": "939788fc-8518-47ab-9d7d-d5e55075e23e",
+      "id": "f6cb8928-f34a-47af-a6de-d88bbc36af71",
       "name": "Sticky Note1",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        144,
-        -80
+        1216,
+        64
       ]
     },
     {
@@ -1021,13 +1032,13 @@
         },
         "options": {}
       },
-      "id": "11934ffb-0384-4242-a813-47a01a6456a5",
+      "id": "43c6eb3c-4609-4858-9a33-ca5a037e9da7",
       "name": "Set Message Params1",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        912,
-        0
+        1984,
+        144
       ]
     },
     {
@@ -1035,13 +1046,13 @@
         "workflowId": "17",
         "options": {}
       },
-      "id": "0f58a9cd-2b72-4559-ad4c-a65392f104d1",
+      "id": "47ef6950-0068-4ebd-a15e-b4a006f0107c",
       "name": "Report Error",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1104,
-        432
+        2176,
+        576
       ]
     },
     {
@@ -1086,24 +1097,24 @@
         },
         "options": {}
       },
-      "id": "142b6b3e-3570-48a0-9084-814f7bd7cf6c",
+      "id": "b3e459d9-85e5-49b6-bb02-ea4eaf8fd7c5",
       "name": "Set Message Params",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        912,
-        432
+        1984,
+        576
       ]
     },
     {
       "parameters": {},
-      "id": "7a9c1c7f-879d-45ae-b34d-47752cf9b32c",
+      "id": "89a10d8d-4bf8-42a0-8edb-400cb67e85b0",
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -176,
-        -16
+        896,
+        128
       ]
     },
     {
@@ -1111,13 +1122,13 @@
         "workflowId": "28",
         "options": {}
       },
-      "id": "abc8a8f2-657c-4cc3-9a59-d71832270745",
+      "id": "e9df5418-30ec-4c3d-9d13-20b7db86bf4a",
       "name": "Build Login Command",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        0,
-        208
+        1072,
+        352
       ],
       "alwaysOutputData": true
     },
@@ -1137,27 +1148,30 @@
         },
         "options": {}
       },
-      "id": "2e4fab5c-b2ae-4043-b982-a9206c9deac4",
+      "id": "024b7073-d6db-41d6-8c4c-b182fb7c72cd",
       "name": "Set Token Name1",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        -160,
-        208
+        912,
+        352
       ]
     },
     {
       "parameters": {
         "command": "={{ $json.ocLogin }}\noc project {{ $node[\"Set Token Name1\"].json.nameSpace }}"
       },
-      "id": "dd6c74b9-d4c7-4b8c-b41c-4f2449b318f9",
+      "id": "0fb043f2-ca96-4542-9866-8537a82b812d",
       "name": "OC Login",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        160,
-        208
-      ]
+        1232,
+        352
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     },
     {
       "parameters": {
@@ -1165,26 +1179,26 @@
         "height": 210.2471003530007,
         "width": 489.09732728189647
       },
-      "id": "06d3e57d-da1e-4dc8-8331-96dc6b5eedd2",
+      "id": "0a50365d-841c-4403-a380-6ab563efd2eb",
       "name": "Sticky Note2",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -208,
-        160
+        864,
+        304
       ]
     },
     {
       "parameters": {
         "errorMessage": "=Error in {{ $workflow.name }}"
       },
-      "id": "b3f53262-a103-458c-8fe1-a989bf57e661",
+      "id": "8101dffc-b26b-480f-9788-6d00062140de",
       "name": "Stop and Error",
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        1312,
-        432
+        2384,
+        576
       ]
     },
     {
@@ -1192,13 +1206,13 @@
         "height": 297.9122541603631,
         "width": 545.7589510842159
       },
-      "id": "1c107aef-7e69-4fa2-91ec-1a9f97f4553c",
+      "id": "006f32cf-fca2-4035-ae73-8366e40d5f2e",
       "name": "Sticky Note3",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        880,
-        336
+        1952,
+        480
       ]
     }
   ],
@@ -1238,6 +1252,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2025-12-24T00:04:07.363Z",
-  "versionId": "686e2524-5af2-4b51-857c-97f8bac90322"
+  "updatedAt": "2026-06-23T20:22:22.609Z",
+  "versionId": "f21aaf0b-972f-48f1-ac6b-bb5e53a8f0c0"
 }
