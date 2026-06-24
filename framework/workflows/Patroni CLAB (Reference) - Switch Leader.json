@@ -1,20 +1,20 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2025-12-23T22:20:38.182Z",
-    "createdAt": "2025-12-23T22:20:38.182Z",
-    "versionId": "664dd275-0763-4840-8f69-2efc61e29e2d",
+    "updatedAt": "2026-06-23T20:19:45.287Z",
+    "createdAt": "2026-06-23T20:19:41.587Z",
+    "versionId": "67dc1ba0-f488-47e4-bd0f-b985b5da701a",
     "workflowId": "34",
     "nodes": [
       {
         "parameters": {},
-        "id": "491df3a1-af15-4b74-9320-ff4d2b9ca15a",
+        "id": "86674d2e-22fa-4dba-a9c0-828b38363b56",
         "name": "When clicking \"Execute Workflow\"",
         "type": "n8n-nodes-base.manualTrigger",
         "typeVersion": 1,
         "position": [
-          -960,
-          -180
+          -448,
+          -16
         ],
         "disabled": true
       },
@@ -34,26 +34,27 @@
           },
           "options": {}
         },
-        "id": "7ed6d850-27eb-4335-a23d-50dd901880cb",
+        "id": "1e5013a3-c79a-44f9-9c51-0ddc0bc23169",
         "name": "Set Token Name",
         "type": "n8n-nodes-base.set",
         "typeVersion": 1,
         "position": [
-          -760,
-          -73
+          -256,
+          96
         ]
       },
       {
         "parameters": {
-          "workflowId": "28"
+          "workflowId": "28",
+          "options": {}
         },
-        "id": "ac3c93a3-37fc-42f0-96d3-877dd64a1739",
+        "id": "9bc32f9f-4e61-4565-8080-6a1a3e350cd0",
         "name": "Build Login Command",
         "type": "n8n-nodes-base.executeWorkflow",
         "typeVersion": 1,
         "position": [
-          -600,
-          -73
+          -96,
+          96
         ],
         "alwaysOutputData": true
       },
@@ -61,24 +62,27 @@
         "parameters": {
           "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}"
         },
-        "id": "da06533e-c7f0-4f69-b3a9-93aeae637f8b",
+        "id": "f0ca5f70-3220-4ac7-8170-6cf5f30a10b7",
         "name": "OC Login",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          -440,
-          -73
-        ]
+          80,
+          96
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 5000
       },
       {
         "parameters": {},
-        "id": "c9e40466-da6e-4c2d-8d49-4e7a95a2c902",
+        "id": "bb66c4a6-b4b9-4f3b-9946-2f6eb42cf812",
         "name": "Execute Workflow Trigger",
         "type": "n8n-nodes-base.executeWorkflowTrigger",
         "typeVersion": 1,
         "position": [
-          -960,
-          0
+          -448,
+          176
         ]
       },
       {
@@ -87,39 +91,42 @@
           "height": 336.5625,
           "width": 471.25
         },
-        "id": "f79430c3-3e58-413f-a886-7c8b7a3db4b3",
+        "id": "819e66c2-2918-45ed-9b81-265709c2865e",
         "name": "Sticky Note",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          -800,
-          -180
+          -288,
+          -16
         ]
       },
       {
         "parameters": {
           "command": "=oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} rsh $(oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} get pods -o name --selector role=master,cluster-name=patroni-reference) curl -s localhost:8008/cluster | jq -e \".\""
         },
-        "id": "70f3ed35-c520-487f-95f0-02605e26edde",
+        "id": "9decefc8-e1c7-42a5-9ba8-6d7310bea11f",
         "name": "Check Readiness",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          -280,
-          -80
-        ]
+          240,
+          96
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 5000
       },
       {
         "parameters": {
           "jsCode": "return JSON.parse($('Check Readiness').item.json.stdout);"
         },
-        "id": "d6c2637a-f9ab-49fb-a3f6-bdfc68ba66f8",
+        "id": "ae26f5d4-5fe3-445a-a733-afeddd21dff8",
         "name": "Get Result",
         "type": "n8n-nodes-base.code",
         "typeVersion": 1,
         "position": [
-          -140,
-          -80
+          368,
+          96
         ]
       },
       {
@@ -141,13 +148,13 @@
             ]
           }
         },
-        "id": "00e8a497-a5d1-44f5-abcf-de07447a11fa",
+        "id": "87dffb11-aab4-4924-a49f-e1eafe21b332",
         "name": "IF",
         "type": "n8n-nodes-base.if",
         "typeVersion": 1,
         "position": [
-          0,
-          -80
+          512,
+          96
         ]
       },
       {
@@ -156,39 +163,40 @@
           "height": 333.5588439233485,
           "width": 426.71205244578886
         },
-        "id": "0f9f34fb-6257-46b9-a382-1f42d3e85220",
+        "id": "46338829-fa89-45d3-b3f6-153fbade395e",
         "name": "Sticky Note6",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          -300,
-          -184.50548411497726
+          208,
+          -16
         ]
       },
       {
         "parameters": {
           "command": "oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n"
         },
-        "id": "23267ed3-23da-413c-9e9c-532b8f6e7752",
+        "id": "8000e6ad-3735-4e44-b4e4-e8892b64836d",
         "name": "OC Logout",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          740,
-          -100
+          1248,
+          80
         ]
       },
       {
         "parameters": {
-          "workflowId": "17"
+          "workflowId": "17",
+          "options": {}
         },
-        "id": "c13fcbc6-571d-47d7-aa35-a8a4bda70426",
+        "id": "edc55ff1-f6a5-448d-9d61-ff4d8d132079",
         "name": "Report Error",
         "type": "n8n-nodes-base.executeWorkflow",
         "typeVersion": 1,
         "position": [
-          408,
-          140
+          928,
+          320
         ]
       },
       {
@@ -197,13 +205,13 @@
           "height": 446.2964889056981,
           "width": 383.0266641452346
         },
-        "id": "565e2d67-7291-42f7-b568-c0993c53f7dc",
+        "id": "3c738d85-c20f-498c-8b00-69da8d6b9d85",
         "name": "Sticky Note4",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          700,
-          -160
+          1216,
+          16
         ]
       },
       {
@@ -212,13 +220,13 @@
           "height": 217.8125,
           "width": 361.0555345436212
         },
-        "id": "0e32a988-1b7b-42bf-852c-05de50749cd3",
+        "id": "c2a75325-64f8-486e-84c6-34eb633b9e7d",
         "name": "Sticky Note5",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          200,
-          80
+          720,
+          256
         ]
       },
       {
@@ -262,37 +270,37 @@
           },
           "options": {}
         },
-        "id": "38f418ac-26ed-43ac-8b42-69fdd3071904",
+        "id": "6b43697b-691f-4dfb-a038-628cafc5c849",
         "name": "Set Message Params for Error Report",
         "type": "n8n-nodes-base.set",
         "typeVersion": 1,
         "position": [
-          248,
-          140
+          768,
+          320
         ]
       },
       {
         "parameters": {},
-        "id": "08ed7fd6-a51d-4ce5-a30b-2005e5fc8c0c",
+        "id": "7e84164b-3c00-40ef-8fc0-27866a3cffb8",
         "name": "No Operation, do nothing1",
         "type": "n8n-nodes-base.noOp",
         "typeVersion": 1,
         "position": [
-          920,
-          -100
+          1440,
+          80
         ]
       },
       {
         "parameters": {
           "command": "=oc exec $(oc get pods -o name --selector role=master,cluster-name=patroni-reference) -- curl -s http://localhost:8008/switchover -XPOST -d '{\"leader\":\"{{ $json.stdout }}\"}' \nsleep 20"
         },
-        "id": "25e0396b-815d-470c-a5da-ae565f776077",
+        "id": "56686269-224f-4cb7-85ca-c9bf7b817a52",
         "name": "Change Leader",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          420,
-          -100
+          928,
+          80
         ],
         "executeOnce": true
       },
@@ -302,40 +310,43 @@
           "height": 143.62077660110947,
           "width": 1719.9798285426127
         },
-        "id": "09868946-3cd1-41d6-8ebd-fc7c03bf0a2f",
+        "id": "fd6fb52e-1a89-4102-a82c-2a9a34f0b52f",
         "name": "Sticky Note1",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          -780,
-          -440
+          -272,
+          -272
         ]
       },
       {
         "parameters": {
           "command": "=oc exec $(oc get pods -o name --selector role=master,cluster-name=patroni-reference) -- curl -s localhost:8008/cluster | jq -r '.members[] | select(.role==\"leader\") | .name'\n"
         },
-        "id": "22ee15e7-ae7f-464e-9940-f6ce4c7b3acd",
+        "id": "8ecc3944-30b6-49c6-835f-99e32a33e91b",
         "name": "Find Leader",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          220,
-          -100
+          736,
+          80
         ],
-        "executeOnce": true
+        "executeOnce": true,
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 5000
       },
       {
         "parameters": {
           "errorMessage": "=Error in {{ $workflow.name }}"
         },
-        "id": "ec6f8261-8caa-4e13-9105-e69251efd5e2",
+        "id": "c3abcfdb-112a-4099-bc65-c7b53caf739f",
         "name": "Stop and Error",
         "type": "n8n-nodes-base.stopAndError",
         "typeVersion": 1,
         "position": [
-          740,
-          140
+          1248,
+          320
         ]
       }
     ],
@@ -496,12 +507,12 @@
         ]
       }
     },
-    "authors": "system migration",
-    "name": null,
-    "description": null,
+    "authors": "Billy li",
+    "name": "Version 67dc1ba0",
+    "description": "",
     "autosaved": false
   },
-  "activeVersionId": "664dd275-0763-4840-8f69-2efc61e29e2d",
+  "activeVersionId": "67dc1ba0-f488-47e4-bd0f-b985b5da701a",
   "connections": {
     "When clicking \"Execute Workflow\"": {
       "main": [
@@ -667,13 +678,13 @@
   "nodes": [
     {
       "parameters": {},
-      "id": "491df3a1-af15-4b74-9320-ff4d2b9ca15a",
+      "id": "86674d2e-22fa-4dba-a9c0-828b38363b56",
       "name": "When clicking \"Execute Workflow\"",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -960,
-        -180
+        -448,
+        -16
       ],
       "disabled": true
     },
@@ -693,26 +704,27 @@
         },
         "options": {}
       },
-      "id": "7ed6d850-27eb-4335-a23d-50dd901880cb",
+      "id": "1e5013a3-c79a-44f9-9c51-0ddc0bc23169",
       "name": "Set Token Name",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        -760,
-        -73
+        -256,
+        96
       ]
     },
     {
       "parameters": {
-        "workflowId": "28"
+        "workflowId": "28",
+        "options": {}
       },
-      "id": "ac3c93a3-37fc-42f0-96d3-877dd64a1739",
+      "id": "9bc32f9f-4e61-4565-8080-6a1a3e350cd0",
       "name": "Build Login Command",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -600,
-        -73
+        -96,
+        96
       ],
       "alwaysOutputData": true
     },
@@ -720,24 +732,27 @@
       "parameters": {
         "command": "=oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n{{ $json.ocLogin }}"
       },
-      "id": "da06533e-c7f0-4f69-b3a9-93aeae637f8b",
+      "id": "f0ca5f70-3220-4ac7-8170-6cf5f30a10b7",
       "name": "OC Login",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -440,
-        -73
-      ]
+        80,
+        96
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {},
-      "id": "c9e40466-da6e-4c2d-8d49-4e7a95a2c902",
+      "id": "bb66c4a6-b4b9-4f3b-9946-2f6eb42cf812",
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -960,
-        0
+        -448,
+        176
       ]
     },
     {
@@ -746,39 +761,42 @@
         "height": 336.5625,
         "width": 471.25
       },
-      "id": "f79430c3-3e58-413f-a886-7c8b7a3db4b3",
+      "id": "819e66c2-2918-45ed-9b81-265709c2865e",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -800,
-        -180
+        -288,
+        -16
       ]
     },
     {
       "parameters": {
         "command": "=oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} rsh $(oc -n {{ $node[\"Set Token Name\"].json.nameSpace }} get pods -o name --selector role=master,cluster-name=patroni-reference) curl -s localhost:8008/cluster | jq -e \".\""
       },
-      "id": "70f3ed35-c520-487f-95f0-02605e26edde",
+      "id": "9decefc8-e1c7-42a5-9ba8-6d7310bea11f",
       "name": "Check Readiness",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -280,
-        -80
-      ]
+        240,
+        96
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
         "jsCode": "return JSON.parse($('Check Readiness').item.json.stdout);"
       },
-      "id": "d6c2637a-f9ab-49fb-a3f6-bdfc68ba66f8",
+      "id": "ae26f5d4-5fe3-445a-a733-afeddd21dff8",
       "name": "Get Result",
       "type": "n8n-nodes-base.code",
       "typeVersion": 1,
       "position": [
-        -140,
-        -80
+        368,
+        96
       ]
     },
     {
@@ -800,13 +818,13 @@
           ]
         }
       },
-      "id": "00e8a497-a5d1-44f5-abcf-de07447a11fa",
+      "id": "87dffb11-aab4-4924-a49f-e1eafe21b332",
       "name": "IF",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        0,
-        -80
+        512,
+        96
       ]
     },
     {
@@ -815,39 +833,40 @@
         "height": 333.5588439233485,
         "width": 426.71205244578886
       },
-      "id": "0f9f34fb-6257-46b9-a382-1f42d3e85220",
+      "id": "46338829-fa89-45d3-b3f6-153fbade395e",
       "name": "Sticky Note6",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -300,
-        -184.50548411497726
+        208,
+        -16
       ]
     },
     {
       "parameters": {
         "command": "oc logout\ntop -n 1 -b | grep oc | awk '{print \"kill -9 \"$1}' | sh\n"
       },
-      "id": "23267ed3-23da-413c-9e9c-532b8f6e7752",
+      "id": "8000e6ad-3735-4e44-b4e4-e8892b64836d",
       "name": "OC Logout",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        740,
-        -100
+        1248,
+        80
       ]
     },
     {
       "parameters": {
-        "workflowId": "17"
+        "workflowId": "17",
+        "options": {}
       },
-      "id": "c13fcbc6-571d-47d7-aa35-a8a4bda70426",
+      "id": "edc55ff1-f6a5-448d-9d61-ff4d8d132079",
       "name": "Report Error",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        408,
-        140
+        928,
+        320
       ]
     },
     {
@@ -856,13 +875,13 @@
         "height": 446.2964889056981,
         "width": 383.0266641452346
       },
-      "id": "565e2d67-7291-42f7-b568-c0993c53f7dc",
+      "id": "3c738d85-c20f-498c-8b00-69da8d6b9d85",
       "name": "Sticky Note4",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        700,
-        -160
+        1216,
+        16
       ]
     },
     {
@@ -871,13 +890,13 @@
         "height": 217.8125,
         "width": 361.0555345436212
       },
-      "id": "0e32a988-1b7b-42bf-852c-05de50749cd3",
+      "id": "c2a75325-64f8-486e-84c6-34eb633b9e7d",
       "name": "Sticky Note5",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        200,
-        80
+        720,
+        256
       ]
     },
     {
@@ -921,37 +940,37 @@
         },
         "options": {}
       },
-      "id": "38f418ac-26ed-43ac-8b42-69fdd3071904",
+      "id": "6b43697b-691f-4dfb-a038-628cafc5c849",
       "name": "Set Message Params for Error Report",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        248,
-        140
+        768,
+        320
       ]
     },
     {
       "parameters": {},
-      "id": "08ed7fd6-a51d-4ce5-a30b-2005e5fc8c0c",
+      "id": "7e84164b-3c00-40ef-8fc0-27866a3cffb8",
       "name": "No Operation, do nothing1",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        920,
-        -100
+        1440,
+        80
       ]
     },
     {
       "parameters": {
         "command": "=oc exec $(oc get pods -o name --selector role=master,cluster-name=patroni-reference) -- curl -s http://localhost:8008/switchover -XPOST -d '{\"leader\":\"{{ $json.stdout }}\"}' \nsleep 20"
       },
-      "id": "25e0396b-815d-470c-a5da-ae565f776077",
+      "id": "56686269-224f-4cb7-85ca-c9bf7b817a52",
       "name": "Change Leader",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        420,
-        -100
+        928,
+        80
       ],
       "executeOnce": true
     },
@@ -961,40 +980,43 @@
         "height": 143.62077660110947,
         "width": 1719.9798285426127
       },
-      "id": "09868946-3cd1-41d6-8ebd-fc7c03bf0a2f",
+      "id": "fd6fb52e-1a89-4102-a82c-2a9a34f0b52f",
       "name": "Sticky Note1",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -780,
-        -440
+        -272,
+        -272
       ]
     },
     {
       "parameters": {
         "command": "=oc exec $(oc get pods -o name --selector role=master,cluster-name=patroni-reference) -- curl -s localhost:8008/cluster | jq -r '.members[] | select(.role==\"leader\") | .name'\n"
       },
-      "id": "22ee15e7-ae7f-464e-9940-f6ce4c7b3acd",
+      "id": "8ecc3944-30b6-49c6-835f-99e32a33e91b",
       "name": "Find Leader",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        220,
-        -100
+        736,
+        80
       ],
-      "executeOnce": true
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
         "errorMessage": "=Error in {{ $workflow.name }}"
       },
-      "id": "ec6f8261-8caa-4e13-9105-e69251efd5e2",
+      "id": "c3abcfdb-112a-4099-bc65-c7b53caf739f",
       "name": "Stop and Error",
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        740,
-        140
+        1248,
+        320
       ]
     }
   ],
@@ -1029,6 +1051,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-26T21:25:54.284Z",
-  "versionId": "664dd275-0763-4840-8f69-2efc61e29e2d"
+  "updatedAt": "2026-06-23T20:19:41.583Z",
+  "versionId": "67dc1ba0-f488-47e4-bd0f-b985b5da701a"
 }
