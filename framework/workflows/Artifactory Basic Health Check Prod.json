@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2025-12-23T22:20:38.177Z",
-    "createdAt": "2025-12-23T22:20:38.177Z",
-    "versionId": "41bd8190-db46-44a0-849c-b51750d900fe",
+    "updatedAt": "2026-06-23T20:17:47.365Z",
+    "createdAt": "2026-06-23T20:17:45.118Z",
+    "versionId": "6928342b-999f-4bab-bc24-780da4e92cd0",
     "workflowId": "59",
     "nodes": [
       {
@@ -33,37 +33,38 @@
             ]
           }
         },
-        "id": "d4ae58c0-0be1-4b83-809e-a753902b32e2",
+        "id": "4cf2c112-1f20-4224-a3a4-479b15a71e19",
         "name": "IF",
         "type": "n8n-nodes-base.if",
         "typeVersion": 1,
         "position": [
-          600,
-          660
+          960,
+          912
         ]
       },
       {
         "parameters": {},
-        "id": "82f0be6f-ecc1-4cb9-8131-21fa6778d3ca",
+        "id": "62ede78b-9b92-4b56-abb8-724be8c90e9a",
         "name": "NoOp",
         "type": "n8n-nodes-base.noOp",
         "typeVersion": 1,
         "position": [
-          860,
-          460
+          1216,
+          704
         ]
       },
       {
         "parameters": {
-          "workflowId": "17"
+          "workflowId": "17",
+          "options": {}
         },
-        "id": "550f77c7-02d2-4286-8b41-efd6203ae1b1",
+        "id": "ecf04ca7-46e7-4e43-b1e0-2efb5b86e29e",
         "name": "Report Error",
         "type": "n8n-nodes-base.executeWorkflow",
         "typeVersion": 1,
         "position": [
-          1008,
-          680
+          1376,
+          928
         ]
       },
       {
@@ -72,13 +73,13 @@
           "height": 217.8125,
           "width": 570.4296383481571
         },
-        "id": "20430514-21d8-4236-8ab7-51d0b7a3ae9b",
+        "id": "eaefcfe7-9005-4c81-8308-fe547ffe7e42",
         "name": "Sticky Note5",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          800,
-          620
+          1168,
+          864
         ]
       },
       {
@@ -122,36 +123,36 @@
           },
           "options": {}
         },
-        "id": "9b61656a-7273-4cdc-b7a2-bf3922dfcb41",
+        "id": "83a6e131-db90-4b67-b8a1-24d041eef1c7",
         "name": "Set Message Params for Error Report",
         "type": "n8n-nodes-base.set",
         "typeVersion": 1,
         "position": [
-          860,
-          680
+          1216,
+          928
         ]
       },
       {
         "parameters": {},
-        "id": "575d0146-fd85-45fc-b393-a537878dbab6",
+        "id": "512f8fbb-500c-4520-93e9-e8888dde171e",
         "name": "When clicking \"Execute Workflow\"",
         "type": "n8n-nodes-base.manualTrigger",
         "typeVersion": 1,
         "position": [
-          -160,
-          160
+          208,
+          416
         ],
         "disabled": true
       },
       {
         "parameters": {},
-        "id": "7c4c2131-fa9d-467f-96a2-853460eb1996",
+        "id": "ec3a6f49-700b-40cc-8086-a083486c2e5e",
         "name": "Execute Workflow Trigger",
         "type": "n8n-nodes-base.executeWorkflowTrigger",
         "typeVersion": 1,
         "position": [
-          -160,
-          320
+          208,
+          576
         ]
       },
       {
@@ -160,26 +161,26 @@
           "height": 80,
           "width": 280.5999654409687
         },
-        "id": "ac8e261b-3f42-40da-9114-244cc8aa8bc7",
+        "id": "d355753f-4147-4b6e-bcbc-27e895222588",
         "name": "Sticky Note",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          223,
-          60
+          576,
+          304
         ]
       },
       {
         "parameters": {
           "errorMessage": "Error in {{ $workflow.name }}"
         },
-        "id": "0a40deae-3092-4010-927a-176d2303e9f2",
+        "id": "ca549fab-8048-4a94-a383-1bf7182b3459",
         "name": "Stop and Error",
         "type": "n8n-nodes-base.stopAndError",
         "typeVersion": 1,
         "position": [
-          1240,
-          680
+          1600,
+          928
         ]
       },
       {
@@ -190,14 +191,17 @@
             "timeout": 10000
           }
         },
-        "id": "a245773f-2437-45c5-8e76-aecb4fbcb26c",
+        "id": "cdb577f8-353c-4978-a8d4-331c39e83f7c",
         "name": "Artifactory Ping",
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 2,
         "position": [
-          140,
-          320
-        ]
+          496,
+          576
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       },
       {
         "parameters": {
@@ -206,14 +210,17 @@
             "timeout": 10000
           }
         },
-        "id": "ed4b9b1a-b753-4171-93dd-539da3ea56d0",
+        "id": "8a99fd74-1212-46db-a3dd-888bf671fe9a",
         "name": "Artifactory Health",
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 2,
         "position": [
-          20,
-          160
-        ]
+          384,
+          416
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       },
       {
         "parameters": {
@@ -223,14 +230,17 @@
             "timeout": 10000
           }
         },
-        "id": "af333369-738d-43ff-92e4-4d6959f8ea28",
+        "id": "4a2e4cf8-e768-4cc3-9994-ed754e4843a6",
         "name": "Artifactory Liveness",
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 2,
         "position": [
-          280,
-          480
-        ]
+          640,
+          736
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       },
       {
         "parameters": {
@@ -240,14 +250,17 @@
             "timeout": 10000
           }
         },
-        "id": "615c3c75-6a67-47e0-a20a-f5d8018ac541",
+        "id": "084c1e8d-fad3-49a2-b4ed-91c5fdf63d71",
         "name": "Artifactory Readiness",
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 2,
         "position": [
-          420,
-          660
-        ]
+          784,
+          912
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 10000
       }
     ],
     "connections": {
@@ -358,12 +371,12 @@
         ]
       }
     },
-    "authors": "system migration",
-    "name": null,
-    "description": null,
+    "authors": "Billy li",
+    "name": "Version 6928342b",
+    "description": "",
     "autosaved": false
   },
-  "activeVersionId": "41bd8190-db46-44a0-849c-b51750d900fe",
+  "activeVersionId": "6928342b-999f-4bab-bc24-780da4e92cd0",
   "connections": {
     "IF": {
       "main": [
@@ -505,37 +518,38 @@
           ]
         }
       },
-      "id": "d4ae58c0-0be1-4b83-809e-a753902b32e2",
+      "id": "4cf2c112-1f20-4224-a3a4-479b15a71e19",
       "name": "IF",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        600,
-        660
+        960,
+        912
       ]
     },
     {
       "parameters": {},
-      "id": "82f0be6f-ecc1-4cb9-8131-21fa6778d3ca",
+      "id": "62ede78b-9b92-4b56-abb8-724be8c90e9a",
       "name": "NoOp",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        860,
-        460
+        1216,
+        704
       ]
     },
     {
       "parameters": {
-        "workflowId": "17"
+        "workflowId": "17",
+        "options": {}
       },
-      "id": "550f77c7-02d2-4286-8b41-efd6203ae1b1",
+      "id": "ecf04ca7-46e7-4e43-b1e0-2efb5b86e29e",
       "name": "Report Error",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        1008,
-        680
+        1376,
+        928
       ]
     },
     {
@@ -544,13 +558,13 @@
         "height": 217.8125,
         "width": 570.4296383481571
       },
-      "id": "20430514-21d8-4236-8ab7-51d0b7a3ae9b",
+      "id": "eaefcfe7-9005-4c81-8308-fe547ffe7e42",
       "name": "Sticky Note5",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        800,
-        620
+        1168,
+        864
       ]
     },
     {
@@ -594,36 +608,36 @@
         },
         "options": {}
       },
-      "id": "9b61656a-7273-4cdc-b7a2-bf3922dfcb41",
+      "id": "83a6e131-db90-4b67-b8a1-24d041eef1c7",
       "name": "Set Message Params for Error Report",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        860,
-        680
+        1216,
+        928
       ]
     },
     {
       "parameters": {},
-      "id": "575d0146-fd85-45fc-b393-a537878dbab6",
+      "id": "512f8fbb-500c-4520-93e9-e8888dde171e",
       "name": "When clicking \"Execute Workflow\"",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -160,
-        160
+        208,
+        416
       ],
       "disabled": true
     },
     {
       "parameters": {},
-      "id": "7c4c2131-fa9d-467f-96a2-853460eb1996",
+      "id": "ec3a6f49-700b-40cc-8086-a083486c2e5e",
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -160,
-        320
+        208,
+        576
       ]
     },
     {
@@ -632,26 +646,26 @@
         "height": 80,
         "width": 280.5999654409687
       },
-      "id": "ac8e261b-3f42-40da-9114-244cc8aa8bc7",
+      "id": "d355753f-4147-4b6e-bcbc-27e895222588",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        223,
-        60
+        576,
+        304
       ]
     },
     {
       "parameters": {
         "errorMessage": "Error in {{ $workflow.name }}"
       },
-      "id": "0a40deae-3092-4010-927a-176d2303e9f2",
+      "id": "ca549fab-8048-4a94-a383-1bf7182b3459",
       "name": "Stop and Error",
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        1240,
-        680
+        1600,
+        928
       ]
     },
     {
@@ -662,14 +676,17 @@
           "timeout": 10000
         }
       },
-      "id": "a245773f-2437-45c5-8e76-aecb4fbcb26c",
+      "id": "cdb577f8-353c-4978-a8d4-331c39e83f7c",
       "name": "Artifactory Ping",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
       "position": [
-        140,
-        320
-      ]
+        496,
+        576
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     },
     {
       "parameters": {
@@ -678,14 +695,17 @@
           "timeout": 10000
         }
       },
-      "id": "ed4b9b1a-b753-4171-93dd-539da3ea56d0",
+      "id": "8a99fd74-1212-46db-a3dd-888bf671fe9a",
       "name": "Artifactory Health",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
       "position": [
-        20,
-        160
-      ]
+        384,
+        416
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     },
     {
       "parameters": {
@@ -695,14 +715,17 @@
           "timeout": 10000
         }
       },
-      "id": "af333369-738d-43ff-92e4-4d6959f8ea28",
+      "id": "4a2e4cf8-e768-4cc3-9994-ed754e4843a6",
       "name": "Artifactory Liveness",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
       "position": [
-        280,
-        480
-      ]
+        640,
+        736
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     },
     {
       "parameters": {
@@ -712,14 +735,17 @@
           "timeout": 10000
         }
       },
-      "id": "615c3c75-6a67-47e0-a20a-f5d8018ac541",
+      "id": "084c1e8d-fad3-49a2-b4ed-91c5fdf63d71",
       "name": "Artifactory Readiness",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 2,
       "position": [
-        420,
-        660
-      ]
+        784,
+        912
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 10000
     }
   ],
   "pinData": {},
@@ -757,6 +783,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2023-05-09T21:26:49.840Z",
-  "versionId": "41bd8190-db46-44a0-849c-b51750d900fe"
+  "updatedAt": "2026-06-23T20:17:45.114Z",
+  "versionId": "6928342b-999f-4bab-bc24-780da4e92cd0"
 }
