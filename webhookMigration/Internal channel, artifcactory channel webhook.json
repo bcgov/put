@@ -3,15 +3,18 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "devx-router/:route",
+        "path": "internal-router/:route",
         "options": {}
       },
       "webhookId": "7499cb76-ae1d-4f73-9d2f-d67afb9b0158",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [1088, 6672],
-      "id": "6899d4f2-8723-4e6e-b650-55a2c39f8789"
+      "position": [
+        736,
+        7184
+      ],
+      "id": "f5f46bb6-f4b7-467c-9f97-3fdbdea744ff"
     },
     {
       "parameters": {
@@ -21,8 +24,11 @@
       "name": "DevX Message Connector - internal-platform-services",
       "type": "CUSTOM.devXMessageConnector",
       "typeVersion": 0.1,
-      "position": [1536, 6480],
-      "id": "834b5cc5-f02d-450d-ad3e-5d74d9b30420",
+      "position": [
+        1184,
+        6896
+      ],
+      "id": "0be8ea70-a861-4fd0-afb4-6693ca54ab09",
       "credentials": {
         "devXConnector": {
           "id": "dj37rgSEG50Hit5E",
@@ -54,16 +60,22 @@
       "name": "Route Switch",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
-      "position": [1312, 6640],
-      "id": "ebee4bec-a7a4-4634-96db-ab2b2ef229a6"
+      "position": [
+        960,
+        7152
+      ],
+      "id": "c6bfb9cf-e666-46a0-87b5-984a786e57c6"
     },
     {
       "parameters": {},
       "name": "Unknown Route (NoOp)",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1360, 7008],
-      "id": "9d16bac8-c8e0-40b8-aa43-01d1b7b74d13"
+      "position": [
+        1232,
+        7472
+      ],
+      "id": "c9cc6729-c55a-42c5-9bb8-87b22450771c"
     },
     {
       "parameters": {
@@ -73,8 +85,11 @@
       "name": "DevX Message Connector - artifactory-project-approvals",
       "type": "CUSTOM.devXMessageConnector",
       "typeVersion": 0.1,
-      "position": [1536, 6672],
-      "id": "44ab25f2-f85f-44d6-9b66-d2dbf8b3074e",
+      "position": [
+        1184,
+        7088
+      ],
+      "id": "61f4c19c-f193-4caa-9540-032d270c6cdb",
       "credentials": {
         "devXConnector": {
           "id": "FqmWgQFswdJtvsy6",
@@ -90,8 +105,11 @@
       "name": "DevX Message Connector - devops-vault",
       "type": "CUSTOM.devXMessageConnector",
       "typeVersion": 0.1,
-      "position": [1536, 6832],
-      "id": "9141be37-e1a6-483e-960a-3e60a928499d",
+      "position": [
+        1184,
+        7280
+      ],
+      "id": "1e0d0daf-4bfb-4915-ab37-dbee1ebb5525",
       "credentials": {
         "devXConnector": {
           "id": "QXno6mkPANcDjVxW",
