@@ -526,13 +526,7 @@
   "connections": {
     "When clicking \"Execute Workflow\"": {
       "main": [
-        [
-          {
-            "node": "Ensure Table",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Ensure Table": {
@@ -1054,6 +1048,6 @@
   },
   "tags": [],
   "triggerCount": 1,
-  "updatedAt": "2026-06-22T21:06:17.402Z",
-  "versionId": "a19212fb-5fed-449e-83bc-3108b1307b8d"
+  "updatedAt": "2026-07-22T20:25:07.518Z",
+  "versionId": "52e15945-6305-4abc-81be-dae94a1ec557"
 }
