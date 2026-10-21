@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2025-12-23T22:20:38.124Z",
-    "createdAt": "2025-12-23T22:20:38.124Z",
-    "versionId": "d45966ca-4b0b-4921-9767-c0427b0b4b26",
+    "updatedAt": "2026-09-17T01:06:39.970Z",
+    "createdAt": "2026-09-17T01:06:36.557Z",
+    "versionId": "11862579-3c6e-4ee0-8b78-634898e978b6",
     "workflowId": "28",
     "nodes": [
       {
@@ -12,63 +12,63 @@
           "height": 217,
           "width": 717
         },
-        "id": "9b977dfc-7a59-4569-a5b2-66eb0623ae9e",
+        "id": "3aab9cb8-98d6-45de-84e4-f433d98aabb5",
         "name": "Sticky Note",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          -40,
-          -140
+          1200,
+          -112
         ]
       },
       {
         "parameters": {
-          "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]'|jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.value' | tr -d '\\n'"
+          "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]'|jq -r '.[] | select(.name == \"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\").data.value' | tr -d '\\n'"
         },
-        "id": "d98086d9-16a7-4567-8ff0-58047735bf4a",
+        "id": "d8a1ea4b-15ac-41a9-8b30-84e21a9b823e",
         "name": "Get Token",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          200,
-          100
+          1440,
+          128
         ]
       },
       {
         "parameters": {
-          "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]' | jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.name' | sed \"s/<token>/{{ $json.stdout }}/g\" "
+          "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]' | jq -r '.[] | select(.name == \"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\").data.name' | sed \"s/<token>/{{ $json.stdout }}/g\" "
         },
-        "id": "7ebaa3c3-1535-4724-8b6e-75aa8c8ffe2a",
+        "id": "097fb6ad-0e00-4caf-92e0-8f6441a84c3f",
         "name": "Build Login",
         "type": "n8n-nodes-base.executeCommand",
         "typeVersion": 1,
         "position": [
-          340,
-          100
+          1584,
+          128
         ]
       },
       {
         "parameters": {},
-        "id": "217c912d-0c76-4735-9c34-dec96eb4920b",
+        "id": "11d8b456-08c3-4e61-aaa5-31e2e311c228",
         "name": "Execute Workflow Trigger",
         "type": "n8n-nodes-base.executeWorkflowTrigger",
         "typeVersion": 1,
         "position": [
-          0,
-          100
+          1248,
+          128
         ]
       },
       {
         "parameters": {
-          "jsCode": "return [{ \"ocLogin\": $('Build Login').item.json.stdout }];"
+          "jsCode": "const inputs = $('Execute Workflow Trigger').all();\nreturn $input.all().map((item, index) => ({\n  json: { ...inputs[index].json, ocLogin: item.json.stdout },\n}));"
         },
-        "id": "e2b00ace-fca3-4bc9-b522-49588b5fef29",
+        "id": "e48d4204-0de5-4ed1-8ee8-834e97f0a9bc",
         "name": "Code",
         "type": "n8n-nodes-base.code",
         "typeVersion": 1,
         "position": [
-          500,
-          100
+          1744,
+          128
         ]
       }
     ],
@@ -107,12 +107,12 @@
         ]
       }
     },
-    "authors": "system migration",
-    "name": null,
-    "description": null,
+    "authors": "Billy li",
+    "name": "Version 11862579",
+    "description": "",
     "autosaved": false
   },
-  "activeVersionId": "d45966ca-4b0b-4921-9767-c0427b0b4b26",
+  "activeVersionId": "11862579-3c6e-4ee0-8b78-634898e978b6",
   "connections": {
     "Get Token": {
       "main": [
@@ -160,63 +160,63 @@
         "height": 217,
         "width": 717
       },
-      "id": "9b977dfc-7a59-4569-a5b2-66eb0623ae9e",
+      "id": "3aab9cb8-98d6-45de-84e4-f433d98aabb5",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -40,
-        -140
+        1200,
+        -112
       ]
     },
     {
       "parameters": {
-        "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]'|jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.value' | tr -d '\\n'"
+        "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]'|jq -r '.[] | select(.name == \"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\").data.value' | tr -d '\\n'"
       },
-      "id": "d98086d9-16a7-4567-8ff0-58047735bf4a",
+      "id": "d8a1ea4b-15ac-41a9-8b30-84e21a9b823e",
       "name": "Get Token",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        200,
-        100
+        1440,
+        128
       ]
     },
     {
       "parameters": {
-        "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]' | jq -r '.[] | select(.name | contains(\"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\")).data.name' | sed \"s/<token>/{{ $json.stdout }}/g\" "
+        "command": "=n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]' | jq -r '.[] | select(.name == \"{{ $node[\"Execute Workflow Trigger\"].json.tokenName }}\").data.name' | sed \"s/<token>/{{ $json.stdout }}/g\" "
       },
-      "id": "7ebaa3c3-1535-4724-8b6e-75aa8c8ffe2a",
+      "id": "097fb6ad-0e00-4caf-92e0-8f6441a84c3f",
       "name": "Build Login",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        340,
-        100
+        1584,
+        128
       ]
     },
     {
       "parameters": {},
-      "id": "217c912d-0c76-4735-9c34-dec96eb4920b",
+      "id": "11d8b456-08c3-4e61-aaa5-31e2e311c228",
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        0,
-        100
+        1248,
+        128
       ]
     },
     {
       "parameters": {
-        "jsCode": "return [{ \"ocLogin\": $('Build Login').item.json.stdout }];"
+        "jsCode": "const inputs = $('Execute Workflow Trigger').all();\nreturn $input.all().map((item, index) => ({\n  json: { ...inputs[index].json, ocLogin: item.json.stdout },\n}));"
       },
-      "id": "e2b00ace-fca3-4bc9-b522-49588b5fef29",
+      "id": "e48d4204-0de5-4ed1-8ee8-834e97f0a9bc",
       "name": "Code",
       "type": "n8n-nodes-base.code",
       "typeVersion": 1,
       "position": [
-        500,
-        100
+        1744,
+        128
       ]
     }
   ],
@@ -256,6 +256,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2025-11-13T22:59:03.514Z",
-  "versionId": "d45966ca-4b0b-4921-9767-c0427b0b4b26"
+  "updatedAt": "2026-09-17T01:06:36.555Z",
+  "versionId": "11862579-3c6e-4ee0-8b78-634898e978b6"
 }
