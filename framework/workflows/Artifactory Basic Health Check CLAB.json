@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2026-06-23T20:17:28.220Z",
-    "createdAt": "2026-06-23T20:17:26.422Z",
-    "versionId": "2ddb3af5-9574-485e-90e2-d340dc35edf3",
+    "updatedAt": "2026-10-01T16:47:55.878Z",
+    "createdAt": "2026-10-01T16:47:55.878Z",
+    "versionId": "5964a694-b495-475d-82e9-13bcdf20bdc9",
     "workflowId": "3",
     "nodes": [
       {
@@ -12,22 +12,18 @@
             "string": [
               {
                 "value1": "={{ $node[\"Artifactory Health\"].json[\"router\"][\"message\"] }}",
-                "operation": "contains",
                 "value2": "OK"
               },
               {
                 "value1": "={{ $node[\"Artifactory Ping\"].json.data }}",
-                "operation": "contains",
                 "value2": "OK"
               },
               {
-                "value1": "={{ $node[\"Artifactory Liveness\"].json.data }}",
-                "operation": "contains",
+                "value1": "={{ $node[\"Artifactory Liveness\"].json.data.code }}",
                 "value2": "OK"
               },
               {
-                "value1": "={{ $node[\"Artifactory Readiness\"].json.data }}",
-                "operation": "contains",
+                "value1": "={{ $node[\"Artifactory Readiness\"].json.data.code }}",
                 "value2": "OK"
               }
             ]
@@ -321,7 +317,7 @@
         ],
         "retryOnFail": true,
         "maxTries": 3,
-        "waitBetweenTries": 10000
+        "waitBetweenTries": 5000
       }
     ],
     "connections": {
@@ -455,11 +451,11 @@
       }
     },
     "authors": "Billy li",
-    "name": "Version 2ddb3af5",
-    "description": "",
+    "name": null,
+    "description": null,
     "autosaved": false
   },
-  "activeVersionId": "2ddb3af5-9574-485e-90e2-d340dc35edf3",
+  "activeVersionId": "5964a694-b495-475d-82e9-13bcdf20bdc9",
   "connections": {
     "IF": {
       "main": [
@@ -602,22 +598,18 @@
           "string": [
             {
               "value1": "={{ $node[\"Artifactory Health\"].json[\"router\"][\"message\"] }}",
-              "operation": "contains",
               "value2": "OK"
             },
             {
               "value1": "={{ $node[\"Artifactory Ping\"].json.data }}",
-              "operation": "contains",
               "value2": "OK"
             },
             {
-              "value1": "={{ $node[\"Artifactory Liveness\"].json.data }}",
-              "operation": "contains",
+              "value1": "={{ $node[\"Artifactory Liveness\"].json.data.code }}",
               "value2": "OK"
             },
             {
-              "value1": "={{ $node[\"Artifactory Readiness\"].json.data }}",
-              "operation": "contains",
+              "value1": "={{ $node[\"Artifactory Readiness\"].json.data.code }}",
               "value2": "OK"
             }
           ]
@@ -911,14 +903,15 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 10000
+      "waitBetweenTries": 5000
     }
   ],
   "pinData": {},
   "settings": {
     "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": "41"
+    "errorWorkflow": "41",
+    "availableInMCP": false
   },
   "shared": [
     {
@@ -949,6 +942,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2026-06-23T20:17:26.418Z",
-  "versionId": "2ddb3af5-9574-485e-90e2-d340dc35edf3"
+  "updatedAt": "2026-10-01T16:47:55.876Z",
+  "versionId": "5964a694-b495-475d-82e9-13bcdf20bdc9"
 }
