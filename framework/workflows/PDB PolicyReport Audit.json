@@ -118,10 +118,10 @@
     },
     {
       "parameters": {
-        "command": "=#!/usr/bin/env bash\nset -euo pipefail\n\nCLUSTER='{{ $json.cluster }}'\nexport KUBECONFIG=\"/tmp/pdb-policyreport-${CLUSTER}.kubeconfig\"\ntrap 'rm -f \"$KUBECONFIG\"' EXIT\n\n{{ $json.ocLogin }}\nprintf 'cluster\\tnamespace\\tpolicy\\trule\\tresult\\tmessage\\tresources\\n'\n# Kyverno PolicyReports can be stale; evaluate its PDB rule against live status.\noc get poddisruptionbudgets -A -o json | jq -r --arg cluster \"$CLUSTER\" '\n.items[]\n| select((.metadata.namespace | test(\"^(kyverno$|kube-|openshift-)\")) | not)\n| select((.spec.selector.matchLabels // {} | length) > 0)\n| select((.status.expectedPods // 0) > 0)\n| select((.status.disruptionsAllowed // 0) == 0)\n| [\n    $cluster,\n    .metadata.namespace,\n    \"pdb-replicas-audit\",\n    \"pdb-replicas-audit\",\n    \"fail\",\n    \"PDB will block eviction of \\(.status.expectedPods) pod(s)\",\n    \"PodDisruptionBudget/\\(.metadata.name)\"\n  ]\n| @tsv\n'\n"
+        "command": "=#!/usr/bin/env bash\nset -euo pipefail\n\nCLUSTER='{{ $json.cluster }}'\nexport KUBECONFIG=\"/tmp/pdb-policyreport-${CLUSTER}.kubeconfig\"\ntrap 'rm -f \"$KUBECONFIG\"' EXIT\n\n{{ $json.ocLogin }}\nprintf 'cluster\\tnamespace\\tpolicy\\trule\\tresult\\tmessage\\tresources\\n'\noc get policyreports.wgpolicyk8s.io -A -o json | jq -r --arg cluster \"$CLUSTER\" '\n  .items[] as $pr\n  | ($pr.metadata.namespace // \"-\") as $ns\n  | $pr.results[]?\n  | select((.policy | test(\"^pdb-replicas-\")) and .result == \"fail\")\n  | [\n      $cluster,\n      $ns,\n      .policy,\n      .rule,\n      .result,\n      (.message // \"\" | gsub(\"\\n\"; \" \")),\n      ((.resources // []) | map((.kind // \"?\") + \"/\" + (.name // \"?\")) | join(\",\"))\n    ]\n  | @tsv\n'"
       },
       "id": "1ca4c893-9625-44f9-8053-520a1e2c3ee8",
-      "name": "Find Current PDB Failures",
+      "name": "Find Failed PDB PolicyReports",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
@@ -209,7 +209,7 @@
     },
     {
       "parameters": {
-        "content": "## Current PDB eviction audit\n\nRuns every Sunday at 10:00 PM, America/Vancouver. It reads live PodDisruptionBudget status for gold, golddr, silver, klab, clab, emerald, and klab2, applying the same conditions as Kyverno's `pdb-replicas-audit` rule: an eligible namespace, a nonempty `matchLabels` selector, `expectedPods > 0`, and `disruptionsAllowed = 0`. Stored Kyverno PolicyReports can be stale, so notifications use current PDB status. It then gets Registry contacts for each affected licence plate.\n\nCredentials are named `PDB_reader_<cluster>` and use the shared OC Login component (workflow 28). `Registry_API_Credential` stores the Registry client ID and secret.",
+        "content": "## Failed PDB policy reports\n\nRuns every Sunday at 10:00 PM, America/Vancouver. It finds failed `pdb-replicas-*` policy reports for gold, golddr, silver, klab, clab, emerald, and klab2, then gets Registry contacts for each affected licence plate.\n\nCredentials are named `PDB_reader_<cluster>` and use the shared OC Login component (workflow 28). `Registry_API_Credential` stores the Registry client ID and secret.",
         "height": 260,
         "width": 760
       },
@@ -308,14 +308,14 @@
       "main": [
         [
           {
-            "node": "Find Current PDB Failures",
+            "node": "Find Failed PDB PolicyReports",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Find Current PDB Failures": {
+    "Find Failed PDB PolicyReports": {
       "main": [
         [
           {
