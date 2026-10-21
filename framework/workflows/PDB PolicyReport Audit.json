@@ -1,4 +1,585 @@
 {
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-10-21T23:29:50.903Z",
+    "createdAt": "2026-10-21T23:29:50.903Z",
+    "versionId": "52992888-4118-4148-8db8-1fc0b4dc43ba",
+    "workflowId": "MyLWZYC29Xl3S2SC",
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "return [{ json: { products: $input.all().map(({ json }) => json) } }];"
+        },
+        "id": "3c86b21f-85ca-4eee-82fc-b7f1f2fbcd66",
+        "name": "Prepare PDB Notification",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          20704,
+          8288
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://n8n.developer.gov.bc.ca/webhook/pdb-router",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json }}",
+          "options": {}
+        },
+        "id": "9d8e6939-e0e6-497b-b8ab-118841f5bc49",
+        "name": "Send PDB Notification",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          20928,
+          8288
+        ]
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "bfff15f9-ddb3-46af-a487-b484acc421ae",
+        "name": "Loop Registry Products",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          20256,
+          8192
+        ]
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "dd28bbcd-84f5-4e70-8749-e3d1e875c43f",
+        "name": "Loop Over Clusters",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          19136,
+          8096
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "43989649-8c21-498d-bd1a-9aee37ae94b4",
+        "name": "When clicking \"Execute Workflow\"",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          18688,
+          8288
+        ]
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "weeks",
+                "triggerAtHour": 22
+              }
+            ]
+          }
+        },
+        "id": "719aa04f-5a5e-4447-a07e-d6ce291d4529",
+        "name": "Schedule Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1,
+        "position": [
+          18688,
+          8096
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return ['gold', 'golddr', 'silver', 'klab', 'clab', 'emerald', 'klab2'].map((cluster) => ({\n  json: { cluster, tokenName: `PDB_reader_${cluster}` },\n}));"
+        },
+        "id": "134031fc-eb01-4f2e-b75b-76eae747a395",
+        "name": "Clusters",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          18912,
+          8096
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": "28",
+          "options": {}
+        },
+        "id": "f37ed0f6-101c-44e1-87f2-ea0575f6b510",
+        "name": "Build Login Command",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1,
+        "position": [
+          19360,
+          7712
+        ],
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "command": "=#!/usr/bin/env bash\nset -euo pipefail\n\nCLUSTER='{{ $json.cluster }}'\nexport KUBECONFIG=\"/tmp/pdb-policyreport-${CLUSTER}.kubeconfig\"\ntrap 'rm -f \"$KUBECONFIG\"' EXIT\n\n{{ $json.ocLogin }}\nprintf 'cluster\\tnamespace\\tpolicy\\trule\\tresult\\tmessage\\tresources\\n'\noc get policyreports.wgpolicyk8s.io -A -o json | jq -r --arg cluster \"$CLUSTER\" '\n  .items[] as $pr\n  | ($pr.metadata.namespace // \"-\") as $ns\n  | $pr.results[]?\n  | select((.policy | test(\"^pdb-replicas-\")) and .result == \"fail\")\n  | [\n      $cluster,\n      $ns,\n      .policy,\n      .rule,\n      .result,\n      (.message // \"\" | gsub(\"\\n\"; \" \")),\n      ((.resources // []) | map((.kind // \"?\") + \"/\" + (.name // \"?\")) | join(\",\"))\n    ]\n  | @tsv\n'"
+        },
+        "id": "1ca4c893-9625-44f9-8053-520a1e2c3ee8",
+        "name": "Find Failed PDB PolicyReports",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          19584,
+          8000
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const header = 'cluster\\tnamespace\\tpolicy\\trule\\tresult\\tmessage\\tresources';\nconst namespaces = new Map();\n\nfor (const { json } of $input.all()) {\n  const rows = String(json.stdout || '').trim().split('\\n');\n  const headerIndex = rows.indexOf(header);\n  if (headerIndex < 0) continue;\n\n  for (const row of rows.slice(headerIndex + 1)) {\n    const [cluster, namespace] = row.split('\\t');\n    if (cluster && namespace) namespaces.set(`${cluster}/${namespace}`, { cluster, namespace });\n  }\n}\n\nreturn [{ json: { misconfiguredNamespaces: [...namespaces.values()] } }];"
+        },
+        "id": "893042c4-c232-4acb-a5ec-5b0872118165",
+        "name": "Gather Misconfigured Namespaces",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          19376,
+          8000
+        ]
+      },
+      {
+        "parameters": {
+          "command": "=#!/usr/bin/env bash\nset -euo pipefail\n\ncredential=$(n8n export:credentials --all --decrypted | grep -o '\\[{.*\\}]' | jq -c '.[] | select(.name == \"Registry_API_Credential\") | {clientId: .data.name, clientSecret: .data.value}')\nclient_id=$(jq -er '.clientId' <<<\"$credential\")\nclient_secret=$(jq -er '.clientSecret' <<<\"$credential\")\n\ncurl -fsS -X POST \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  --data-urlencode 'grant_type=client_credentials' \\\n  --data-urlencode \"client_id=$client_id\" \\\n  --data-urlencode \"client_secret=$client_secret\" \\\n  'https://loginproxy.gov.bc.ca/auth/realms/platform-services/protocol/openid-connect/token' \\\n  | jq -er '.access_token'"
+        },
+        "id": "2f95a72a-bb45-492e-8a03-5feb69121bfb",
+        "name": "Get Registry Access Token",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          19584,
+          8192
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{\n  json: {\n    accessToken: String($json.stdout || '').trim(),\n    misconfiguredNamespaces: $('Gather Misconfigured Namespaces').first().json.misconfiguredNamespaces,\n  },\n}];"
+        },
+        "id": "ada0584b-0b1f-473a-883e-b0688c0b9e23",
+        "name": "Attach Findings to Registry Token",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          19808,
+          8192
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const { accessToken, misconfiguredNamespaces = [] } = $input.first().json;\nconst products = new Map();\n\nfor (const finding of misconfiguredNamespaces) {\n  const licencePlate = String(finding.namespace).slice(0, 6);\n  if (!products.has(licencePlate)) products.set(licencePlate, []);\n  products.get(licencePlate).push(finding);\n}\n\nreturn [...products].map(([licencePlate, namespaces]) => ({\n  json: { accessToken, licencePlate, namespaces },\n}));"
+        },
+        "id": "eedce93c-caec-43cb-9c5a-cfed80b363e3",
+        "name": "Build Registry Lookup Items",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          20032,
+          8192
+        ]
+      },
+      {
+        "parameters": {
+          "command": "=curl -fsS \\\n  -H \"Authorization: Bearer {{ $json.accessToken }}\" \\\n  \"https://registry.developer.gov.bc.ca/api/v1/private-cloud/products/{{ $json.licencePlate }}\""
+        },
+        "id": "c420e708-39c1-4ee7-a0ae-d2fe4d45173e",
+        "name": "Get Registry Products",
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          20416,
+          8528
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const lookups = $('Build Registry Lookup Items').all();\n\nreturn $input.all().map((item, index) => {\n  const response = JSON.parse(item.json.stdout);\n  if (!response.success || !response.data) {\n    throw new Error(`Registry lookup failed for ${lookups[index].json.licencePlate}`);\n  }\n\n  const product = response.data;\n  const contacts = [\n    ['projectOwner', product.projectOwner],\n    ['primaryTechnicalLead', product.primaryTechnicalLead],\n    ['secondaryTechnicalLead', product.secondaryTechnicalLead],\n  ]\n    .filter(([, contact]) => contact)\n    .map(([role, contact]) => ({\n      role,\n      name: [contact.firstName, contact.lastName].filter(Boolean).join(' '),\n      email: contact.email,\n    }));\n\n  return {\n    json: {\n      licencePlate: lookups[index].json.licencePlate,\n      productName: product.name,\n      contacts,\n      namespaces: lookups[index].json.namespaces,\n    },\n  };\n});"
+        },
+        "id": "db1d5ab2-c87b-4b4f-93af-c602b74a65ad",
+        "name": "Extract Registry Contacts",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          20480,
+          8288
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Failed PDB policy reports\n\nRuns every Sunday at 10:00 PM, America/Vancouver. It finds failed `pdb-replicas-*` policy reports for gold, golddr, silver, klab, clab, emerald, and klab2, then gets Registry contacts for each affected licence plate.\n\nCredentials are named `PDB_reader_<cluster>` and use the shared OC Login component (workflow 28). `Registry_API_Credential` stores the Registry client ID and secret.",
+          "height": 260,
+          "width": 760
+        },
+        "id": "758ea7ae-fa45-4d89-a95d-7e42dc981218",
+        "name": "How this works",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          18896,
+          7456
+        ]
+      }
+    ],
+    "connections": {
+      "When clicking \"Execute Workflow\"": {
+        "main": [
+          [
+            {
+              "node": "Clusters",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Clusters": {
+        "main": [
+          [
+            {
+              "node": "Gather Misconfigured Namespaces",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Build Login Command",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Clusters",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Clusters": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Clusters",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Login Command": {
+        "main": [
+          [
+            {
+              "node": "Find Failed PDB PolicyReports",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find Failed PDB PolicyReports": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Clusters",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gather Misconfigured Namespaces": {
+        "main": [
+          [
+            {
+              "node": "Get Registry Access Token",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Registry Access Token": {
+        "main": [
+          [
+            {
+              "node": "Attach Findings to Registry Token",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Attach Findings to Registry Token": {
+        "main": [
+          [
+            {
+              "node": "Build Registry Lookup Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Registry Lookup Items": {
+        "main": [
+          [
+            {
+              "node": "Loop Registry Products",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Registry Products": {
+        "main": [
+          [
+            {
+              "node": "Extract Registry Contacts",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get Registry Products",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Registry Products": {
+        "main": [
+          [
+            {
+              "node": "Loop Registry Products",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Registry Contacts": {
+        "main": [
+          [
+            {
+              "node": "Prepare PDB Notification",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare PDB Notification": {
+        "main": [
+          [
+            {
+              "node": "Send PDB Notification",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Billy li",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "52992888-4118-4148-8db8-1fc0b4dc43ba",
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Clusters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Clusters": {
+      "main": [
+        [
+          {
+            "node": "Gather Misconfigured Namespaces",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Login Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clusters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clusters": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Clusters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Login Command": {
+      "main": [
+        [
+          {
+            "node": "Find Failed PDB PolicyReports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Failed PDB PolicyReports": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Clusters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gather Misconfigured Namespaces": {
+      "main": [
+        [
+          {
+            "node": "Get Registry Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Registry Access Token": {
+      "main": [
+        [
+          {
+            "node": "Attach Findings to Registry Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach Findings to Registry Token": {
+      "main": [
+        [
+          {
+            "node": "Build Registry Lookup Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Registry Lookup Items": {
+      "main": [
+        [
+          {
+            "node": "Loop Registry Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Registry Products": {
+      "main": [
+        [
+          {
+            "node": "Extract Registry Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Registry Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Registry Products": {
+      "main": [
+        [
+          {
+            "node": "Loop Registry Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Registry Contacts": {
+      "main": [
+        [
+          {
+            "node": "Prepare PDB Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare PDB Notification": {
+      "main": [
+        [
+          {
+            "node": "Send PDB Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-09-16T21:47:44.742Z",
+  "id": "MyLWZYC29Xl3S2SC",
+  "isArchived": false,
+  "meta": null,
+  "name": "PDB PolicyReport Audit",
   "nodes": [
     {
       "parameters": {
@@ -223,178 +804,28 @@
       ]
     }
   ],
-  "connections": {
-    "Prepare PDB Notification": {
-      "main": [
-        [
-          {
-            "node": "Send PDB Notification",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Loop Registry Products": {
-      "main": [
-        [
-          {
-            "node": "Extract Registry Contacts",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Get Registry Products",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Loop Over Clusters": {
-      "main": [
-        [
-          {
-            "node": "Gather Misconfigured Namespaces",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Build Login Command",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "When clicking \"Execute Workflow\"": {
-      "main": [
-        [
-          {
-            "node": "Clusters",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Schedule Trigger": {
-      "main": [
-        [
-          {
-            "node": "Clusters",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Clusters": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Clusters",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Build Login Command": {
-      "main": [
-        [
-          {
-            "node": "Find Failed PDB PolicyReports",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Find Failed PDB PolicyReports": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Clusters",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Gather Misconfigured Namespaces": {
-      "main": [
-        [
-          {
-            "node": "Get Registry Access Token",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Registry Access Token": {
-      "main": [
-        [
-          {
-            "node": "Attach Findings to Registry Token",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Attach Findings to Registry Token": {
-      "main": [
-        [
-          {
-            "node": "Build Registry Lookup Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Build Registry Lookup Items": {
-      "main": [
-        [
-          {
-            "node": "Loop Registry Products",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Registry Products": {
-      "main": [
-        [
-          {
-            "node": "Loop Registry Products",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract Registry Contacts": {
-      "main": [
-        [
-          {
-            "node": "Prepare PDB Notification",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-09-16T21:47:44.742Z",
+      "createdAt": "2026-09-16T21:47:44.742Z",
+      "role": "workflow:owner",
+      "workflowId": "MyLWZYC29Xl3S2SC",
+      "projectId": "8TL7f7Zh5T94reb3"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
     }
   },
-  "pinData": {},
-  "meta": {
-    "instanceId": "c2a9f7d67da59ff35a95e297fb86c74cce47a81a86b2e53fd994d5c3a75af39c"
-  }
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-10-21T23:29:50.901Z",
+  "versionId": "52992888-4118-4148-8db8-1fc0b4dc43ba"
 }
